@@ -1,0 +1,36 @@
+{
+  "name": "dsh-rules-manager",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness (dsh) rules & commands manager: /rules slash command, settings panel with visual rule editing, command list, and user-defined custom commands",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "service.js",
+    "rules-core.js",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "rules",
+    "commands",
+    "agent"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4",
+    "@deepseek-ai/dsh-home-paths": ">=0.1.0",
+    "@deepseek-ai/dsh-typert-protocol": ">=0.1.0"
+  },
+  "scripts": {
+    "test": "node test-service.js && node test-local.js"
+  }
+}

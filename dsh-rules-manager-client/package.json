@@ -1,0 +1,40 @@
+{
+  "name": "dsh-rules-manager-client",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness (dsh) settings panel: '命令与规则' — visual rule editing, slash command list, and user-defined custom command management (client bundle for dsh-rules-manager)",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "settings",
+    "rules",
+    "commands",
+    "agent"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

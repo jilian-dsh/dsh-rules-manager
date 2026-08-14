@@ -1,6 +1,6 @@
 {
   "name": "dsh-rules-manager-client",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "DeepSeek Harness (dsh) settings panel: '命令与规则' — visual rule editing, slash command list, user-defined custom command management (with {input} argument support), and backup restore (client bundle for dsh-rules-manager)",
   "type": "module",
   "main": "index.js",

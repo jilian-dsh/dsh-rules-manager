@@ -2,7 +2,7 @@
 // 职责：解析 AGENTS.md、备份、写入、增删改操作。不依赖 Cordis/UI，纯 Node。
 import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
 import { join } from "node:path";
-import { readFile, writeFile, copyFile, mkdir, readdir, unlink } from "node:fs/promises";
+import { readFile, writeFile, copyFile, mkdir, readdir, unlink, stat } from "node:fs/promises";
 
 const MAX_BACKUPS = 5;
 
@@ -69,7 +69,8 @@ export async function loadRules() {
 async function backupAgents(file) {
 	const dir = join(resolveDshHome(), ".backups");
 	await mkdir(dir, { recursive: true });
-	const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+	// 时间戳含毫秒（slice 到 23）：避免同一秒内多次操作互相覆盖备份
+	const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 23);
 	const dest = join(dir, `AGENTS.md-${stamp}.bak`);
 	await copyFile(file, dest);
 	const files = (await readdir(dir))
@@ -159,4 +160,77 @@ export function disableRuleOp(lines, rules, index) {
 		lines: nextLines,
 		removed
 	};
+}
+
+// ── 备份管理（迭代②：备份清单 + 一键恢复）──────────────────────────
+
+/** 备份目录绝对路径 */
+export function backupsDir() {
+	return join(resolveDshHome(), ".backups");
+}
+
+/** 把备份文件名里的 UTC 时间戳转成本地时间字符串（文件名来自 toISOString，UTC；毫秒可选） */
+function backupTimeLocal(name) {
+	const m = name.match(/^AGENTS\.md-(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})(?:-(\d{3}))?\.bak$/);
+	if (!m) return "";
+	const d = new Date(`${m[1]}T${m[2]}:${m[3]}:${m[4]}${m[5] ? "." + m[5] : ""}Z`);
+	if (Number.isNaN(d.getTime())) return "";
+	const p = (n) => String(n).padStart(2, "0");
+	return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+/** 统计文本中的规则条数（宽松匹配标题行，与 loadRules 的正则口径一致） */
+export function countRulesInText(raw) {
+	const text = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
+	let count = 0;
+	for (const line of text.split("\n")) {
+		if (/^###\s*\[规则\s*\d+\]/u.test(line)) count++;
+	}
+	return count;
+}
+
+/** 列出全部备份（时间升序），每条含 name/本地时间/大小(字节)/规则条数 */
+export async function listBackups() {
+	const dir = backupsDir();
+	await mkdir(dir, { recursive: true });
+	const entries = await readdir(dir, { withFileTypes: true });
+	const names = entries
+		.filter((e) => e.isFile() && /^AGENTS\.md-.+\.bak$/u.test(e.name))
+		.map((e) => e.name)
+		.sort();
+	const result = [];
+	for (const name of names) {
+		const file = join(dir, name);
+		const s = await stat(file);
+		const raw = await readFile(file, "utf8");
+		result.push({
+			name,
+			time: backupTimeLocal(name),
+			size: s.size,
+			rulesCount: countRulesInText(raw)
+		});
+	}
+	return result;
+}
+
+/**
+ * 一键恢复备份：先把当前 AGENTS.md 再备份一份（双保险），再把备份内容写回。
+ * @returns {{ok:true, safety:string} | {error:string}}
+ */
+export async function restoreBackupOp(name) {
+	if (typeof name !== "string" || !/^AGENTS\.md-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3})?\.bak$/u.test(name)) {
+		return { error: "备份文件名不合法" };
+	}
+	const file = join(backupsDir(), name);
+	let raw;
+	try {
+		raw = await readFile(file, "utf8");
+	} catch (error) {
+		if (error && error.code === "ENOENT") return { error: `备份不存在：${name}` };
+		throw error;
+	}
+	const current = agentsFilePath();
+	const safety = await backupAgents(current); // 恢复前先备份当前状态
+	await writeFile(current, raw, "utf8");
+	return { ok: true, safety };
 }

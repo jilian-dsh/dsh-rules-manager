@@ -1,7 +1,7 @@
 // service.js 隔离测试：手动 Remote 标记 + 全部 Remote 方法 + C3 用户自定义命令
 // 运行：node "D:\DeepSeek harness\.dsh\profiles\web\rules-manager\test-service.js"
 // 使用固定 fixture（不依赖真实 AGENTS.md），测试稳定可重复。
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { remoteMethods } from "@deepseek-ai/dsh-typert-protocol";
@@ -60,8 +60,8 @@ const t = (name, cond) => {
 
 // ── 1. 手动 Remote 标记 ─────────────────────────────────────────────
 const methods = remoteMethods(svc).map((m) => m.method);
-t("remoteMethods 标记 11 个方法", methods.length === 11);
-for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand"]) {
+t("remoteMethods 标记 13 个方法", methods.length === 13);
+for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand"]) {
 	t(`含 ${m}`, methods.includes(m));
 }
 
@@ -131,6 +131,34 @@ t("deleteUserCommand ok", removed.ok === true);
 t("命令已注销", !registered.has("backup-note"));
 t("listUserCommands 不再含 backup-note", !(await svc.listUserCommands()).commands.some((c) => c.name === "backup-note"));
 t("删除不存在命令 error", (await svc.deleteUserCommand("nope")).ok === false);
+
+// ── 4.5 备份与恢复（迭代②）────────────────────────────────────────
+const bks = await svc.listBackups();
+t("listBackups ok（≥1 份）", bks.ok === true && Array.isArray(bks.backups) && bks.backups.length >= 1);
+const first = bks.backups[0];
+t("备份字段齐全（name/time/size/rulesCount）", typeof first.name === "string" && /^AGENTS\.md-.+\.bak$/.test(first.name) && typeof first.time === "string" && first.time.length > 0 && typeof first.size === "number" && first.size > 0 && typeof first.rulesCount === "number" && first.rulesCount >= 1);
+t("备份按文件名（时间）升序", bks.backups.every((b, i) => i === 0 || bks.backups[i - 1].name < b.name));
+
+// 恢复验证：取备份 X，改坏 AGENTS.md，再恢复 X，内容应精确回到 X 的内容
+const target = bks.backups[bks.backups.length - 1]; // 用最新一份，最不可能被裁剪
+const targetContent = await readFile(join(home, ".backups", target.name), "utf8");
+const beforeRestore = await readFile(join(home, "AGENTS.md"), "utf8");
+t("恢复前目标备份与当前内容不同（fixture 无备份测试规则）", !targetContent.includes("备份测试规则") && !beforeRestore.includes("备份测试规则"));
+const bad = await svc.addRule("备份测试规则", "恢复前的临时内容");
+t("制造一次修改（addRule 备份测试规则）", bad.ok === true);
+const bksBeforeRestore = (await svc.listBackups()).backups.length;
+const restored = await svc.restoreBackup(target.name);
+t("restoreBackup ok（返回 safety 备份名）", restored.ok === true && typeof restored.safety === "string" && restored.safety.includes(".bak"));
+const afterRestore = await readFile(join(home, "AGENTS.md"), "utf8");
+t("恢复后内容精确等于目标备份内容", afterRestore === targetContent);
+t("恢复后临时规则已消失", !afterRestore.includes("备份测试规则"));
+let safetyExists = false;
+try { await access(restored.safety); safetyExists = true; } catch {}
+t("恢复前自动备份了当前状态（safety 备份文件已生成）", safetyExists);
+t("恢复后备份数不少于恢复前", (await svc.listBackups()).backups.length >= bksBeforeRestore);
+t("恢复后备份规则数与目标备份一致", (await svc.listBackups()).backups.some((b) => b.name === target.name));
+t("恢复不合法文件名 error", (await svc.restoreBackup("../evil")).ok === false);
+t("恢复不存在备份 error", (await svc.restoreBackup("AGENTS.md-2000-01-01T00-00-00.bak")).ok === false);
 
 // ── 5. 文件干净 ─────────────────────────────────────────────────────
 const after = await readFile(join(home, "AGENTS.md"), "utf8");

@@ -37,6 +37,12 @@
 - **命令名冲突防护**：自定义命令与系统命令（/rules、/compact 等）同名会被拒绝；
 - **命令名规范**：只能小写字母、数字、连字符或下划线（`/^[a-z][a-z0-9_-]*$/`）。
 
+## ⚠️ 已知问题与踩坑
+
+- **投递消息必须带 `id`**（严重，已修复）：早期版本自定义命令投递给 AI 的用户消息缺 `id` 字段，会写坏 DSH 会话日志、**锁死整个会话历史**（`history unavailable … lacks an identified message`）。修复：消息补 `id: randomUUID()`，测试已加 id 断言。
+- **这是 DSH 自身的机制缺口**：写入路径（`agent.followup`→`inbox.splice`、`session.append`）对消息 `id` 零校验，加载路径（`Session.fromRestore → assertMessageEventShape`）严格校验——不对称导致坏数据落盘后整会话拒载。已反馈官方：https://github.com/deepseek-ai/deepseek-harness/discussions/1121
+- 详细排查与修复记录见 [`docs/dsh-session-message-id-bug.md`](../docs/dsh-session-message-id-bug.md)。
+
 ## 📦 安装（DSH 插件装配三步）
 
 本仓库包含两个包，都需要装配：

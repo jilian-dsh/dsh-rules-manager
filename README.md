@@ -28,6 +28,7 @@ dsh-rules-manager/             host 插件（纯 Node，无需构建）
 dsh-rules-manager-client/      client 插件（浏览器 bundle）
 ├── client.js                  设置页「命令与规则」面板（手写 __ModuleLoader__ bundle）
 └── README.md                  面板说明
+docs/                          踩坑与反馈记录（DSH message.id 校验不对称 bug：修复 + 官方反馈存档）
 ```
 
 ## 快速开始

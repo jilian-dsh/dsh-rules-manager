@@ -1,14 +1,14 @@
 # dsh-rules-manager（规则与命令管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.1.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
 
-> DeepSeek Harness（DSH）的规则与命令管理插件：**/rules 斜杠命令** + 设置页**「命令与规则」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**）。
+> DeepSeek Harness（DSH）的规则与命令管理插件：**/rules 斜杠命令** + 设置页**「命令与规则」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**、**备份与一键恢复**）。
 >
-> ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**。
+> ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**，可随时**一键恢复到任意备份时刻**。
 
 ## ✨ 功能
 
@@ -17,6 +17,7 @@
 | 列出 / 查看 / 新增 / 修改 / 删除规则 | `/rules` 命令 或 设置→命令与规则 | 规则 = 用户全局规则（AGENTS.md），按分区组织，全文可视化编辑 |
 | 命令清单 | 设置→命令与规则 →「命令」 | 只读展示所有可用斜杠命令（名称/说明/用法） |
 | **自定义命令** | 设置→命令与规则 →「自定义命令」 | 你自己定义快捷指令：在聊天框输入 `/名字`，把预设内容发送给 AI 执行 |
+| **备份与恢复** | 设置→命令与规则 →「备份与恢复」 | 查看所有自动备份（时间 / 规则条数 / 大小），一键恢复到某个备份时刻 |
 
 ### 使用示例
 
@@ -32,7 +33,8 @@
 
 ## 🛡️ 安全设计
 
-- **自动备份**：每次修改 AGENTS.md 前，完整备份到 `$DSH_HOME/.backups/AGENTS.md-<时间戳>.bak`，保留最近 **5 份**；
+- **自动备份**：每次修改 AGENTS.md 前，完整备份到 `$DSH_HOME/.backups/AGENTS.md-<时间戳>.bak`，保留最近 **5 份**；时间戳含毫秒，同一秒内连续操作也不会互相覆盖；
+- **一键恢复（双保险）**：恢复备份时，先把当前 AGENTS.md **再自动备份一份**再写回——恢复错了也能随时退回，永远不会丢数据；
 - **删除不改编号**：删除规则后其余编号不变，避免引用错乱；
 - **命令名冲突防护**：自定义命令与系统命令（/rules、/compact 等）同名会被拒绝；
 - **命令名规范**：只能小写字母、数字、连字符或下划线（`/^[a-z][a-z0-9_-]*$/`）。
@@ -83,7 +85,7 @@ dsh-rules-manager-client/       client 插件（浏览器 bundle）
 ## 🧪 开发与测试
 
 ```sh
-node test-service.js   # 31 项断言：Remote 标记 + 规则 CRUD + 用户命令（隔离环境）
+node test-service.js   # 58 项断言：Remote 标记 + 规则 CRUD + 用户命令 + 备份恢复（隔离环境）
 node test-local.js     # 16 项断言：/rules 命令全场景（隔离环境）
 ```
 

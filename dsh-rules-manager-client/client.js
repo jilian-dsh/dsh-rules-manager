@@ -102,6 +102,28 @@ window.__ModuleLoader__.load({
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 76, column: 1 }
 				},
 				{
+					id: "rules-manager#rulesManager/listBackups",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "listBackups",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listBackups:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 292, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/restoreBackup",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "restoreBackup",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 300, column: 1 }
+				},
+				{
 					id: "rules-manager#rulesManager/listCommands",
 					service: "rulesManager",
 					namespace: "rulesManager",
@@ -195,6 +217,11 @@ window.__ModuleLoader__.load({
 			const [message, setMessage] = useState("");
 			// 已禁用规则
 			const [disabledRules, setDisabledRules] = useState(null);
+			// 备份与恢复
+			const [backups, setBackups] = useState(null);
+			const [bkError, setBkError] = useState("");
+			const [bkMessage, setBkMessage] = useState("");
+			const [bkBusy, setBkBusy] = useState(false);
 			// 命令清单
 			const [commands, setCommands] = useState(null);
 			const [cmdError, setCmdError] = useState("");
@@ -248,6 +275,22 @@ window.__ModuleLoader__.load({
 			useEffect(() => {
 				if (tab === "commands" && commands === null) loadCommands();
 			}, [tab, commands, loadCommands]);
+
+			const loadBackups = useCallback(async () => {
+				try {
+					const res = await rulesApi.listBackups();
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setBackups(data.backups);
+						setBkError("");
+					} else setBkError((data && data.error) || "未知错误");
+				} catch (e) {
+					setBkError(String((e && e.message) || e));
+				}
+			}, [rulesApi]);
+			useEffect(() => {
+				if (tab === "bk" && backups === null) loadBackups();
+			}, [tab, backups, loadBackups]);
 
 			const loadUserCommands = useCallback(async () => {
 				try {
@@ -313,6 +356,20 @@ window.__ModuleLoader__.load({
 				}
 				refresh();
 				loadDisabled();
+			};
+			const doRestore = async (name) => {
+				if (!window.confirm("将把 AGENTS.md 恢复到该备份的时刻。\n\n恢复前会先把当前文件再自动备份一份（双保险，恢复错了还能再退回去）。\n\n注意：恢复后当前会话可能仍在使用旧的规则缓存，建议之后新开一个会话验证生效。\n\n确定恢复这份备份吗？")) return;
+				setBkBusy(true);
+				try {
+					const res = await rulesApi.restoreBackup(name);
+					const data = unwrap(res);
+					setBkMessage(data && data.ok ? "已恢复备份！恢复前已自动备份当前文件，可随时再退回去。" : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setBkMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				setBkBusy(false);
+				loadBackups();
+				refresh();
 			};
 			const doAdd = async () => {
 				try {
@@ -394,10 +451,11 @@ window.__ModuleLoader__.load({
 				react.createElement("div", { style: s.tabs },
 					react.createElement("button", { style: tab === "rules" ? s.tabActive : s.tab, onClick: () => setTab("rules") }, "规则"),
 					react.createElement("button", { style: tab === "commands" ? s.tabActive : s.tab, onClick: () => setTab("commands") }, "命令"),
-					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令")
+					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令"),
+					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "备份与恢复")
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
-				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : renderUserCommands()
+				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : renderBackups()
 			);
 
 			function renderRules() {
@@ -499,6 +557,25 @@ window.__ModuleLoader__.load({
 						ucEditing === cmd.name
 							? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, value: ucEditPrompt, onChange: (e) => setUcEditPrompt(e.target.value) })
 							: react.createElement("div", { style: s.cardBody }, cmd.prompt)
+					))
+				);
+			}
+
+			function renderBackups() {
+				if (backups === null && !bkError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (bkError) return react.createElement("div", { style: s.msgErr }, `加载失败：${bkError}`);
+				return react.createElement("div", null,
+					bkMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, bkMessage) : null,
+					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "每次修改规则前，系统都会自动把 AGENTS.md 备份到 ~/.dsh/.backups/（自动保留最近 5 份）。这里可以看到每份备份，点「恢复」即可回到该时刻的规则文件。"),
+					backups.length === 0 ? react.createElement("div", { style: s.empty }, "还没有备份。修改任意规则（编辑 / 新增 / 删除 / 禁用）后，这里就会出现备份。") : null,
+					[...backups].reverse().map((b) => react.createElement("div", { key: b.name, style: s.card },
+						react.createElement("div", { style: s.cardHead },
+							react.createElement("div", null,
+								react.createElement("div", { style: s.cardTitle }, b.time),
+								react.createElement("div", { style: { ...s.sub, marginTop: "2px" } }, `${b.rulesCount} 条规则 · ${(b.size / 1024).toFixed(1)} KB`)
+							),
+							react.createElement("button", { style: bkBusy ? { ...s.btnPrimary, opacity: 0.5 } : s.btnPrimary, disabled: bkBusy, onClick: () => doRestore(b.name) }, "恢复")
+						)
 					))
 				);
 			}

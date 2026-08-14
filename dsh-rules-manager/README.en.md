@@ -1,17 +1,18 @@
 # dsh-rules-manager (Rules & Commands Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.1.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
 
 > A DeepSeek Harness (DSH) plugin for managing your user-global rules and commands:
 > the **`/rules` slash command** plus a **settings panel "命令与规则"** with visual rule editing,
-> a slash-command list, and **user-defined custom commands**.
+> a slash-command list, **user-defined custom commands**, and **backup restore**.
 >
 > ⚡ Rules live in `$DSH_HOME/AGENTS.md`; every change takes effect **immediately**
-> (DSH hot-reloads the file) and is **automatically backed up** before each write.
+> (DSH hot-reloads the file) and is **automatically backed up** before each write —
+> you can restore to any backup snapshot at any time.
 
 ## Features
 
@@ -20,6 +21,7 @@
 | List / view / add / edit / delete rules | `/rules` command or Settings → 命令与规则 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
 | Command list | Settings → 命令与规则 → 命令 | Read-only list of all available slash commands (name/description/usage) |
 | **Custom commands** | Settings → 命令与规则 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI |
+| **Backup & restore** | Settings → 命令与规则 → 备份与恢复 | Browse all auto backups (time / rule count / size), restore to any snapshot with one click |
 
 ### Examples
 
@@ -36,7 +38,10 @@ Custom commands: define `hello` = "Please greet me warmly" in the panel, then ty
 ## Safety
 
 - **Auto backup**: before every AGENTS.md write, a full copy is saved to
-  `$DSH_HOME/.backups/AGENTS.md-<timestamp>.bak` (last 5 kept);
+  `$DSH_HOME/.backups/AGENTS.md-<timestamp>.bak` (last 5 kept; timestamps include
+  milliseconds so rapid consecutive writes never overwrite each other);
+- **One-click restore (double safety)**: restoring a backup first backs up the
+  current AGENTS.md automatically — you can always revert again, data is never lost;
 - **No renumbering**: deleting a rule keeps the remaining numbers stable;
 - **Name-conflict guard**: custom commands colliding with system commands (e.g. `/rules`, `/compact`) are rejected;
 - **Name rules**: lowercase letters, digits, hyphen, underscore only (`/^[a-z][a-z0-9_-]*$/`).
@@ -82,7 +87,7 @@ dsh-rules-manager-client/       client plugin (browser bundle)
 ## Development
 
 ```sh
-node test-service.js   # 31 assertions: Remote markers + rule CRUD + user commands (isolated)
+node test-service.js   # 58 assertions: Remote markers + rule CRUD + user commands + backup restore (isolated)
 node test-local.js     # 16 assertions: /rules command end-to-end (isolated)
 ```
 

@@ -14,7 +14,9 @@ import {
 	deleteRuleOp,
 	disableRuleOp,
 	editRuleOp,
+	listBackups as listBackupsCore,
 	loadRules,
+	restoreBackupOp,
 	ruleView,
 	saveLines
 } from "./rules-core.js";
@@ -28,6 +30,8 @@ const REMOTE_METHODS = [
 	"disableRule",
 	"enableRule",
 	"listDisabledRules",
+	"listBackups",
+	"restoreBackup",
 	"listCommands",
 	"listUserCommands",
 	"saveUserCommand",
@@ -270,6 +274,25 @@ class RulesManagerService extends TypertRemoteService {
 					disabledAt: d.disabledAt ?? ""
 				}))
 			};
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 备份清单（含本地时间/大小/规则条数），供"备份与恢复"面板展示 */
+	async listBackups() {
+		try {
+			const backups = await listBackupsCore();
+			return { ok: true, backups };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 一键恢复备份：恢复前先把当前 AGENTS.md 再备份一份（双保险），再把备份内容写回 */
+	async restoreBackup(name) {
+		try {
+			const result = await restoreBackupOp(name);
+			if (result.error) return { ok: false, error: result.error };
+			return { ok: true, safety: result.safety };
 		} catch (error) {
 			return { ok: false, error: error instanceof Error ? error.message : String(error) };
 		}

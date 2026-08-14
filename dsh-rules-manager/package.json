@@ -1,7 +1,7 @@
 {
   "name": "dsh-rules-manager",
-  "version": "1.0.0",
-  "description": "DeepSeek Harness (dsh) rules & commands manager: /rules slash command, settings panel with visual rule editing, command list, and user-defined custom commands",
+  "version": "1.1.0",
+  "description": "DeepSeek Harness (dsh) rules & commands manager: /rules slash command, settings panel with visual rule editing, command list, user-defined custom commands, and backup restore",
   "type": "module",
   "main": "index.js",
   "files": [

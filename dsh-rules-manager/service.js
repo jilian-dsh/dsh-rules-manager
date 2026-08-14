@@ -6,6 +6,7 @@
 //     执行时把预设内容作为用户消息投递给 AI：agent.followup）。
 import { Remote, TypertRemoteService } from "@deepseek-ai/dsh-typert-protocol";
 import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
+import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import {
@@ -127,7 +128,11 @@ class RulesManagerService extends TypertRemoteService {
 			description: `自定义命令：${cmd.prompt.slice(0, 40)}`,
 			input: { hint: "无参数（发送预设内容给 AI）" },
 			handler: (invocation) => {
+				// 注意：message 必须有 id（randomUUID）！DSH 写入路径零校验、
+				// 但加载历史时严格校验 message.id 非空——缺 id 会写坏会话日志，
+				// 导致整个会话历史无法加载（2026-08-14 排查会话定位的 bug）。
 				const message = {
+					id: randomUUID(),
 					role: "user",
 					content: [{ type: "text", text: cmd.prompt }],
 					source: { kind: "user" }

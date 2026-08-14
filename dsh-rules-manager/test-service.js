@@ -1,13 +1,29 @@
 // service.js 隔离测试：手动 Remote 标记 + 全部 Remote 方法 + C3 用户自定义命令
 // 运行：node "D:\DeepSeek harness\.dsh\profiles\web\rules-manager\test-service.js"
-import { mkdtemp, copyFile, readFile, rm } from "node:fs/promises";
+// 使用固定 fixture（不依赖真实 AGENTS.md），测试稳定可重复。
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { remoteMethods } from "@deepseek-ai/dsh-typert-protocol";
 
 const home = await mkdtemp(join(tmpdir(), "rules-svc-"));
 process.env.DSH_HOME = home;
-await copyFile("D:/DeepSeek harness/.dsh/AGENTS.md", join(home, "AGENTS.md"));
+
+// 固定测试夹具：3 条规则 + 分区
+const FIXTURE = `# 测试规则（fixture）
+
+## 一、通用行为
+
+### [规则 1] 规则一标题（来源 test-1）
+规则一正文内容。
+
+### [规则 2] 规则二标题（来源 test-2）
+规则二正文内容。
+
+### [规则 3] 规则三标题（来源 test-3）
+规则三正文内容。
+`;
+await writeFile(join(home, "AGENTS.md"), FIXTURE, "utf8");
 
 // 模拟 commands 服务：内置命令表 + 注册表 + find
 const builtin = new Map([
@@ -49,15 +65,15 @@ for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule"
 	t(`含 ${m}`, methods.includes(m));
 }
 
-// ── 2. 规则方法（临时 DSH_HOME）────────────────────────────────────
+// ── 2. 规则方法（fixture）───────────────────────────────────────────
 const list = await svc.listRules();
-t("listRules ok (17 条含正文)", list.ok === true && list.rules.length === 17 && typeof list.rules[0].body === "string");
+t("listRules ok (3 条含正文)", list.ok === true && list.rules.length === 3 && typeof list.rules[0].body === "string");
 
 const added = await svc.addRule("服务测试规则", "服务测试正文");
-t("addRule ok", added.ok === true && added.rule.index === 18);
-const edited = await svc.editRule(18, "服务测试正文已修改");
+t("addRule ok", added.ok === true && added.rule.index === 4);
+const edited = await svc.editRule(4, "服务测试正文已修改");
 t("editRule ok", edited.ok === true);
-const del = await svc.deleteRule(18);
+const del = await svc.deleteRule(4);
 t("deleteRule ok", del.ok === true);
 
 // ── 2.5 禁用/恢复规则（迭代①）───────────────────────────────────────
@@ -65,12 +81,12 @@ const dis = await svc.disableRule(2);
 t("disableRule ok", dis.ok === true && dis.rule.index === 2);
 t("listDisabledRules 含规则 2", (await svc.listDisabledRules()).rules.some((r) => r.index === 2));
 const afterDisable = await readFile(join(home, "AGENTS.md"), "utf8");
-t("AGENTS.md 已移除规则 2", !afterDisable.includes("### [规则 2] 时间信息须真实"));
+t("AGENTS.md 已移除规则 2", !afterDisable.includes("### [规则 2] 规则二标题"));
 const en = await svc.enableRule(2);
 t("enableRule ok（回原编号 2）", en.ok === true && en.rule.index === 2);
 t("listDisabledRules 已清空", (await svc.listDisabledRules()).rules.length === 0);
 const afterEnable = await readFile(join(home, "AGENTS.md"), "utf8");
-t("AGENTS.md 恢复规则 2（原编号）", afterEnable.includes("### [规则 2] 时间信息须真实"));
+t("AGENTS.md 恢复规则 2（原编号）", afterEnable.includes("### [规则 2] 规则二标题"));
 t("恢复位置在一区（规则 3 之前）", afterEnable.indexOf("### [规则 2]") < afterEnable.indexOf("### [规则 3]"));
 t("禁用不存在规则 error", (await svc.disableRule(99)).ok === false);
 const del2 = await svc.deleteRule(2);
@@ -88,18 +104,18 @@ t("saveUserCommand ok", saved.ok === true && saved.command.name === "backup-note
 t("命令已注册为斜杠命令", registered.has("backup-note"));
 t("listUserCommands 含 backup-note", (await svc.listUserCommands()).commands.some((c) => c.name === "backup-note"));
 
-// 执行命令 → 投递预设内容给 agent
+// 执行命令 → 投递预设内容给 agent（必须含 id！缺 id 会锁死会话历史）
 const handler = registered.get("backup-note").handler;
 const result = handler({ agent: { followup: (m) => followed.push(m) }, rawInput: "", commandId: "t", signal: new AbortController().signal });
 t("命令执行返回 success", result.kind === "success");
-t("投递了用户消息（文本=预设内容）", followed.length === 1 && followed[0].role === "user" && followed[0].content[0].type === "text" && followed[0].content[0].text.includes("每周备份"));
+t("投递了用户消息（含 id，文本=预设内容）", followed.length === 1 && typeof followed[0].id === "string" && followed[0].id.length > 0 && followed[0].role === "user" && followed[0].content[0].type === "text" && followed[0].content[0].text.includes("每周备份"));
 
 // 更新命令 → 重注册（新内容）
 const updated = await svc.saveUserCommand("backup-note", "请提醒我每周三备份");
 t("saveUserCommand 更新 ok", updated.ok === true);
 const handler2 = registered.get("backup-note").handler;
 handler2({ agent: { followup: (m) => followed.push(m) }, rawInput: "", commandId: "t", signal: new AbortController().signal });
-t("更新后投递新内容", followed[1].content[0].text.includes("每周三"));
+t("更新后投递新内容（含 id）", followed[1].content[0].text.includes("每周三") && typeof followed[1].id === "string" && followed[1].id.length > 0);
 
 // 冲突检查：与内置命令同名
 const conflict = await svc.saveUserCommand("compact", "占用系统命令");

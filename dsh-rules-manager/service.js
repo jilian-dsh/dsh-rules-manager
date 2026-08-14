@@ -211,11 +211,33 @@ class RulesManagerService extends TypertRemoteService {
 		if (!entry) return { ok: false, error: `没有已禁用的规则 ${index}` };
 		const { lines, rules, bom, missing } = await loadRules();
 		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
-		const op = addRuleOp(lines, rules, entry.title, entry.body);
-		if (op.error) return { ok: false, error: op.error };
-		const backup = await saveLines(op.lines, bom);
+		const nextLines = [...lines];
+		const taken = rules.some((r) => r.index === entry.index);
+		const bodyLines = (entry.body || "").split("\n");
+		let ruleIndex;
+		if (!taken) {
+			// 原编号可用：回原分区（分区标题行之后）；原分区已不存在则追加末尾
+			ruleIndex = entry.index;
+			const header = entry.header || `### [规则 ${entry.index}] ${entry.title}（来源：/rules 命令 ${today()}）`;
+			const secIdx = nextLines.findIndex((l) => l.trim() === `## ${entry.section}`);
+			if (secIdx >= 0) {
+				const insertAt = nextLines[secIdx + 1] !== void 0 && nextLines[secIdx + 1].trim() === "" ? secIdx + 2 : secIdx + 1;
+				nextLines.splice(insertAt, 0, header, ...bodyLines);
+			} else {
+				if (nextLines.length > 0 && nextLines[nextLines.length - 1] !== "") nextLines.push("");
+				nextLines.push(header, ...bodyLines);
+			}
+		} else {
+			// 原编号被占用：新编号追加末尾
+			const op = addRuleOp(nextLines, rules, entry.title, entry.body);
+			if (op.error) return { ok: false, error: op.error };
+			ruleIndex = op.rule.index;
+			nextLines.length = 0;
+			nextLines.push(...op.lines);
+		}
+		const backup = await saveLines(nextLines, bom);
 		await saveDisabledRules(disabled.filter((d) => d.index !== Number(index)));
-		return { ok: true, rule: op.rule, backup };
+		return { ok: true, rule: { index: ruleIndex, title: entry.title }, backup };
 	}
 	/** 已禁用规则清单（供面板"已禁用"区展示与恢复） */
 	async listDisabledRules() {

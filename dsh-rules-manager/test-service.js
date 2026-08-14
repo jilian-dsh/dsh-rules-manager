@@ -67,13 +67,14 @@ t("listDisabledRules 含规则 2", (await svc.listDisabledRules()).rules.some((r
 const afterDisable = await readFile(join(home, "AGENTS.md"), "utf8");
 t("AGENTS.md 已移除规则 2", !afterDisable.includes("### [规则 2] 时间信息须真实"));
 const en = await svc.enableRule(2);
-t("enableRule ok（新编号 18）", en.ok === true && en.rule.index === 18);
+t("enableRule ok（回原编号 2）", en.ok === true && en.rule.index === 2);
 t("listDisabledRules 已清空", (await svc.listDisabledRules()).rules.length === 0);
 const afterEnable = await readFile(join(home, "AGENTS.md"), "utf8");
-t("AGENTS.md 恢复规则 2（编号 18）", afterEnable.includes("### [规则 18] 时间信息须真实"));
+t("AGENTS.md 恢复规则 2（原编号）", afterEnable.includes("### [规则 2] 时间信息须真实"));
+t("恢复位置在一区（规则 3 之前）", afterEnable.indexOf("### [规则 2]") < afterEnable.indexOf("### [规则 3]"));
 t("禁用不存在规则 error", (await svc.disableRule(99)).ok === false);
-const del2 = await svc.deleteRule(18);
-t("清理恢复的规则 18", del2.ok === true);
+const del2 = await svc.deleteRule(2);
+t("清理恢复的规则 2", del2.ok === true);
 t("addRule 空标题 error", (await svc.addRule("", "正文")).ok === false);
 
 // ── 3. 命令清单 ────────────────────────────────────────────────────

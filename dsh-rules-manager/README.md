@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则与命令管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.2-blue)
+![version](https://img.shields.io/badge/version-1.3.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -71,7 +71,25 @@
 
 ## 📦 安装
 
-### 方式一：npm 安装（推荐，自动管理依赖）
+### 方式一：bundle 一键安装（推荐，标准 DSH 插件）
+
+`dsh-rules-manager` 是符合官方规范的 **bundle 包**（package.json 声明 `dsh.bundle`，包内自带 `cordis.patch.yml`），可通过官方插件命令一键安装：
+
+```sh
+dsh plugin --profile web add dsh-rules-manager
+```
+
+dsh 会自动：安装本包及其依赖（含配套面板 `dsh-rules-manager-client`）、把本包追加进该 profile 的 `dsh.profile.bundles`、加载包内 `cordis.patch.yml` 挂载三个插件行（host 命令 / Remote 服务 / client 面板）。重启 DSH 后设置页出现「命令与规则」，聊天框可用 `/rules`。
+
+卸载：
+
+```sh
+dsh plugin --profile web remove dsh-rules-manager
+```
+
+> 本 bundle 同时满足插件市场（如 DSH Creative Workshop 类目录）的 `dsh.bundle.patch` 结构验证收录条件。
+
+### 方式二：npm 安装 + 手动装配（自动管理依赖，保持原装配方式）
 
 本插件发布在 npm，包名 `dsh-rules-manager`（配套面板 `dsh-rules-manager-client`）：
 
@@ -84,7 +102,7 @@ npm install dsh-rules-manager dsh-rules-manager-client
 
 > 注：npm 包与下方「拷贝」方式内容一致，二选一即可；DSH 依赖（`@deepseek-ai/*`）会自动按 peerDependencies 解析。
 
-### 方式二：源码拷贝（DSH 插件装配三步）
+### 方式三：源码拷贝（DSH 插件装配三步）
 
 本仓库包含两个包，都需要装配：
 

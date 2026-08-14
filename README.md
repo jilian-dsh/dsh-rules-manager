@@ -1,7 +1,7 @@
 # dsh-rules-manager
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.2-blue)
+![version](https://img.shields.io/badge/version-1.3.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 
@@ -33,6 +33,18 @@ docs/                          踩坑与反馈记录（DSH message.id 校验不�
 ```
 
 ## 快速开始
+
+### 方式一：bundle 一键安装（推荐）
+
+`dsh-rules-manager` 是标准 DSH **bundle 包**（声明 `dsh.bundle`，自带 `cordis.patch.yml`），官方插件命令一行安装：
+
+```sh
+dsh plugin --profile web add dsh-rules-manager
+```
+
+重启 DSH → 设置页出现「命令与规则」，聊天框可用 `/rules`。
+
+### 方式二：源码拷贝
 
 1. 把 `dsh-rules-manager/` 拷贝到 `$DSH_HOME/profiles/web/`，把 `dsh-rules-manager-client/` 拷贝到 `$DSH_HOME/profiles/node_modules/`；
 2. 在 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加装配（见 `dsh-rules-manager/README.md`）；

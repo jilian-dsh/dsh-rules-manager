@@ -5,7 +5,7 @@
 //   2) RulesCommandsPanel：设置页 settings.section 面板（规则可视化编辑 + 命令清单 + 自定义命令）
 //   3) apply：先 $mount 贡献，再用 ctx.get() 取服务实例注入组件（绕开 Cordis 代理守卫）
 window.__ModuleLoader__.load({
-	id: "rules-manager-client",
+	id: "dsh-rules-manager-client",
 	factory: (require) => {
 		var module = { exports: {} };
 		var exports = module.exports;

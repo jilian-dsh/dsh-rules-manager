@@ -1,5 +1,11 @@
 # dsh-rules-manager (Rules & Commands Manager)
 
+![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+![node](https://img.shields.io/badge/node-%3E%3D22-green)
+![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
+![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
+
 > A DeepSeek Harness (DSH) plugin for managing your user-global rules and commands:
 > the **`/rules` slash command** plus a **settings panel "命令与规则"** with visual rule editing,
 > a slash-command list, and **user-defined custom commands**.

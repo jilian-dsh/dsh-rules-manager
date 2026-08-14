@@ -1,5 +1,11 @@
 # dsh-rules-manager（规则与命令管理）
 
+![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+![node](https://img.shields.io/badge/node-%3E%3D22-green)
+![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
+![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
+
 > DeepSeek Harness（DSH）的规则与命令管理插件：**/rules 斜杠命令** + 设置页**「命令与规则」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**）。
 >
 > ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**。

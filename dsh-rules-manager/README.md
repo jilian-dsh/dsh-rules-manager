@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则与命令管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.0-blue)
+![version](https://img.shields.io/badge/version-1.2.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -35,9 +35,9 @@
 
 命令名后面可以跟**参数**，参数会拼进预设内容再发给 AI。规则 3 条：
 
-1. **预设内容里写了 `{input}`** → 参数整体替换到每个 `{input}` 位置（可多处使用）；
+1. **预设内容里写了 `{input}`** → 参数整体替换到每个 `{input}` 位置（可多处使用）；**该命令不带参数时会提示用法，不发送残缺内容**；
 2. **没写 `{input}` 且有参数** → 参数自动追加到预设内容末尾（换行分隔）；
-3. **不带参数** → 只发预设内容本身（和之前行为完全一致，老命令不受影响）。
+3. **没写 `{input}` 且不带参数** → 只发预设内容本身（和之前行为完全一致，老命令不受影响）。
 
 ```
 预设：请用一句话总结：{input}
@@ -61,7 +61,7 @@
 - **删除不改编号**：删除规则后其余编号不变，避免引用错乱；
 - **命令名冲突防护**：自定义命令与系统命令（/rules、/compact 等）同名会被拒绝；
 - **命令名规范**：只能小写字母、数字、连字符或下划线（`/^[a-z][a-z0-9_-]*$/`）；
-- **参数拼装**：预设内容里的 `{input}` 占位符会被命令后输入的内容替换（可多处使用）；没写 `{input}` 时参数自动追加到预设末尾（换行分隔）；不带参数则只发预设内容（兼容旧行为）。
+- **参数拼装**：预设内容里的 `{input}` 占位符会被命令后输入的内容替换（可多处使用）；没写 `{input}` 时参数自动追加到预设末尾（换行分隔）；含 `{input}` 的命令不带参数会提示用法（不发送残缺内容），不含 `{input}` 的命令不带参数则只发预设内容（兼容旧行为）。
 
 ## ⚠️ 已知问题与踩坑
 
@@ -109,7 +109,7 @@ dsh-rules-manager-client/       client 插件（浏览器 bundle）
 ## 🧪 开发与测试
 
 ```sh
-node test-service.js   # 71 项断言：Remote 标记 + 规则 CRUD + 用户命令（含参数）+ 备份恢复（隔离环境）
+node test-service.js   # 73 项断言：Remote 标记 + 规则 CRUD + 用户命令（含参数）+ 备份恢复（隔离环境）
 node test-local.js     # 16 项断言：/rules 命令全场景（隔离环境）
 ```
 

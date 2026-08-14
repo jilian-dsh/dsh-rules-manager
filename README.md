@@ -1,7 +1,7 @@
 # dsh-rules-manager
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.0-blue)
+![version](https://img.shields.io/badge/version-1.2.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 
@@ -43,12 +43,12 @@ docs/                          踩坑与反馈记录（DSH message.id 校验不�
 - 每次写入 AGENTS.md 前自动备份到 `$DSH_HOME/.backups/`（保留最近 5 份，时间戳含毫秒不互相覆盖）；
 - **一键恢复双保险**：恢复前先把当前文件再自动备份一份，恢复错了也能退回；
 - 自定义命令与系统命令同名会被拒绝；命令名限小写字母/数字/连字符/下划线；
-- 自定义命令支持参数：预设内容里的 `{input}` 占位符会被命令后输入的内容替换（可多处使用）；没写 `{input}` 时参数自动追加到预设末尾（换行分隔）；不带参数则只发预设内容（兼容旧行为）。
+- 自定义命令支持参数：预设内容里的 `{input}` 占位符会被命令后输入的内容替换（可多处使用）；没写 `{input}` 时参数自动追加到预设末尾（换行分隔）；含 `{input}` 的命令不带参数会提示用法（不发送残缺内容），不含 `{input}` 的命令不带参数则只发预设内容（兼容旧行为）。
 
 ## 开发
 
 ```sh
-node dsh-rules-manager/test-service.js   # 71 项断言（隔离环境）
+node dsh-rules-manager/test-service.js   # 73 项断言（隔离环境）
 node dsh-rules-manager/test-local.js     # 16 项断言（隔离环境）
 ```
 

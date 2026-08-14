@@ -1,7 +1,7 @@
 # dsh-rules-manager (Rules & Commands Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.0-blue)
+![version](https://img.shields.io/badge/version-1.2.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
@@ -39,9 +39,9 @@ Custom commands: define `hello` = "Please greet me warmly" in the panel, then ty
 
 Anything typed after the command name is treated as an **argument** and merged into the preset prompt before delivery. Three rules:
 
-1. **The preset contains `{input}`** → the argument replaces every `{input}` occurrence (usable multiple times);
+1. **The preset contains `{input}`** → the argument replaces every `{input}` occurrence (usable multiple times); running it **without an argument shows a usage hint instead of sending a truncated prompt**;
 2. **No `{input}` and an argument is given** → the argument is appended to the preset (newline-separated);
-3. **No argument** → only the preset is sent (identical to previous behavior; existing commands are unaffected).
+3. **No `{input}` and no argument** → only the preset is sent (identical to previous behavior; existing commands are unaffected).
 
 ```
 Preset: Please summarize in one sentence: {input}
@@ -68,7 +68,7 @@ Sent:   Please greet me warmly
 - **No renumbering**: deleting a rule keeps the remaining numbers stable;
 - **Name-conflict guard**: custom commands colliding with system commands (e.g. `/rules`, `/compact`) are rejected;
 - **Name rules**: lowercase letters, digits, hyphen, underscore only (`/^[a-z][a-z0-9_-]*$/`);
-- **Argument merging**: `{input}` placeholders in the preset are replaced by the typed argument (multiple allowed); without `{input}`, the argument is appended (newline-separated); without an argument, only the preset is sent (backward compatible).
+- **Argument merging**: `{input}` placeholders in the preset are replaced by the typed argument (multiple allowed); without `{input}`, the argument is appended (newline-separated); a command with `{input}` run without an argument shows a usage hint (no truncated prompt is sent), while a command without `{input}` run without an argument sends only the preset (backward compatible).
 
 ## Install
 
@@ -111,7 +111,7 @@ dsh-rules-manager-client/       client plugin (browser bundle)
 ## Development
 
 ```sh
-node test-service.js   # 71 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
+node test-service.js   # 73 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
 node test-local.js     # 16 assertions: /rules command end-to-end (isolated)
 ```
 

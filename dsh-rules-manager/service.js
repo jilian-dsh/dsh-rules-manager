@@ -226,8 +226,20 @@ class RulesManagerService extends TypertRemoteService {
 			const header = entry.header || `### [规则 ${entry.index}] ${entry.title}（来源：/rules 命令 ${today()}）`;
 			const secIdx = nextLines.findIndex((l) => l.trim() === `## ${entry.section}`);
 			if (secIdx >= 0) {
-				const insertAt = nextLines[secIdx + 1] !== void 0 && nextLines[secIdx + 1].trim() === "" ? secIdx + 2 : secIdx + 1;
-				nextLines.splice(insertAt, 0, header, ...bodyLines);
+				// 按编号升序插回分区：找分区内第一个编号 > entry.index 的规则，插到它之前
+				// （分区内没有更大编号则插到分区末尾），保持规则顺序与恢复前一致
+				let sectionEnd = nextLines.length;
+				for (let i = secIdx + 1; i < nextLines.length; i++) {
+					if (/^##\s+/u.test(nextLines[i])) { sectionEnd = i; break; }
+				}
+				let insertAt = sectionEnd;
+				for (let i = secIdx + 1; i < sectionEnd; i++) {
+					const rm = nextLines[i].match(/^###\s*\[规则\s*(\d+)\]/u);
+					if (rm && Number(rm[1]) > entry.index) { insertAt = i; break; }
+				}
+				const block = [header, ...bodyLines];
+				if (insertAt > 0 && nextLines[insertAt - 1].trim() !== "") block.unshift("");
+				nextLines.splice(insertAt, 0, ...block);
 			} else {
 				if (nextLines.length > 0 && nextLines[nextLines.length - 1] !== "") nextLines.push("");
 				nextLines.push(header, ...bodyLines);

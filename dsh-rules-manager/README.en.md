@@ -1,7 +1,7 @@
 # dsh-rules-manager (Rules & Commands Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.1-blue)
+![version](https://img.shields.io/badge/version-1.2.2-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
@@ -71,6 +71,20 @@ Sent:   Please greet me warmly
 - **Argument merging**: `{input}` placeholders in the preset are replaced by the typed argument (multiple allowed); without `{input}`, the argument is appended (newline-separated); a command with `{input}` run without an argument shows a usage hint (no truncated prompt is sent), while a command without `{input}` run without an argument sends only the preset (backward compatible).
 
 ## Install
+
+### Option 1: npm (recommended — dependencies resolved automatically)
+
+Both packages are published on npm as `dsh-rules-manager` and `dsh-rules-manager-client`:
+
+```sh
+# Run inside your plugin directory (e.g. $DSH_HOME/profiles/web)
+npm install dsh-rules-manager dsh-rules-manager-client
+```
+
+Then wire them in `cordis.patch.yml` (step 2 below; reference the npm package names) and restart DSH.
+DSH dependencies (`@deepseek-ai/*`) resolve automatically via peerDependencies.
+
+### Option 2: copy from source
 
 Both packages must be installed:
 

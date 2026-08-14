@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则与命令管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.2.1-blue)
+![version](https://img.shields.io/badge/version-1.2.2-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -69,7 +69,22 @@
 - **这是 DSH 自身的机制缺口**：写入路径（`agent.followup`→`inbox.splice`、`session.append`）对消息 `id` 零校验，加载路径（`Session.fromRestore → assertMessageEventShape`）严格校验——不对称导致坏数据落盘后整会话拒载。已反馈官方：https://github.com/deepseek-ai/deepseek-harness/discussions/1121
 - 详细排查与修复记录见 [`docs/dsh-session-message-id-bug.md`](../docs/dsh-session-message-id-bug.md)。
 
-## 📦 安装（DSH 插件装配三步）
+## 📦 安装
+
+### 方式一：npm 安装（推荐，自动管理依赖）
+
+本插件发布在 npm，包名 `dsh-rules-manager`（配套面板 `dsh-rules-manager-client`）：
+
+```sh
+# 在 $DSH_HOME/profiles/web 目录下安装（或你配置的插件目录）
+npm install dsh-rules-manager dsh-rules-manager-client
+```
+
+然后在 `$DSH_HOME/profiles/web/cordis.patch.yml` 装配（见下方「DSH 插件装配三步」第 2 步，host 引用改成 npm 包名），重启 DSH 即可。
+
+> 注：npm 包与下方「拷贝」方式内容一致，二选一即可；DSH 依赖（`@deepseek-ai/*`）会自动按 peerDependencies 解析。
+
+### 方式二：源码拷贝（DSH 插件装配三步）
 
 本仓库包含两个包，都需要装配：
 

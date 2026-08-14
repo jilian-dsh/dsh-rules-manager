@@ -150,16 +150,17 @@ t("带参数执行返回 success", parResult.kind === "success");
 t("带参数投递文本含替换后的参数", followed[2].content[0].text === "请用一句话总结：本周工作");
 t("带参数返回提示含「带参数」", parResult.text.includes("带参数"));
 
-// 同一命令不带参数 → 占位符替换为空
-parHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: "", commandId: "t", signal: new AbortController().signal });
-t("不带参数投递文本（占位符替换为空）", followed[3].content[0].text === "请用一句话总结：");
+// 同一命令不带参数（含 {input}）→ 不投递残缺内容，返回用法提示
+const noArgResult = parHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: "", commandId: "t", signal: new AbortController().signal });
+t("含 {input} 命令不带参数 → 不投递消息", followed.length === 3);
+t("含 {input} 命令不带参数 → 返回 error 用法提示", noArgResult.kind === "error" && noArgResult.text.includes("需要带参数") && noArgResult.text.includes("/summarize"));
 
 // 无占位符命令带参数 → 追加末尾
 const appCmd = await svc.saveUserCommand("append-cmd", "请生成周报");
 t("saveUserCommand 无占位符命令 ok", appCmd.ok === true);
 const appHandler = registered.get("append-cmd").handler;
 appHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: "本月收入 5 万", commandId: "t", signal: new AbortController().signal });
-t("无占位符带参数投递文本（追加末尾）", followed[4].content[0].text === "请生成周报\n本月收入 5 万");
+t("无占位符带参数投递文本（追加末尾）", followed[3].content[0].text === "请生成周报\n本月收入 5 万");
 
 // 清理：删除两个参数测试命令
 await svc.deleteUserCommand("summarize");

@@ -148,7 +148,16 @@ class RulesManagerService extends TypertRemoteService {
 				// 注意：message 必须有 id（randomUUID）！DSH 写入路径零校验、
 				// 但加载历史时严格校验 message.id 非空——缺 id 会写坏会话日志，
 				// 导致整个会话历史无法加载（2026-08-14 排查会话定位的 bug）。
-				const text = this.composeCommandText(cmd.prompt, invocation.rawInput || "");
+				const raw = invocation.rawInput || "";
+				// 含 {input} 占位符但没带参数：不发送残缺内容（如「请总结：」），
+				// 而是返回用法提示，让用户知道要带参数。
+				if (cmd.prompt.includes("{input}") && !raw.trim()) {
+					return {
+						kind: "error",
+						text: `命令 /${cmd.name} 需要带参数。用法：/${cmd.name} 你的内容（输入的内容会替换预设里的 {input}）`
+					};
+				}
+				const text = this.composeCommandText(cmd.prompt, raw);
 				const message = {
 					id: randomUUID(),
 					role: "user",
@@ -156,7 +165,7 @@ class RulesManagerService extends TypertRemoteService {
 					source: { kind: "user" }
 				};
 				invocation.agent.followup(message);
-				const hasArg = (invocation.rawInput || "").trim().length > 0;
+				const hasArg = raw.trim().length > 0;
 				return {
 					kind: "success",
 					text: hasArg

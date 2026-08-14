@@ -132,6 +132,40 @@ t("命令已注销", !registered.has("backup-note"));
 t("listUserCommands 不再含 backup-note", !(await svc.listUserCommands()).commands.some((c) => c.name === "backup-note"));
 t("删除不存在命令 error", (await svc.deleteUserCommand("nope")).ok === false);
 
+// ── 4.4 命令带参数（迭代③）────────────────────────────────────────
+// 占位符替换规则（composeCommandText 纯函数直接测）
+t("占位符 {input} 替换为参数", svc.composeCommandText("请总结：{input}", "本周工作") === "请总结：本周工作");
+t("多个 {input} 全部替换", svc.composeCommandText("{input} 与 {input}", "A") === "A 与 A");
+t("无占位符有参数 → 追加到末尾（换行分隔）", svc.composeCommandText("请生成周报", "本月收入 5 万") === "请生成周报\n本月收入 5 万");
+t("无占位符无参数 → 原样发预设", svc.composeCommandText("请生成周报", "") === "请生成周报");
+t("有占位符无参数 → 替换为空", svc.composeCommandText("请总结：{input}", "") === "请总结：");
+t("参数首尾空格被 trim", svc.composeCommandText("请总结：{input}", "  本周工作  ") === "请总结：本周工作");
+
+// 保存含占位符的命令 → 执行带参数 → 投递替换后的文本
+const parCmd = await svc.saveUserCommand("summarize", "请用一句话总结：{input}");
+t("saveUserCommand 含占位符命令 ok", parCmd.ok === true);
+const parHandler = registered.get("summarize").handler;
+const parResult = parHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: " 本周工作 ", commandId: "t", signal: new AbortController().signal });
+t("带参数执行返回 success", parResult.kind === "success");
+t("带参数投递文本含替换后的参数", followed[2].content[0].text === "请用一句话总结：本周工作");
+t("带参数返回提示含「带参数」", parResult.text.includes("带参数"));
+
+// 同一命令不带参数 → 占位符替换为空
+parHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: "", commandId: "t", signal: new AbortController().signal });
+t("不带参数投递文本（占位符替换为空）", followed[3].content[0].text === "请用一句话总结：");
+
+// 无占位符命令带参数 → 追加末尾
+const appCmd = await svc.saveUserCommand("append-cmd", "请生成周报");
+t("saveUserCommand 无占位符命令 ok", appCmd.ok === true);
+const appHandler = registered.get("append-cmd").handler;
+appHandler({ agent: { followup: (m) => followed.push(m) }, rawInput: "本月收入 5 万", commandId: "t", signal: new AbortController().signal });
+t("无占位符带参数投递文本（追加末尾）", followed[4].content[0].text === "请生成周报\n本月收入 5 万");
+
+// 清理：删除两个参数测试命令
+await svc.deleteUserCommand("summarize");
+await svc.deleteUserCommand("append-cmd");
+t("参数测试命令已清理", !registered.has("summarize") && !registered.has("append-cmd"));
+
 // ── 4.5 备份与恢复（迭代②）────────────────────────────────────────
 const bks = await svc.listBackups();
 t("listBackups ok（≥1 份）", bks.ok === true && Array.isArray(bks.backups) && bks.backups.length >= 1);

@@ -1,7 +1,7 @@
 # dsh-rules-manager (Rules & Commands Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.1.0-blue)
+![version](https://img.shields.io/badge/version-1.2.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
@@ -20,7 +20,7 @@
 |---|---|---|
 | List / view / add / edit / delete rules | `/rules` command or Settings → 命令与规则 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
 | Command list | Settings → 命令与规则 → 命令 | Read-only list of all available slash commands (name/description/usage) |
-| **Custom commands** | Settings → 命令与规则 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI |
+| **Custom commands** | Settings → 命令与规则 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI; **supports arguments** (see below) |
 | **Backup & restore** | Settings → 命令与规则 → 备份与恢复 | Browse all auto backups (time / rule count / size), restore to any snapshot with one click |
 
 ### Examples
@@ -35,6 +35,29 @@
 
 Custom commands: define `hello` = "Please greet me warmly" in the panel, then type `/hello` in the chat box.
 
+### Custom commands with arguments
+
+Anything typed after the command name is treated as an **argument** and merged into the preset prompt before delivery. Three rules:
+
+1. **The preset contains `{input}`** → the argument replaces every `{input}` occurrence (usable multiple times);
+2. **No `{input}` and an argument is given** → the argument is appended to the preset (newline-separated);
+3. **No argument** → only the preset is sent (identical to previous behavior; existing commands are unaffected).
+
+```
+Preset: Please summarize in one sentence: {input}
+Type:   /summarize this week's progress
+Sent:   Please summarize in one sentence: this week's progress
+
+Preset: Please generate a weekly report
+Type:   /weekly-report monthly revenue 50k
+Sent:   Please generate a weekly report
+        monthly revenue 50k          ← argument appended
+
+Preset: Please greet me warmly
+Type:   /hello                       ← no argument
+Sent:   Please greet me warmly
+```
+
 ## Safety
 
 - **Auto backup**: before every AGENTS.md write, a full copy is saved to
@@ -44,7 +67,8 @@ Custom commands: define `hello` = "Please greet me warmly" in the panel, then ty
   current AGENTS.md automatically — you can always revert again, data is never lost;
 - **No renumbering**: deleting a rule keeps the remaining numbers stable;
 - **Name-conflict guard**: custom commands colliding with system commands (e.g. `/rules`, `/compact`) are rejected;
-- **Name rules**: lowercase letters, digits, hyphen, underscore only (`/^[a-z][a-z0-9_-]*$/`).
+- **Name rules**: lowercase letters, digits, hyphen, underscore only (`/^[a-z][a-z0-9_-]*$/`);
+- **Argument merging**: `{input}` placeholders in the preset are replaced by the typed argument (multiple allowed); without `{input}`, the argument is appended (newline-separated); without an argument, only the preset is sent (backward compatible).
 
 ## Install
 
@@ -87,7 +111,7 @@ dsh-rules-manager-client/       client plugin (browser bundle)
 ## Development
 
 ```sh
-node test-service.js   # 58 assertions: Remote markers + rule CRUD + user commands + backup restore (isolated)
+node test-service.js   # 71 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
 node test-local.js     # 16 assertions: /rules command end-to-end (isolated)
 ```
 

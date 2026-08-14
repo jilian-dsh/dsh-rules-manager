@@ -124,25 +124,45 @@ class RulesManagerService extends TypertRemoteService {
 		}
 	}
 
-	/** 注册一条用户命令（handler 把预设内容投递给 AI） */
+	/**
+	 * 把命令参数拼进预设内容（迭代③：命令带参数）。
+	 * 规则：
+	 *   1) 预设含 {input} 占位符 → 参数整体替换到每个 {input} 处（无参数时替换为空）
+	 *   2) 预设不含 {input} 且有参数 → 参数追加到预设末尾（换行分隔）
+	 *   3) 无参数 → 原样发预设内容（兼容旧行为）
+	 */
+	composeCommandText(prompt, arg) {
+		const text = arg.trim();
+		if (prompt.includes("{input}")) return prompt.replaceAll("{input}", text);
+		return text ? `${prompt}\n${text}` : prompt;
+	}
+
+	/** 注册一条用户命令（handler 把预设内容投递给 AI，支持带参数） */
 	registerUserCommand(cmd) {
 		if (this.userCommandNames.has(cmd.name)) return;
 		const disposer = this.ctx.commands.register({
 			name: cmd.name,
 			description: `自定义命令：${cmd.prompt.slice(0, 40)}`,
-			input: { hint: "无参数（发送预设内容给 AI）" },
+			input: { hint: "可带参数：预设内容里的 {input} 会被替换成你输入的内容；没写 {input} 时参数自动追加到末尾；不带参数则只发预设内容" },
 			handler: (invocation) => {
 				// 注意：message 必须有 id（randomUUID）！DSH 写入路径零校验、
 				// 但加载历史时严格校验 message.id 非空——缺 id 会写坏会话日志，
 				// 导致整个会话历史无法加载（2026-08-14 排查会话定位的 bug）。
+				const text = this.composeCommandText(cmd.prompt, invocation.rawInput || "");
 				const message = {
 					id: randomUUID(),
 					role: "user",
-					content: [{ type: "text", text: cmd.prompt }],
+					content: [{ type: "text", text }],
 					source: { kind: "user" }
 				};
 				invocation.agent.followup(message);
-				return { kind: "success", text: `已发送自定义命令「${cmd.name}」的预设内容给 AI。` };
+				const hasArg = (invocation.rawInput || "").trim().length > 0;
+				return {
+					kind: "success",
+					text: hasArg
+						? `已发送自定义命令「${cmd.name}」（带参数）给 AI。`
+						: `已发送自定义命令「${cmd.name}」的预设内容给 AI。`
+				};
 			}
 		});
 		this.userCommandDisposers.set(cmd.name, disposer);

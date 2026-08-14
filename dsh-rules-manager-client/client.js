@@ -68,6 +68,40 @@ window.__ModuleLoader__.load({
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 52, column: 1 }
 				},
 				{
+					id: "rules-manager#rulesManager/disableRule",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "disableRule",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:index", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 60, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/enableRule",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "enableRule",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:index", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 68, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/listDisabledRules",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "listDisabledRules",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledRules:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 76, column: 1 }
+				},
+				{
 					id: "rules-manager#rulesManager/listCommands",
 					service: "rulesManager",
 					namespace: "rulesManager",
@@ -159,6 +193,8 @@ window.__ModuleLoader__.load({
 			const [newTitle, setNewTitle] = useState("");
 			const [newBody, setNewBody] = useState("");
 			const [message, setMessage] = useState("");
+			// 已禁用规则
+			const [disabledRules, setDisabledRules] = useState(null);
 			// 命令清单
 			const [commands, setCommands] = useState(null);
 			const [cmdError, setCmdError] = useState("");
@@ -185,6 +221,17 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => { refresh(); }, [refresh]);
+
+			const loadDisabled = useCallback(async () => {
+				try {
+					const res = await rulesApi.listDisabledRules();
+					const data = unwrap(res);
+					if (data && data.ok) setDisabledRules(data.rules);
+				} catch (e) {
+					setDisabledRules([]);
+				}
+			}, [rulesApi]);
+			useEffect(() => { loadDisabled(); }, [loadDisabled]);
 
 			const loadCommands = useCallback(async () => {
 				try {
@@ -243,6 +290,29 @@ window.__ModuleLoader__.load({
 					setMessage(`出错了：${String((e && e.message) || e)}`);
 				}
 				refresh();
+			};
+			const doDisable = async (index) => {
+				if (!window.confirm(`确定禁用规则 ${index} 吗？禁用的规则会从 AGENTS.md 移除（不再生效），原样保存，随时可恢复。`)) return;
+				try {
+					const res = await rulesApi.disableRule(index);
+					const data = unwrap(res);
+					setMessage(data && data.ok ? `已禁用规则 ${index}（可在下方"已禁用"恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				refresh();
+				loadDisabled();
+			};
+			const doEnable = async (index) => {
+				try {
+					const res = await rulesApi.enableRule(index);
+					const data = unwrap(res);
+					setMessage(data && data.ok ? `已恢复规则 ${data.rule.index}：${data.rule.title}` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				refresh();
+				loadDisabled();
 			};
 			const doAdd = async () => {
 				try {
@@ -358,6 +428,9 @@ window.__ModuleLoader__.load({
 										: react.createElement("button", { style: s.btn, onClick: () => doEdit(rule) }, "编辑"),
 									editing === rule.index
 										? react.createElement("button", { style: s.btn, onClick: () => setEditing(null) }, "取消")
+										: react.createElement("button", { style: s.btn, onClick: () => doDisable(rule.index) }, "禁用"),
+									editing === rule.index
+										? null
 										: react.createElement("button", { style: s.btnDanger, onClick: () => doDelete(rule.index) }, "删除")
 								)
 							),
@@ -365,7 +438,16 @@ window.__ModuleLoader__.load({
 								? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, value: editBody, onChange: (e) => setEditBody(e.target.value) })
 								: react.createElement("div", { style: s.cardBody }, rule.body)
 						))
-					))
+					)),
+					(disabledRules && disabledRules.length > 0) ? react.createElement("div", { style: { marginTop: "16px" } },
+						react.createElement("div", { style: s.groupTitle }, `已禁用规则（${disabledRules.length}）— 已从 AGENTS.md 移除，恢复后自动重新生效`),
+						disabledRules.map((d) => react.createElement("div", { key: d.index, style: { ...s.card, opacity: 0.6 } },
+							react.createElement("div", { style: s.cardHead },
+								react.createElement("div", { style: s.cardTitle }, `[${d.index}] ${d.title}（原分区：${d.section}）`),
+								react.createElement("button", { style: s.btnPrimary, onClick: () => doEnable(d.index) }, "恢复")
+							)
+						))
+					) : null
 				);
 			}
 

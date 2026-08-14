@@ -11,6 +11,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import {
 	addRuleOp,
 	deleteRuleOp,
+	disableRuleOp,
 	editRuleOp,
 	loadRules,
 	ruleView,
@@ -23,6 +24,9 @@ const REMOTE_METHODS = [
 	"addRule",
 	"editRule",
 	"deleteRule",
+	"disableRule",
+	"enableRule",
+	"listDisabledRules",
 	"listCommands",
 	"listUserCommands",
 	"saveUserCommand",
@@ -50,6 +54,28 @@ async function loadUserCommands() {
 /** 写入用户自定义命令 */
 async function saveUserCommands(list) {
 	await writeFile(userCommandsFile(), JSON.stringify(list, null, 2), "utf8");
+}
+
+/** 已禁用规则存储文件 */
+function disabledRulesFile() {
+	return join(resolveDshHome(), "disabled-rules.json");
+}
+
+/** 读取已禁用规则（容错：文件不存在返回空列表） */
+async function loadDisabledRules() {
+	try {
+		const raw = await readFile(disabledRulesFile(), "utf8");
+		const list = JSON.parse(raw);
+		return Array.isArray(list) ? list : [];
+	} catch (error) {
+		if (error && error.code === "ENOENT") return [];
+		throw error;
+	}
+}
+
+/** 写入已禁用规则 */
+async function saveDisabledRules(list) {
+	await writeFile(disabledRulesFile(), JSON.stringify(list, null, 2), "utf8");
 }
 
 class RulesManagerService extends TypertRemoteService {
@@ -165,6 +191,49 @@ class RulesManagerService extends TypertRemoteService {
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
 		return { ok: true, rule: op.rule, backup };
+	}
+	/** 禁用规则：从 AGENTS.md 移除并原样保存到 disabled-rules.json（可恢复） */
+	async disableRule(index) {
+		const { lines, rules, bom, missing } = await loadRules();
+		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const op = disableRuleOp(lines, rules, Number(index));
+		if (op.error) return { ok: false, error: op.error };
+		const backup = await saveLines(op.lines, bom);
+		const disabled = await loadDisabledRules();
+		disabled.push({ ...op.removed, disabledAt: new Date().toISOString() });
+		await saveDisabledRules(disabled);
+		return { ok: true, rule: { index: op.removed.index, title: op.removed.title }, backup };
+	}
+	/** 启用规则：从 disabled-rules.json 取回并重新写入 AGENTS.md（自动分配新编号） */
+	async enableRule(index) {
+		const disabled = await loadDisabledRules();
+		const entry = disabled.find((d) => d.index === Number(index));
+		if (!entry) return { ok: false, error: `没有已禁用的规则 ${index}` };
+		const { lines, rules, bom, missing } = await loadRules();
+		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const op = addRuleOp(lines, rules, entry.title, entry.body);
+		if (op.error) return { ok: false, error: op.error };
+		const backup = await saveLines(op.lines, bom);
+		await saveDisabledRules(disabled.filter((d) => d.index !== Number(index)));
+		return { ok: true, rule: op.rule, backup };
+	}
+	/** 已禁用规则清单（供面板"已禁用"区展示与恢复） */
+	async listDisabledRules() {
+		try {
+			const disabled = await loadDisabledRules();
+			return {
+				ok: true,
+				rules: disabled.map((d) => ({
+					index: d.index,
+					title: d.title,
+					section: d.section,
+					body: d.body,
+					disabledAt: d.disabledAt ?? ""
+				}))
+			};
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
 	}
 	/** 全部可用斜杠命令（全局层，只读清单） */
 	async listCommands() {

@@ -141,3 +141,22 @@ export function deleteRuleOp(lines, rules, index) {
 		rule: { index: rule.index, title: rule.title }
 	};
 }
+
+/** 禁用规则：从 AGENTS.md 移除并原样记录（标题/分区/标题行/正文），供之后恢复 */
+export function disableRuleOp(lines, rules, index) {
+	const rule = rules.find((r) => r.index === index);
+	if (!rule) return { error: `没有编号 ${index} 的规则` };
+	const removed = {
+		index: rule.index,
+		title: rule.title,
+		section: rule.section,
+		header: lines[rule.startLine],
+		body: lines.slice(rule.startLine + 1, rule.endLine).join("\n").trim()
+	};
+	const nextLines = [...lines];
+	nextLines.splice(rule.startLine, rule.endLine - rule.startLine);
+	return {
+		lines: nextLines,
+		removed
+	};
+}

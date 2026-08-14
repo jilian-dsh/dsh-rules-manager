@@ -528,14 +528,14 @@ window.__ModuleLoader__.load({
 				if (ucError) return react.createElement("div", { style: s.msgErr }, `加载失败：${ucError}`);
 				return react.createElement("div", null,
 					ucMessage ? react.createElement("div", { style: s.msg, marginBottom: "8px" }, ucMessage) : null,
-					react.createElement("div", { style: s.sub, marginBottom: "8px" }, "自定义命令 = 你自己定义的快捷指令：在聊天框输入 /命令名，即可把预设内容发送给 AI。命令名只能用小写字母、数字、连字符或下划线（例如 weekly-report）。"),
+					react.createElement("div", { style: s.sub, marginBottom: "8px" }, "自定义命令 = 你自己定义的快捷指令：在聊天框输入 /命令名，即可把预设内容发送给 AI。命令名只能用小写字母、数字、连字符或下划线（例如 weekly-report）。还可以带参数：预设内容里写 {input}，输入命令时 {input} 会被替换成你输入的内容；没写 {input} 时，输入的内容会自动追加到预设内容末尾（例如 /weekly-report 本周进展）。"),
 					react.createElement("div", { style: { display: "flex", justifyContent: "flex-end", marginBottom: "8px" } },
 						react.createElement("button", { style: s.btnPrimary, onClick: () => setUcShowAdd(!ucShowAdd) }, ucShowAdd ? "收起新增" : "＋ 新增命令")
 					),
 					ucShowAdd ? react.createElement("div", { style: s.card },
 						react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "8px" } },
 							react.createElement("input", { style: s.input, placeholder: "命令名（例如 weekly-report，不用带 /）", value: ucNewName, onChange: (e) => setUcNewName(e.target.value) }),
-							react.createElement("textarea", { style: s.textarea, placeholder: "发送给 AI 的预设内容（例如：请帮我总结本周工作进展…）", value: ucNewPrompt, onChange: (e) => setUcNewPrompt(e.target.value) }),
+							react.createElement("textarea", { style: s.textarea, placeholder: "发送给 AI 的预设内容（例如：请帮我总结本周工作进展…）。想支持带参数，就在内容里写 {input}，比如：请用一句话总结：{input}", value: ucNewPrompt, onChange: (e) => setUcNewPrompt(e.target.value) }),
 							react.createElement("div", { style: { display: "flex", gap: "8px", justifyContent: "flex-end" } },
 								react.createElement("button", { style: s.btnPrimary, onClick: doSaveUserCommand }, "保存命令")
 							)
@@ -555,8 +555,11 @@ window.__ModuleLoader__.load({
 							)
 						),
 						ucEditing === cmd.name
-							? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, value: ucEditPrompt, onChange: (e) => setUcEditPrompt(e.target.value) })
-							: react.createElement("div", { style: s.cardBody }, cmd.prompt)
+							? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, placeholder: "支持带参数：内容里写 {input} 会被替换成你输入的内容", value: ucEditPrompt, onChange: (e) => setUcEditPrompt(e.target.value) })
+							: react.createElement("div", { style: s.cardBody }, cmd.prompt),
+						ucEditing !== cmd.name && cmd.prompt.includes("{input}")
+							? react.createElement("div", { style: { ...s.sub, marginTop: "4px", color: "var(--dsw-alias-brand-6, #3370ff)" } }, "支持参数：{input} = 你输入的内容")
+							: null
 					))
 				);
 			}

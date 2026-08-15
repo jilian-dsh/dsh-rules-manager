@@ -124,6 +124,16 @@ window.__ModuleLoader__.load({
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 300, column: 1 }
 				},
 				{
+					id: "rules-manager#rulesManager/pruneBackups",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "pruneBackups",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/pruneBackups:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 308, column: 1 }
+				},
+				{
 					id: "rules-manager#rulesManager/listCommands",
 					service: "rulesManager",
 					namespace: "rulesManager",
@@ -167,6 +177,98 @@ window.__ModuleLoader__.load({
 					],
 					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteUserCommand:result", schema: passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 84, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/disableUserCommand",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "disableUserCommand",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 92, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/enableUserCommand",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "enableUserCommand",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 100, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/listSkills",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "listSkills",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listSkills:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 108, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/getSkill",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "getSkill",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 116, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/disableSkill",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "disableSkill",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 124, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/enableSkill",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "enableSkill",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 132, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/deleteSkill",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "deleteSkill",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:name", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 140, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/listDisabledSkills",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "listDisabledSkills",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledSkills:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 148, column: 1 }
 				}
 			]
 		};
@@ -234,6 +336,12 @@ window.__ModuleLoader__.load({
 			const [ucEditing, setUcEditing] = useState(null);
 			const [ucEditPrompt, setUcEditPrompt] = useState("");
 			const [ucMessage, setUcMessage] = useState("");
+			// 技能
+			const [skills, setSkills] = useState(null);
+			const [skillError, setSkillError] = useState("");
+			const [skillMessage, setSkillMessage] = useState("");
+			const [skillDetail, setSkillDetail] = useState(null);
+			const [disabledSkills, setDisabledSkills] = useState(null);
 
 			const refresh = useCallback(async () => {
 				try {
@@ -278,6 +386,16 @@ window.__ModuleLoader__.load({
 
 			const loadBackups = useCallback(async () => {
 				try {
+					// 打开面板即自动清理超额备份（超出 5 份的旧备份移入回收站，不永久删除）
+					try {
+						const pruneRes = await rulesApi.pruneBackups();
+						const pruneData = unwrap(pruneRes);
+						if (pruneData && pruneData.ok && pruneData.pruned > 0) {
+							setBkMessage(`已自动把 ${pruneData.pruned} 份旧备份移入回收站（保留最近 5 份，可恢复）。`);
+						}
+					} catch (e) {
+						/* 清理失败不阻断列表展示 */
+					}
 					const res = await rulesApi.listBackups();
 					const data = unwrap(res);
 					if (data && data.ok) {
@@ -307,6 +425,35 @@ window.__ModuleLoader__.load({
 			useEffect(() => {
 				if (tab === "uc" && userCmds === null) loadUserCommands();
 			}, [tab, userCmds, loadUserCommands]);
+
+			const loadSkills = useCallback(async () => {
+				try {
+					const res = await rulesApi.listSkills();
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setSkills(data.skills);
+						setSkillError("");
+					} else setSkillError((data && data.error) || "未知错误");
+				} catch (e) {
+					setSkillError(String((e && e.message) || e));
+				}
+			}, [rulesApi]);
+			useEffect(() => {
+				if (tab === "skills" && skills === null) loadSkills();
+			}, [tab, skills, loadSkills]);
+
+			const loadDisabledSkills = useCallback(async () => {
+				try {
+					const res = await rulesApi.listDisabledSkills();
+					const data = unwrap(res);
+					if (data && data.ok) setDisabledSkills(data.skills);
+				} catch (e) {
+					setDisabledSkills([]);
+				}
+			}, [rulesApi]);
+			useEffect(() => {
+				if (tab === "skills") loadDisabledSkills();
+			}, [tab, loadDisabledSkills]);
 
 			const doEdit = (rule) => {
 				setEditing(rule.index);
@@ -428,6 +575,75 @@ window.__ModuleLoader__.load({
 				}
 				loadUserCommands();
 			};
+			const doDisableUserCommand = async (name) => {
+				try {
+					const res = await rulesApi.disableUserCommand(name);
+					const data = unwrap(res);
+					setUcMessage(data && data.ok ? `已禁用命令 /${name}（内容保留，随时可恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setUcMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				loadUserCommands();
+			};
+			const doEnableUserCommand = async (name) => {
+				try {
+					const res = await rulesApi.enableUserCommand(name);
+					const data = unwrap(res);
+					setUcMessage(data && data.ok ? `已恢复命令 /${name}` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setUcMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				loadUserCommands();
+			};
+
+			// ── 技能操作 ─────────────────────────────────────────────
+			const doShowSkill = async (name) => {
+				try {
+					const res = await rulesApi.getSkill(name);
+					const data = unwrap(res);
+					if (data && data.ok) setSkillDetail({ name: data.name, content: data.content });
+					else setSkillMessage(`出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+			};
+			const doDisableSkill = async (name) => {
+				if (!window.confirm(`确定禁用技能「${name}」吗？\n\n禁用 = 把它移出技能目录（内容原样保留，随时可恢复）。\n注意：需要重启 DSH 后才完全生效。`)) return;
+				try {
+					const res = await rulesApi.disableSkill(name);
+					const data = unwrap(res);
+					setSkillMessage(data && data.ok ? `已禁用技能「${name}」（重启 DSH 后完全生效）` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				setSkillDetail(null);
+				loadSkills();
+				loadDisabledSkills();
+			};
+			const doEnableSkill = async (name) => {
+				try {
+					const res = await rulesApi.enableSkill(name);
+					const data = unwrap(res);
+					setSkillMessage(data && data.ok ? `已恢复技能「${name}」（重启 DSH 后完全生效）` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				loadSkills();
+				loadDisabledSkills();
+			};
+			const doDeleteSkill = async (name) => {
+				if (!window.confirm(`确定删除技能「${name}」吗？\n\n删除 = 移入回收站（~/.dsh/.backups/trash-<时间戳>/），内容不丢失，随时可恢复。\n\n注意：需要重启 DSH 后才完全生效。`)) return;
+				try {
+					const res = await rulesApi.deleteSkill(name);
+					const data = unwrap(res);
+					setSkillMessage(data && data.ok ? `已删除技能「${name}」（已移入回收站，可恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
+				} catch (e) {
+					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+				}
+				setSkillDetail(null);
+				loadSkills();
+				loadDisabledSkills();
+			};
 
 			// 按分区分组
 			const groups = [];
@@ -452,10 +668,11 @@ window.__ModuleLoader__.load({
 					react.createElement("button", { style: tab === "rules" ? s.tabActive : s.tab, onClick: () => setTab("rules") }, "规则"),
 					react.createElement("button", { style: tab === "commands" ? s.tabActive : s.tab, onClick: () => setTab("commands") }, "命令"),
 					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令"),
+					react.createElement("button", { style: tab === "skills" ? s.tabActive : s.tab, onClick: () => setTab("skills") }, "技能"),
 					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "备份与恢复")
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
-				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : renderBackups()
+				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : renderBackups()
 			);
 
 			function renderRules() {
@@ -542,15 +759,22 @@ window.__ModuleLoader__.load({
 						)
 					) : null,
 					(userCmds || []).length === 0 ? react.createElement("div", { style: s.empty }, "还没有自定义命令，点「＋ 新增命令」创建一个") : null,
-					(userCmds || []).map((cmd) => react.createElement("div", { key: cmd.name, style: s.card },
+					(userCmds || []).map((cmd) => react.createElement("div", { key: cmd.name, style: cmd.disabled ? { ...s.card, opacity: 0.55 } : s.card },
 						react.createElement("div", { style: s.cardHead },
-							react.createElement("div", { style: s.cardTitle }, `/${cmd.name}`),
+							react.createElement("div", { style: s.cardTitle }, `/${cmd.name}${cmd.disabled ? "（已禁用）" : ""}`),
 							react.createElement("div", { style: { display: "flex", gap: "6px" } },
-								ucEditing === cmd.name
-									? react.createElement("button", { style: s.btnPrimary, onClick: doSaveUserCommandEdit }, "保存")
-									: react.createElement("button", { style: s.btn, onClick: () => doEditUserCommand(cmd) }, "编辑"),
-								ucEditing === cmd.name
-									? react.createElement("button", { style: s.btn, onClick: () => setUcEditing(null) }, "取消")
+								cmd.disabled
+									? react.createElement("button", { style: s.btnPrimary, onClick: () => doEnableUserCommand(cmd.name) }, "启用")
+									: ucEditing === cmd.name
+										? react.createElement("button", { style: s.btnPrimary, onClick: doSaveUserCommandEdit }, "保存")
+										: react.createElement("button", { style: s.btn, onClick: () => doEditUserCommand(cmd) }, "编辑"),
+								cmd.disabled
+									? null
+									: ucEditing === cmd.name
+										? react.createElement("button", { style: s.btn, onClick: () => setUcEditing(null) }, "取消")
+										: react.createElement("button", { style: s.btn, onClick: () => doDisableUserCommand(cmd.name) }, "禁用"),
+								(ucEditing === cmd.name && !cmd.disabled)
+									? null
 									: react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteUserCommand(cmd.name) }, "删除")
 							)
 						),
@@ -564,12 +788,50 @@ window.__ModuleLoader__.load({
 				);
 			}
 
+			function renderSkills() {
+				if (skills === null && !skillError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (skillError) return react.createElement("div", { style: s.msgErr }, `加载失败：${skillError}`);
+				return react.createElement("div", null,
+					skillMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, skillMessage) : null,
+					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "技能 = 教会 AI 特定本领的说明书，存放在 ~/.dsh/skills/ 下。禁用 = 把它移到旁边的存放区（内容原样保留，可随时恢复）；删除 = 移入回收站（可恢复）。禁用或删除都需要重启 DSH 后才完全生效。"),
+					(skills || []).length === 0 ? react.createElement("div", { style: s.empty }, "尚未发现技能") : null,
+					(skills || []).map((sk) => react.createElement("div", { key: sk.name, style: s.card },
+						react.createElement("div", { style: s.cardHead },
+							react.createElement("div", { style: s.cardTitle }, sk.title === sk.name ? sk.name : `${sk.title}（${sk.name}）`),
+							react.createElement("div", { style: { display: "flex", gap: "6px" } },
+								skillDetail && skillDetail.name === sk.name
+									? react.createElement("button", { style: s.btn, onClick: () => setSkillDetail(null) }, "收起")
+									: react.createElement("button", { style: s.btn, onClick: () => doShowSkill(sk.name) }, "查看"),
+								react.createElement("button", { style: s.btn, onClick: () => doDisableSkill(sk.name) }, "禁用"),
+								react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(sk.name) }, "删除")
+							)
+						),
+						sk.description ? react.createElement("div", { style: s.cardBody }, sk.description) : null,
+						skillDetail && skillDetail.name === sk.name
+							? react.createElement("pre", { style: { ...s.cardBody, background: "var(--dsw-alias-bg-layer-2, #f5f6f8)", borderRadius: "6px", padding: "8px", maxHeight: "260px", overflow: "auto" } }, skillDetail.content)
+							: null
+					)),
+					(disabledSkills && disabledSkills.length > 0) ? react.createElement("div", { style: { marginTop: "16px" } },
+						react.createElement("div", { style: s.groupTitle }, `已禁用技能（${disabledSkills.length}）— 已移出技能目录，恢复后自动重新生效`),
+						disabledSkills.map((d) => react.createElement("div", { key: d.name, style: { ...s.card, opacity: 0.6 } },
+							react.createElement("div", { style: s.cardHead },
+								react.createElement("div", { style: s.cardTitle }, d.name),
+								react.createElement("div", { style: { display: "flex", gap: "6px" } },
+									react.createElement("button", { style: s.btnPrimary, onClick: () => doEnableSkill(d.name) }, "启用"),
+									react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(d.name) }, "删除")
+								)
+							)
+						))
+					) : null
+				);
+			}
+
 			function renderBackups() {
 				if (backups === null && !bkError) return react.createElement("div", { style: s.empty }, "加载中…");
 				if (bkError) return react.createElement("div", { style: s.msgErr }, `加载失败：${bkError}`);
 				return react.createElement("div", null,
 					bkMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, bkMessage) : null,
-					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "每次修改规则前，系统都会自动把 AGENTS.md 备份到 ~/.dsh/.backups/（自动保留最近 5 份）。这里可以看到每份备份，点「恢复」即可回到该时刻的规则文件。"),
+					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "每次修改规则前，系统都会自动把 AGENTS.md 备份到 ~/.dsh/.backups/，自动保留最近 5 份——打开本页时，超出 5 份的旧备份会自动移入回收站（~/.dsh/.backups/trash-<时间戳>/，可恢复）。这里可以看到每份备份，点「恢复」即可回到该时刻的规则文件。"),
 					backups.length === 0 ? react.createElement("div", { style: s.empty }, "还没有备份。修改任意规则（编辑 / 新增 / 删除 / 禁用）后，这里就会出现备份。") : null,
 					[...backups].reverse().map((b) => react.createElement("div", { key: b.name, style: s.card },
 						react.createElement("div", { style: s.cardHead },

@@ -16,10 +16,19 @@ import {
 	editRuleOp,
 	listBackups as listBackupsCore,
 	loadRules,
+	pruneBackups as pruneBackupsOp,
 	restoreBackupOp,
 	ruleView,
 	saveLines
 } from "./rules-core.js";
+import {
+	deleteSkill as deleteSkillOp,
+	disableSkill as disableSkillOp,
+	enableSkill as enableSkillOp,
+	getSkill as getSkillOp,
+	listDisabledSkills as listDisabledSkillsOp,
+	listSkills as listSkillsOp
+} from "./skills-core.js";
 
 /** 需要暴露为 Remote 的方法名（顺序 = 声明顺序） */
 const REMOTE_METHODS = [
@@ -32,10 +41,19 @@ const REMOTE_METHODS = [
 	"listDisabledRules",
 	"listBackups",
 	"restoreBackup",
+	"pruneBackups",
 	"listCommands",
 	"listUserCommands",
 	"saveUserCommand",
-	"deleteUserCommand"
+	"deleteUserCommand",
+	"disableUserCommand",
+	"enableUserCommand",
+	"listSkills",
+	"getSkill",
+	"disableSkill",
+	"enableSkill",
+	"deleteSkill",
+	"listDisabledSkills"
 ];
 
 /** 用户自定义命令存储文件 */
@@ -112,11 +130,12 @@ class RulesManagerService extends TypertRemoteService {
 		void this.ensureUserCommands();
 	}
 
-	/** 读取存储并把尚未注册的用户命令注册为斜杠命令 */
+	/** 读取存储并把尚未注册且未禁用的用户命令注册为斜杠命令 */
 	async ensureUserCommands() {
 		try {
 			const list = await loadUserCommands();
 			for (const cmd of list) {
+				if (cmd.disabled) continue; // 已禁用的命令不注册
 				if (!this.userCommandNames.has(cmd.name)) this.registerUserCommand(cmd);
 			}
 		} catch (error) {
@@ -316,6 +335,15 @@ class RulesManagerService extends TypertRemoteService {
 			return { ok: false, error: error instanceof Error ? error.message : String(error) };
 		}
 	}
+	/** 清理超额备份：超出 5 份的旧备份移入回收站（不永久删除） */
+	async pruneBackups() {
+		try {
+			const res = await pruneBackupsOp();
+			return res;
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
 	/** 一键恢复备份：恢复前先把当前 AGENTS.md 再备份一份（双保险），再把备份内容写回 */
 	async restoreBackup(name) {
 		try {
@@ -343,18 +371,79 @@ class RulesManagerService extends TypertRemoteService {
 		}
 	}
 
-	// ── Remote: 用户自定义命令（C3）─────────────────────────────────────
+	// ── Remote: 技能管理（查看/禁用/启用/删除，全部基于目录搬移，天然不乱序）──
 
-	/** 用户自定义命令清单 */
-	async listUserCommands() {
+	/** 已安装技能清单（名称 + frontmatter 名称/描述，按名称排序） */
+	async listSkills() {
 		try {
-			const list = await loadUserCommands();
-			return { ok: true, commands: list.map((c) => ({ name: c.name, prompt: c.prompt })) };
+			const skills = await listSkillsOp();
+			return { ok: true, skills };
 		} catch (error) {
 			return { ok: false, error: error instanceof Error ? error.message : String(error) };
 		}
 	}
-	/** 新增/更新用户命令（保存后立即注册/重注册为斜杠命令） */
+	/** 读取某技能的 SKILL.md 全文 */
+	async getSkill(name) {
+		try {
+			const res = await getSkillOp(name);
+			if (res.error) return { ok: false, error: res.error };
+			return res;
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 禁用技能：目录移到 ~/.dsh/disabled-skills/（重启 DSH 后完全生效） */
+	async disableSkill(name) {
+		try {
+			const res = await disableSkillOp(name);
+			if (res.error) return { ok: false, error: res.error };
+			return { ok: true, name: res.name };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 启用技能：目录移回 ~/.dsh/skills/（重启 DSH 后完全生效） */
+	async enableSkill(name) {
+		try {
+			const res = await enableSkillOp(name);
+			if (res.error) return { ok: false, error: res.error };
+			return { ok: true, name: res.name };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 删除技能：整目录移入回收站 ~/.dsh/.backups/trash-<时间戳>/（可恢复） */
+	async deleteSkill(name) {
+		try {
+			const res = await deleteSkillOp(name);
+			if (res.error) return { ok: false, error: res.error };
+			return { ok: true, name: res.name, trash: res.trash, fromDisabled: res.fromDisabled === true };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 已禁用技能清单 */
+	async listDisabledSkills() {
+		try {
+			const skills = await listDisabledSkillsOp();
+			return { ok: true, skills };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+
+	// ── Remote: 用户自定义命令（C3）─────────────────────────────────────
+
+	/** 用户自定义命令清单（含禁用状态） */
+	async listUserCommands() {
+		try {
+			const list = await loadUserCommands();
+			return { ok: true, commands: list.map((c) => ({ name: c.name, prompt: c.prompt, disabled: c.disabled === true })) };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 新增/更新用户命令（保存后立即注册/重注册为斜杠命令；禁用状态保持不变） */
 	async saveUserCommand(name, prompt) {
 		if (typeof name !== "string" || !/^[a-z][a-z0-9_-]*$/u.test(name)) {
 			return { ok: false, error: "命令名只能用小写字母、数字、连字符或下划线（例如 backup-note）" };
@@ -367,15 +456,39 @@ class RulesManagerService extends TypertRemoteService {
 		if (existing !== void 0 && !this.userCommandNames.has(name)) {
 			return { ok: false, error: `命令 /${name} 已被系统或其他插件占用，请换一个名字` };
 		}
-		const entry = { name, prompt: prompt.trim(), updatedAt: new Date().toISOString() };
 		const list = await loadUserCommands();
 		const idx = list.findIndex((c) => c.name === name);
+		const wasDisabled = idx >= 0 && list[idx].disabled === true;
+		const entry = { name, prompt: prompt.trim(), updatedAt: new Date().toISOString() };
+		if (wasDisabled) entry.disabled = true; // 编辑已禁用命令：保持禁用状态
 		if (idx >= 0) list[idx] = entry;
 		else list.push(entry);
 		await saveUserCommands(list);
 		this.unregisterUserCommand(name);
-		this.registerUserCommand(entry);
+		if (!wasDisabled) this.registerUserCommand(entry);
 		return { ok: true, command: { name } };
+	}
+	/** 禁用用户命令（保留内容，注销斜杠命令；列表顺序不变，天然不乱序） */
+	async disableUserCommand(name) {
+		const list = await loadUserCommands();
+		const cmd = list.find((c) => c.name === name);
+		if (!cmd) return { ok: false, error: `没有命令 /${name}` };
+		if (cmd.disabled) return { ok: false, error: `命令 /${name} 已是禁用状态` };
+		cmd.disabled = true;
+		await saveUserCommands(list);
+		this.unregisterUserCommand(name);
+		return { ok: true };
+	}
+	/** 启用用户命令（恢复注册斜杠命令） */
+	async enableUserCommand(name) {
+		const list = await loadUserCommands();
+		const cmd = list.find((c) => c.name === name);
+		if (!cmd) return { ok: false, error: `没有命令 /${name}` };
+		if (!cmd.disabled) return { ok: false, error: `命令 /${name} 不是禁用状态` };
+		cmd.disabled = false;
+		await saveUserCommands(list);
+		this.registerUserCommand(cmd);
+		return { ok: true };
 	}
 	/** 删除用户命令（同时注销斜杠命令） */
 	async deleteUserCommand(name) {

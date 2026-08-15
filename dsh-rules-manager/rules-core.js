@@ -2,7 +2,7 @@
 // 职责：解析 AGENTS.md、备份、写入、增删改操作。不依赖 Cordis/UI，纯 Node。
 import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
 import { join } from "node:path";
-import { readFile, writeFile, copyFile, mkdir, readdir, unlink, stat } from "node:fs/promises";
+import { readFile, writeFile, copyFile, mkdir, readdir, rename, stat } from "node:fs/promises";
 
 const MAX_BACKUPS = 5;
 
@@ -65,7 +65,7 @@ export async function loadRules() {
 	return { lines, rules, bom, missing: false };
 }
 
-/** 备份 AGENTS.md 到 ~/.dsh/.backups/，保留最近 MAX_BACKUPS 份，返回备份路径 */
+/** 备份 AGENTS.md 到 ~/.dsh/.backups/，超额部分移入回收站（保留最近 MAX_BACKUPS 份），返回备份路径 */
 async function backupAgents(file) {
 	const dir = join(resolveDshHome(), ".backups");
 	await mkdir(dir, { recursive: true });
@@ -73,13 +73,35 @@ async function backupAgents(file) {
 	const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 23);
 	const dest = join(dir, `AGENTS.md-${stamp}.bak`);
 	await copyFile(file, dest);
-	const files = (await readdir(dir))
-		.filter((f) => f.startsWith("AGENTS.md-") && f.endsWith(".bak"))
-		.sort();
-	while (files.length > MAX_BACKUPS) {
-		await unlink(join(dir, files.shift()));
-	}
+	// 超额清理：移入回收站（不永久删除，可恢复）
+	await pruneBackups();
 	return dest;
+}
+
+/**
+ * 清理超额备份：按文件名升序（= 时间升序）只保留最近 MAX_BACKUPS 份，
+ * 超出部分移入回收站 .backups/trash-<时间戳>/（不永久删除）。
+ * @returns {{ok:true, pruned:number, kept:number, trash:string}}
+ */
+export async function pruneBackups() {
+	const dir = backupsDir();
+	await mkdir(dir, { recursive: true });
+	const entries = await readdir(dir, { withFileTypes: true });
+	const files = entries
+		.filter((e) => e.isFile() && /^AGENTS\.md-.+\.bak$/u.test(e.name))
+		.map((e) => e.name)
+		.sort();
+	if (files.length <= MAX_BACKUPS) {
+		return { ok: true, pruned: 0, kept: files.length, trash: "" };
+	}
+	const excess = files.slice(0, files.length - MAX_BACKUPS);
+	const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 23);
+	const trashRoot = join(dir, `trash-${stamp}`);
+	await mkdir(trashRoot, { recursive: true });
+	for (const name of excess) {
+		await rename(join(dir, name), join(trashRoot, name));
+	}
+	return { ok: true, pruned: excess.length, kept: MAX_BACKUPS, trash: trashRoot };
 }
 
 /** 把修改后的行数组写回 AGENTS.md（先备份，保持原 BOM 状态），返回备份路径 */

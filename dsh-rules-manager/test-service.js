@@ -1,7 +1,7 @@
 // service.js 隔离测试：手动 Remote 标记 + 全部 Remote 方法 + C3 用户自定义命令
 // 运行：node "D:\DeepSeek harness\.dsh\profiles\web\rules-manager\test-service.js"
 // 使用固定 fixture（不依赖真实 AGENTS.md），测试稳定可重复。
-import { access, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { remoteMethods } from "@deepseek-ai/dsh-typert-protocol";
@@ -60,8 +60,8 @@ const t = (name, cond) => {
 
 // ── 1. 手动 Remote 标记 ─────────────────────────────────────────────
 const methods = remoteMethods(svc).map((m) => m.method);
-t("remoteMethods 标记 13 个方法", methods.length === 13);
-for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand"]) {
+t("remoteMethods 标记 22 个方法", methods.length === 22);
+for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "pruneBackups", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand", "disableUserCommand", "enableUserCommand", "listSkills", "getSkill", "disableSkill", "enableSkill", "deleteSkill", "listDisabledSkills"]) {
 	t(`含 ${m}`, methods.includes(m));
 }
 
@@ -194,6 +194,101 @@ t("恢复后备份数不少于恢复前", (await svc.listBackups()).backups.leng
 t("恢复后备份规则数与目标备份一致", (await svc.listBackups()).backups.some((b) => b.name === target.name));
 t("恢复不合法文件名 error", (await svc.restoreBackup("../evil")).ok === false);
 t("恢复不存在备份 error", (await svc.restoreBackup("AGENTS.md-2000-01-01T00-00-00.bak")).ok === false);
+
+// ── 4.5b 超额备份自动清理（迭代⑥：打开面板即清理，移入回收站不永久删除）──
+const bkDir = join(home, ".backups");
+const beforePrune = (await svc.listBackups()).backups.length;
+// 造 7 份 2000 年的假旧备份（文件名合法、时间最旧）
+for (let i = 1; i <= 7; i++) {
+	await writeFile(join(bkDir, `AGENTS.md-2000-01-01T00-00-0${i}.bak`), "old backup", "utf8");
+}
+const pruned = await svc.pruneBackups();
+t("pruneBackups ok（超出部分被移走）", pruned.ok === true && pruned.pruned === beforePrune + 7 - 5 && pruned.kept === 5);
+const afterPruneList = (await svc.listBackups()).backups;
+t("清理后只剩 5 份", afterPruneList.length === 5);
+let oldestMoved = false;
+try { await access(join(pruned.trash, "AGENTS.md-2000-01-01T00-00-01.bak")); oldestMoved = true; } catch {}
+t("最旧备份已移入回收站（未永久删除）", oldestMoved);
+t("回收站目录在 .backups 下", pruned.trash.includes(".backups"));
+const pruned2 = await svc.pruneBackups();
+t("再次清理 pruned=0（不超额）", pruned2.ok === true && pruned2.pruned === 0);
+t("清理后列表仍可正常读取", (await svc.listBackups()).backups.length === 5);
+
+// ── 4.6 命令禁用/启用（迭代⑤，防乱序：只改字段，不搬移不改序）────────
+const disCmd = await svc.saveUserCommand("disable-me", "禁用测试命令内容");
+t("saveUserCommand 禁用测试命令 ok", disCmd.ok === true);
+t("命令已注册", registered.has("disable-me"));
+const cmdDis = await svc.disableUserCommand("disable-me");
+t("disableUserCommand ok", cmdDis.ok === true);
+t("禁用后命令已注销", !registered.has("disable-me"));
+t("重复禁用 error", (await svc.disableUserCommand("disable-me")).ok === false);
+const ucAfterDis = await svc.listUserCommands();
+const disEntry = ucAfterDis.commands.find((c) => c.name === "disable-me");
+t("listUserCommands 含禁用条目且 disabled=true", disEntry !== void 0 && disEntry.disabled === true && disEntry.prompt.includes("禁用测试命令内容"));
+t("禁用条目仍在列表原位置（无搬移无乱序）", ucAfterDis.commands[ucAfterDis.commands.length - 1].name === "disable-me");
+// ensureUserCommands 不应把已禁用命令重新注册
+await svc.ensureUserCommands();
+t("ensureUserCommands 不注册已禁用命令", !registered.has("disable-me"));
+const cmdEn = await svc.enableUserCommand("disable-me");
+t("enableUserCommand ok", cmdEn.ok === true);
+t("启用后命令重新注册", registered.has("disable-me"));
+t("重复启用 error", (await svc.enableUserCommand("disable-me")).ok === false);
+// 编辑已禁用命令：disabled 状态保持
+await svc.disableUserCommand("disable-me");
+const editDis = await svc.saveUserCommand("disable-me", "禁用命令编辑后内容");
+t("编辑已禁用命令 ok（保持禁用）", editDis.ok === true && !registered.has("disable-me"));
+t("编辑后仍是禁用状态", (await svc.listUserCommands()).commands.find((c) => c.name === "disable-me").disabled === true);
+await svc.deleteUserCommand("disable-me");
+t("禁用测试命令已清理", !registered.has("disable-me"));
+
+// ── 4.7 技能管理（迭代⑥，防乱序：目录整体搬移，无编号无分区）──────────
+const skillsHome = join(home, "skills");
+await mkdir(join(skillsHome, "test-skill-a"), { recursive: true });
+await writeFile(join(skillsHome, "test-skill-a", "SKILL.md"), `---\nname: test-skill-a\ndescription: 测试技能 A 的描述\n---\n\n# 测试技能 A\n\n正文内容。\n`, "utf8");
+await mkdir(join(skillsHome, "test-skill-b"), { recursive: true });
+await writeFile(join(skillsHome, "test-skill-b", "SKILL.md"), `---\nname: test-skill-b\ndescription: 测试技能 B 的描述\n---\n\n# 测试技能 B\n`, "utf8");
+
+const skList = await svc.listSkills();
+t("listSkills ok（含 A/B 与描述）", skList.ok === true && skList.skills.length === 2 && skList.skills.some((s) => s.name === "test-skill-a" && s.description.includes("测试技能 A")) && skList.skills.some((s) => s.name === "test-skill-b"));
+t("技能列表按名称排序", skList.skills[0].name === "test-skill-a");
+
+const skGet = await svc.getSkill("test-skill-a");
+t("getSkill ok（返回全文）", skGet.ok === true && skGet.content.includes("正文内容"));
+t("getSkill 不存在 error", (await svc.getSkill("nope")).ok === false);
+t("getSkill 非法名 error", (await svc.getSkill("../evil")).ok === false);
+
+const skDis = await svc.disableSkill("test-skill-a");
+t("disableSkill ok", skDis.ok === true);
+t("禁用后 skills/ 只剩 B", (await svc.listSkills()).skills.length === 1 && (await svc.listSkills()).skills[0].name === "test-skill-b");
+t("listDisabledSkills 含 A", (await svc.listDisabledSkills()).skills.some((s) => s.name === "test-skill-a"));
+t("重复禁用 error（已不存在于 skills/）", (await svc.disableSkill("test-skill-a")).ok === false);
+
+// 同名冲突：skills/ 里手工再造一个 A，再尝试启用 disabled 里的 A → 应拒绝（防覆盖）
+await mkdir(join(skillsHome, "test-skill-a"), { recursive: true });
+await writeFile(join(skillsHome, "test-skill-a", "SKILL.md"), "---\nname: test-skill-a\n---\n", "utf8");
+t("启用同名冲突 error（防覆盖）", (await svc.enableSkill("test-skill-a")).ok === false);
+await rm(join(skillsHome, "test-skill-a"), { recursive: true, force: true });
+
+const skEn = await svc.enableSkill("test-skill-a");
+t("enableSkill ok（原样搬回）", skEn.ok === true);
+t("启用后 skills/ 又含 A（排序仍 A<B）", (await svc.listSkills()).skills.length === 2 && (await svc.listSkills()).skills[0].name === "test-skill-a");
+t("listDisabledSkills 已清空", (await svc.listDisabledSkills()).skills.length === 0);
+t("启用后 SKILL.md 内容完好", (await svc.getSkill("test-skill-a")).content.includes("正文内容"));
+
+const skDel = await svc.deleteSkill("test-skill-b");
+t("deleteSkill ok（含回收站路径）", skDel.ok === true && typeof skDel.trash === "string" && skDel.trash.includes("trash-"));
+t("删除后 skills/ 只剩 A", (await svc.listSkills()).skills.length === 1 && (await svc.listSkills()).skills[0].name === "test-skill-a");
+let trashFileOk = false;
+try { await access(join(skDel.trash, "test-skill-b", "SKILL.md")); trashFileOk = true; } catch {}
+t("回收站里能找回 B（SKILL.md 完好）", trashFileOk);
+t("deleteSkill 不存在 error", (await svc.deleteSkill("nope")).ok === false);
+t("deleteSkill 非法名 error", (await svc.deleteSkill("../evil")).ok === false);
+
+// 删除已禁用技能（从 disabled-skills/ 移入回收站）
+await svc.disableSkill("test-skill-a");
+const skDel2 = await svc.deleteSkill("test-skill-a");
+t("deleteSkill 已禁用技能 ok（fromDisabled）", skDel2.ok === true && skDel2.fromDisabled === true);
+t("skills/ 与 disabled-skills/ 均空", (await svc.listSkills()).skills.length === 0 && (await svc.listDisabledSkills()).skills.length === 0);
 
 // ── 5. 文件干净 ─────────────────────────────────────────────────────
 const after = await readFile(join(home, "AGENTS.md"), "utf8");

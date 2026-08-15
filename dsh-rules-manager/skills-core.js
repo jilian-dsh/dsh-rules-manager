@@ -30,14 +30,39 @@ export function isValidSkillName(name) {
 	return typeof name === "string" && NAME_RE.test(name);
 }
 
-/** 解析 SKILL.md 的 YAML frontmatter（只取 name/description） */
+/**
+ * 解析 SKILL.md 的 YAML frontmatter（只取 name/description）。
+ * 支持两种写法：
+ *   1) 单行：description: 一句话
+ *   2) YAML 块标量（多行）：description: |（或 >）后接缩进的多行文本
+ *      ——实测本机 30 个技能中有 5 个用块标量写法，旧实现把它们读成 1 个字符（"|"），
+ *        导致面板显示空白（2026-08-15 修复）。
+ */
 export function parseFrontmatter(raw) {
 	const m = raw.match(/^---\s*\n([\s\S]*?)\n---/u);
 	if (!m) return {};
 	const out = {};
-	for (const line of m[1].split("\n")) {
-		const kv = line.match(/^(name|description)\s*:\s*(.+?)\s*$/u);
-		if (kv) out[kv[1]] = kv[2].trim();
+	const lines = m[1].split("\n");
+	for (let i = 0; i < lines.length; i++) {
+		const kv = lines[i].match(/^(name|description)\s*:\s*(.*)$/u);
+		if (!kv) continue;
+		const key = kv[1];
+		const rest = kv[2].trim();
+		if (rest === "|" || rest === ">" || rest === "|-" || rest === ">-") {
+			// 块标量：收集后续缩进行，直到下一个顶格 frontmatter 键或顶格非缩进行
+			const parts = [];
+			let j = i + 1;
+			for (; j < lines.length; j++) {
+				const next = lines[j];
+				if (/^\S/u.test(next)) break; // 顶格行（下一键或空行之外的顶格内容）= 块结束
+				const t = next.trim();
+				if (t) parts.push(t);
+			}
+			out[key] = parts.join(" ");
+			i = j - 1;
+		} else if (rest !== "") {
+			out[key] = rest.replace(/^["']|["']$/g, "");
+		}
 	}
 	return out;
 }

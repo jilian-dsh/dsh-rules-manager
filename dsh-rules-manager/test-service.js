@@ -246,10 +246,11 @@ const skillsHome = join(home, "skills");
 await mkdir(join(skillsHome, "test-skill-a"), { recursive: true });
 await writeFile(join(skillsHome, "test-skill-a", "SKILL.md"), `---\nname: test-skill-a\ndescription: 测试技能 A 的描述\n---\n\n# 测试技能 A\n\n正文内容。\n`, "utf8");
 await mkdir(join(skillsHome, "test-skill-b"), { recursive: true });
-await writeFile(join(skillsHome, "test-skill-b", "SKILL.md"), `---\nname: test-skill-b\ndescription: 测试技能 B 的描述\n---\n\n# 测试技能 B\n`, "utf8");
+await writeFile(join(skillsHome, "test-skill-b", "SKILL.md"), `---\nname: test-skill-b\ndescription: |\n  测试技能 B 的描述第一行\n  描述第二行更详细\ntrigger-words: [b]\n---\n\n# 测试技能 B\n`, "utf8");
 
 const skList = await svc.listSkills();
 t("listSkills ok（含 A/B 与描述）", skList.ok === true && skList.skills.length === 2 && skList.skills.some((s) => s.name === "test-skill-a" && s.description.includes("测试技能 A")) && skList.skills.some((s) => s.name === "test-skill-b"));
+t("块标量 description 完整解析（多行合并）", skList.skills.find((s) => s.name === "test-skill-b").description === "测试技能 B 的描述第一行 描述第二行更详细");
 t("技能列表按名称排序", skList.skills[0].name === "test-skill-a");
 
 const skGet = await svc.getSkill("test-skill-a");

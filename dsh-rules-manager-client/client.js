@@ -661,7 +661,7 @@ window.__ModuleLoader__.load({
 				react.createElement("div", { style: s.header },
 					react.createElement("div", null,
 						react.createElement("div", { style: s.title }, "规则、命令与技能"),
-						react.createElement("div", { style: s.sub }, "可视化编辑用户全局规则（AGENTS.md，保存即生效，自动备份）；查看斜杠命令；创建你自己的自定义命令；管理技能。")
+						react.createElement("div", { style: s.sub }, "可视化编辑你的全局规则（AGENTS.md，保存即生效、自动备份）；查看全部斜杠命令；创建自定义命令（支持禁用/启用）；管理技能（查看说明、禁用、启用、删除进回收站）。")
 					)
 				),
 				react.createElement("div", { style: s.tabs },

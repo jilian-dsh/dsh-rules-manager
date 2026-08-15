@@ -1,6 +1,6 @@
 # dsh-rules-manager-client
 
-> DeepSeek Harness 设置页「命令与规则」面板（client 插件），是 **dsh-rules-manager** 的配套浏览器端。
+> DeepSeek Harness 设置页「规则、命令与技能」面板（client 插件），是 **dsh-rules-manager** 的配套浏览器端。
 
 ## 功能
 

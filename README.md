@@ -1,11 +1,11 @@
 # dsh-rules-manager
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.0-blue)
+![version](https://img.shields.io/badge/version-1.4.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 
-> 规则、命令与技能管理插件 for **DeepSeek Harness (DSH)**：用 `/rules` 斜杠命令或设置页**「命令与规则」**面板，可视化地管理你的用户全局规则（`AGENTS.md`）、查看全部斜杠命令、**创建你自己的自定义命令**（支持禁用/启用）、**管理技能**（查看/禁用/启用/删除进回收站）、**备份与一键恢复**。
+> 规则、命令与技能管理插件 for **DeepSeek Harness (DSH)**：用 `/rules` 斜杠命令或设置页**「规则、命令与技能」**面板，可视化地管理你的用户全局规则（`AGENTS.md`）、查看全部斜杠命令、**创建你自己的自定义命令**（支持禁用/启用）、**管理技能**（查看/禁用/启用/删除进回收站）、**备份与一键恢复**。
 
 [English](dsh-rules-manager/README.en.md) | 中文
 
@@ -13,11 +13,11 @@
 
 | 能力 | 入口 | 说明 |
 |---|---|---|
-| 规则管理 | `/rules` 命令 或 设置→命令与规则 | 列出 / 查看 / 新增 / 修改 / 删除 / **禁用 / 恢复**用户全局规则（AGENTS.md），**保存即生效**，每次修改**自动备份** |
-| 命令清单 | 设置→命令与规则 →「命令」 | 只读展示所有可用斜杠命令 |
-| 自定义命令 | 设置→命令与规则 →「自定义命令」 | 定义你自己的快捷指令：聊天框输入 `/名字`，把预设内容发送给 AI 执行；**支持带参数**：预设里写 `{input}` 会被替换成你输入的内容，没写则参数自动追加到末尾；**支持禁用/启用**（禁用后斜杠命令停用、内容保留） |
-| **技能管理** | 设置→命令与规则 →「技能」 | 查看已安装技能（名称+简介+全文）、**禁用**（移出技能目录，内容原样保留）、**启用**（原样搬回）、**删除**（移入回收站 `~/.dsh/.backups/trash-<时间戳>/`，随时可恢复）；禁用/删除需重启 DSH 后完全生效 |
-| **备份与恢复** | 设置→命令与规则 →「备份与恢复」 | 查看所有自动备份（时间 / 规则条数 / 大小），**一键恢复到任意备份时刻** |
+| 规则管理 | `/rules` 命令 或 设置→规则、命令与技能 | 列出 / 查看 / 新增 / 修改 / 删除 / **禁用 / 恢复**用户全局规则（AGENTS.md），**保存即生效**，每次修改**自动备份** |
+| 命令清单 | 设置→规则、命令与技能 →「命令」 | 只读展示所有可用斜杠命令 |
+| 自定义命令 | 设置→规则、命令与技能 →「自定义命令」 | 定义你自己的快捷指令：聊天框输入 `/名字`，把预设内容发送给 AI 执行；**支持带参数**：预设里写 `{input}` 会被替换成你输入的内容，没写则参数自动追加到末尾；**支持禁用/启用**（禁用后斜杠命令停用、内容保留） |
+| **技能管理** | 设置→规则、命令与技能 →「技能」 | 查看已安装技能（名称+简介+全文）、**禁用**（移出技能目录，内容原样保留）、**启用**（原样搬回）、**删除**（移入回收站 `~/.dsh/.backups/trash-<时间戳>/`，随时可恢复）；禁用/删除需重启 DSH 后完全生效 |
+| **备份与恢复** | 设置→规则、命令与技能 →「备份与恢复」 | 查看所有自动备份（时间 / 规则条数 / 大小），**一键恢复到任意备份时刻** |
 
 ## 仓库结构
 
@@ -29,7 +29,7 @@ dsh-rules-manager/             host 插件（纯 Node，无需构建）
 ├── skills-core.js             共享核心：技能目录搬移（禁用/启用/删除进回收站）
 └── README.md                  完整使用文档（中文）/ README.en.md（英文）
 dsh-rules-manager-client/      client 插件（浏览器 bundle）
-├── client.js                  设置页「命令与规则」面板（手写 __ModuleLoader__ bundle）
+├── client.js                  设置页「规则、命令与技能」面板（手写 __ModuleLoader__ bundle）
 └── README.md                  面板说明
 docs/                          踩坑与反馈记录（DSH message.id 校验不对称 bug：修复 + 官方反馈存档）
 ```
@@ -44,13 +44,13 @@ docs/                          踩坑与反馈记录（DSH message.id 校验不�
 dsh plugin --profile web add dsh-rules-manager
 ```
 
-重启 DSH → 设置页出现「命令与规则」，聊天框可用 `/rules`。
+重启 DSH → 设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
 
 ### 方式二：源码拷贝
 
 1. 把 `dsh-rules-manager/` 拷贝到 `$DSH_HOME/profiles/web/`，把 `dsh-rules-manager-client/` 拷贝到 `$DSH_HOME/profiles/node_modules/`；
 2. 在 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加装配（见 `dsh-rules-manager/README.md`）；
-3. 重启 DSH → 设置页出现「命令与规则」，聊天框可用 `/rules`。
+3. 重启 DSH → 设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
 
 ## 安全
 

@@ -1,12 +1,12 @@
-# dsh-rules-manager（规则与命令管理）
+# dsh-rules-manager（规则、命令与技能管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.0-blue)
+![version](https://img.shields.io/badge/version-1.4.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
 
-> DeepSeek Harness（DSH）的规则、命令与技能管理插件：**/rules 斜杠命令** + 设置页**「命令与规则」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**（支持禁用/启用）、**管理技能**（查看/禁用/启用/删除进回收站）、**备份与一键恢复**）。
+> DeepSeek Harness（DSH）的规则、命令与技能管理插件：**/rules 斜杠命令** + 设置页**「规则、命令与技能」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**（支持禁用/启用）、**管理技能**（查看/禁用/启用/删除进回收站）、**备份与一键恢复**）。
 >
 > ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**，可随时**一键恢复到任意备份时刻**。
 
@@ -14,11 +14,11 @@
 
 | 能力 | 入口 | 说明 |
 |---|---|---|
-| 列出 / 查看 / 新增 / 修改 / 删除 / **禁用 / 恢复**规则 | `/rules` 命令 或 设置→命令与规则 | 规则 = 用户全局规则（AGENTS.md），按分区组织，全文可视化编辑 |
-| 命令清单 | 设置→命令与规则 →「命令」 | 只读展示所有可用斜杠命令（名称/说明/用法） |
-| **自定义命令** | 设置→命令与规则 →「自定义命令」 | 你自己定义快捷指令：在聊天框输入 `/名字`，把预设内容发送给 AI 执行；**支持带参数**（见下）；**支持禁用/启用**（禁用后斜杠命令停用、内容保留、随时恢复） |
-| **技能管理** | 设置→命令与规则 →「技能」 | 查看已安装技能（名称+简介+全文）、**禁用**（移出技能目录，内容原样保留）、**启用**（原样搬回）、**删除**（移入回收站 `~/.dsh/.backups/trash-<时间戳>/`，随时可恢复）；禁用/删除需重启 DSH 后完全生效 |
-| **备份与恢复** | 设置→命令与规则 →「备份与恢复」 | 查看所有自动备份（时间 / 规则条数 / 大小），一键恢复到某个备份时刻；打开本页时自动把超出的旧备份移入回收站（保留最近 5 份） |
+| 列出 / 查看 / 新增 / 修改 / 删除 / **禁用 / 恢复**规则 | `/rules` 命令 或 设置→规则、命令与技能 | 规则 = 用户全局规则（AGENTS.md），按分区组织，全文可视化编辑 |
+| 命令清单 | 设置→规则、命令与技能 →「命令」 | 只读展示所有可用斜杠命令（名称/说明/用法） |
+| **自定义命令** | 设置→规则、命令与技能 →「自定义命令」 | 你自己定义快捷指令：在聊天框输入 `/名字`，把预设内容发送给 AI 执行；**支持带参数**（见下）；**支持禁用/启用**（禁用后斜杠命令停用、内容保留、随时恢复） |
+| **技能管理** | 设置→规则、命令与技能 →「技能」 | 查看已安装技能（名称+简介+全文）、**禁用**（移出技能目录，内容原样保留）、**启用**（原样搬回）、**删除**（移入回收站 `~/.dsh/.backups/trash-<时间戳>/`，随时可恢复）；禁用/删除需重启 DSH 后完全生效 |
+| **备份与恢复** | 设置→规则、命令与技能 →「备份与恢复」 | 查看所有自动备份（时间 / 规则条数 / 大小），一键恢复到某个备份时刻；打开本页时自动把超出的旧备份移入回收站（保留最近 5 份） |
 
 ### 使用示例
 
@@ -83,7 +83,7 @@
 dsh plugin --profile web add dsh-rules-manager
 ```
 
-dsh 会自动：安装本包及其依赖（含配套面板 `dsh-rules-manager-client`）、把本包追加进该 profile 的 `dsh.profile.bundles`、加载包内 `cordis.patch.yml` 挂载三个插件行（host 命令 / Remote 服务 / client 面板）。重启 DSH 后设置页出现「命令与规则」，聊天框可用 `/rules`。
+dsh 会自动：安装本包及其依赖（含配套面板 `dsh-rules-manager-client`）、把本包追加进该 profile 的 `dsh.profile.bundles`、加载包内 `cordis.patch.yml` 挂载三个插件行（host 命令 / Remote 服务 / client 面板）。重启 DSH 后设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
 
 卸载：
 
@@ -123,7 +123,7 @@ npm install dsh-rules-manager dsh-rules-manager-client
          name: 'dsh-rules-manager-client'
    ```
 
-3. **重启** DSH（Electron 窗口 ✕ → 重新打开）。设置页出现「命令与规则」，聊天框可用 `/rules`。
+3. **重启** DSH（Electron 窗口 ✕ → 重新打开）。设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
 
 > 说明：client 包必须放在 `profiles/node_modules/`（DSH 的 client 插件发现机制按 npm 包名解析）；依赖通过 `profiles/node_modules` 的 junction 森林解析 DSH 自带包。
 
@@ -136,7 +136,7 @@ dsh-rules-manager/              host 插件（纯 Node，无需构建）
 ├── rules-core.js               共享核心：AGENTS.md 解析 / 备份 / 增删改
 dsh-rules-manager-client/       client 插件（浏览器 bundle）
 ├── index.js                    host 面占位入口
-└── client.js                   设置页「命令与规则」面板（手写 __ModuleLoader__ bundle）
+└── client.js                   设置页「规则、命令与技能」面板（手写 __ModuleLoader__ bundle）
 ```
 
 - host 端定位 home 用 `@deepseek-ai/dsh-home-paths` 的 `resolveDshHome()`；

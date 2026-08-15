@@ -1,13 +1,13 @@
-# dsh-rules-manager (Rules & Commands Manager)
+# dsh-rules-manager (Rules, Commands & Skills Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.3.1-blue)
+![version](https://img.shields.io/badge/version-1.4.1-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
 
 > A DeepSeek Harness (DSH) plugin for managing your user-global rules and commands:
-> the **`/rules` slash command** plus a **settings panel "命令与规则"** with visual rule editing,
+> the **`/rules` slash command** plus a **settings panel "规则、命令与技能"** with visual rule editing,
 > a slash-command list, **user-defined custom commands**, and **backup restore**.
 >
 > ⚡ Rules live in `$DSH_HOME/AGENTS.md`; every change takes effect **immediately**
@@ -18,10 +18,10 @@
 
 | Capability | Where | Notes |
 |---|---|---|
-| List / view / add / edit / delete rules | `/rules` command or Settings → 命令与规则 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
-| Command list | Settings → 命令与规则 → 命令 | Read-only list of all available slash commands (name/description/usage) |
-| **Custom commands** | Settings → 命令与规则 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI; **supports arguments** (see below) |
-| **Backup & restore** | Settings → 命令与规则 → 备份与恢复 | Browse all auto backups (time / rule count / size), restore to any snapshot with one click |
+| List / view / add / edit / delete rules | `/rules` command or Settings → 规则、命令与技能 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
+| Command list | Settings → 规则、命令与技能 → 命令 | Read-only list of all available slash commands (name/description/usage) |
+| **Custom commands** | Settings → 规则、命令与技能 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI; **supports arguments** (see below) |
+| **Backup & restore** | Settings → 规则、命令与技能 → 备份与恢复 | Browse all auto backups (time / rule count / size), restore to any snapshot with one click |
 
 ### Examples
 
@@ -101,7 +101,7 @@ Both packages must be installed:
          name: 'dsh-rules-manager-client'
    ```
 
-3. **Restart** DSH. The settings panel shows "命令与规则"; the `/rules` command works in the chat box.
+3. **Restart** DSH. The settings panel shows "规则、命令与技能"; the `/rules` command works in the chat box.
 
 > The client package must live under `profiles/node_modules/` (DSH discovers client plugins by npm package name).
 > Host dependencies resolve through the junction forest in `profiles/node_modules`.

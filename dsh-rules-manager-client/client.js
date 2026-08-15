@@ -1,4 +1,4 @@
-// rules-manager-client —— 浏览器 bundle（设置页"命令与规则"面板）
+// rules-manager-client —— 浏览器 bundle（设置页"规则、命令与技能"面板）
 // 手写 bundle：window.__ModuleLoader__.load({ id, factory })，CJS factory。
 // 结构：
 //   1) TYPERT_REMOTE 贡献：把 host 端 rulesManager 服务挂到 ctx.remote（schema 用 passthrough）
@@ -660,8 +660,8 @@ window.__ModuleLoader__.load({
 			return react.createElement("div", { style: s.wrap },
 				react.createElement("div", { style: s.header },
 					react.createElement("div", null,
-						react.createElement("div", { style: s.title }, "命令与规则"),
-						react.createElement("div", { style: s.sub }, "可视化编辑用户全局规则（AGENTS.md，保存即生效，自动备份）；查看斜杠命令；创建你自己的自定义命令。")
+						react.createElement("div", { style: s.title }, "规则、命令与技能"),
+						react.createElement("div", { style: s.sub }, "可视化编辑用户全局规则（AGENTS.md，保存即生效，自动备份）；查看斜杠命令；创建你自己的自定义命令；管理技能。")
 					)
 				),
 				react.createElement("div", { style: s.tabs },
@@ -858,7 +858,7 @@ window.__ModuleLoader__.load({
 				name: "settings.section",
 				id: "rules-commands",
 				order: 100,
-				label: () => "命令与规则",
+				label: () => "规则、命令与技能",
 				inject: () => ({ rulesApi })
 			}, RulesCommandsPanel));
 		}

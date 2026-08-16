@@ -47,11 +47,11 @@ export async function loadRules() {
 			current = null;
 			continue;
 		}
-		const rule = line.match(/^###\s*\[规则\s*(\d+)\]\s*(.+?)\s*(?:（来源[^）]*）)?\s*$/);
+		const rule = line.match(/^###\s*\[规则\s*([0-9A-Za-z]+)\]\s*(.+?)\s*(?:（来源[^）]*）)?\s*$/);
 		if (rule) {
 			if (current) rules.push(current);
 			current = {
-				index: Number(rule[1]),
+				index: /^\d+$/.test(rule[1]) ? Number(rule[1]) : rule[1],
 				title: rule[2].trim(),
 				section: currentSection,
 				startLine: i,
@@ -127,7 +127,7 @@ export function ruleView(rule, lines) {
 export function addRuleOp(lines, rules, title, body) {
 	if (!title.trim()) return { error: "标题不能为空" };
 	if (!body.trim()) return { error: "正文不能为空" };
-	const maxIndex = rules.reduce((m, r) => Math.max(m, r.index), 0);
+	const maxIndex = rules.reduce((m, r) => Math.max(m, parseInt(String(r.index), 10) || 0), 0);
 	const next = maxIndex + 1;
 	const header = `### [规则 ${next}] ${title.trim()}（来源：/rules 命令 ${today()}）`;
 	const bodyLines = body.trimEnd().split("\n");
@@ -143,7 +143,7 @@ export function addRuleOp(lines, rules, title, body) {
 /** 修改规则正文：返回新行数组与规则信息，或 { error } */
 export function editRuleOp(lines, rules, index, body) {
 	if (!body.trim()) return { error: "正文不能为空" };
-	const rule = rules.find((r) => r.index === index);
+	const rule = rules.find((r) => String(r.index) === String(index));
 	if (!rule) return { error: `没有编号 ${index} 的规则` };
 	const nextLines = [...lines];
 	nextLines.splice(rule.startLine + 1, rule.endLine - rule.startLine - 1, ...body.trimEnd().split("\n"));
@@ -155,7 +155,7 @@ export function editRuleOp(lines, rules, index, body) {
 
 /** 删除规则：返回新行数组与规则信息，或 { error } */
 export function deleteRuleOp(lines, rules, index) {
-	const rule = rules.find((r) => r.index === index);
+	const rule = rules.find((r) => String(r.index) === String(index));
 	if (!rule) return { error: `没有编号 ${index} 的规则` };
 	const nextLines = [...lines];
 	nextLines.splice(rule.startLine, rule.endLine - rule.startLine);
@@ -167,7 +167,7 @@ export function deleteRuleOp(lines, rules, index) {
 
 /** 禁用规则：从 AGENTS.md 移除并原样记录（标题/分区/标题行/正文），供之后恢复 */
 export function disableRuleOp(lines, rules, index) {
-	const rule = rules.find((r) => r.index === index);
+	const rule = rules.find((r) => String(r.index) === String(index));
 	if (!rule) return { error: `没有编号 ${index} 的规则` };
 	const removed = {
 		index: rule.index,
@@ -213,7 +213,7 @@ export function countRulesInText(raw) {
 	const text = raw.charCodeAt(0) === 0xfeff ? raw.slice(1) : raw;
 	let count = 0;
 	for (const line of text.split("\n")) {
-		if (/^###\s*\[规则\s*\d+\]/u.test(line)) count++;
+		if (/^###\s*\[规则\s*[0-9A-Za-z]+\]/u.test(line)) count++;
 	}
 	return count;
 }
@@ -239,6 +239,7 @@ export async function listBackups() {
 			rulesCount: countRulesInText(raw)
 		});
 	}
+	result.sort((a, b) => a.time.localeCompare(b.time));
 	return result;
 }
 
@@ -262,4 +263,15 @@ export async function restoreBackupOp(name) {
 	const safety = await backupAgents(current); // 恢复前先备份当前状态
 	await writeFile(current, raw, "utf8");
 	return { ok: true, safety };
+}
+
+
+export function compareIndex(a, b) {
+	const ma = /^(\d+)([A-Za-z]?)$/.exec(String(a));
+	const mb = /^(\d+)([A-Za-z]?)$/.exec(String(b));
+	if (!ma || !mb) return String(a).localeCompare(String(b));
+	const na = Number(ma[1]);
+	const nb = Number(mb[1]);
+	if (na !== nb) return na - nb;
+	return (ma[2] || '').localeCompare(mb[2] || '');
 }

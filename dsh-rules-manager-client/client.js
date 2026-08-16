@@ -348,30 +348,66 @@ window.__ModuleLoader__.load({
 
 		// ── 2. 面板组件（React，内联样式，中文界面）──────────────────────────
 		const s = {
-			wrap: { display: "flex", flexDirection: "column", gap: "12px", width: "100%", boxSizing: "border-box" },
-			header: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" },
-			title: { fontSize: "15px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)" },
-			sub: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", lineHeight: "18px" },
-			tabs: { display: "flex", gap: "8px", borderBottom: "1px solid var(--dsw-alias-border-1, #e8eaee)", paddingBottom: "8px" },
-			tab: { padding: "6px 14px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "13px", background: "transparent", color: "var(--dsw-alias-label-secondary, #4e5969)" },
-			tabActive: { padding: "6px 14px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "13px", background: "var(--dsw-alias-interactive-bg-active, #e8f3ff)", color: "var(--dsw-alias-brand-6, #3370ff)" },
+			wrap: { display: "flex", flexDirection: "column", gap: "14px", width: "100%", boxSizing: "border-box" },
+			header: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" },
+			title: { fontSize: "17px", fontWeight: 650, color: "var(--dsw-alias-label-primary, #1f2329)" },
+			sub: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", lineHeight: "18px", marginTop: "3px" },
+			tabs: { display: "flex", gap: "6px", flexWrap: "wrap", borderBottom: "1px solid var(--dsw-alias-border-1, #e8eaee)", paddingBottom: "10px" },
+			tab: { padding: "7px 14px", borderRadius: "999px", border: "1px solid transparent", cursor: "pointer", fontSize: "13px", background: "transparent", color: "var(--dsw-alias-label-secondary, #4e5969)", transition: "all 160ms ease-out" },
+			tabActive: { padding: "7px 14px", borderRadius: "999px", border: "1px solid var(--dsw-alias-brand-2, #c9d9ff)", cursor: "pointer", fontSize: "13px", background: "var(--dsw-alias-interactive-bg-active, #e8f3ff)", color: "var(--dsw-alias-brand-6, #3370ff)", fontWeight: 550 },
 			groupTitle: { fontSize: "13px", fontWeight: 600, margin: "12px 0 6px", color: "var(--dsw-alias-label-primary, #1f2329)" },
-			card: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "10px", padding: "10px 12px", marginBottom: "8px", background: "var(--dsw-alias-bg-layer-1, #ffffff)" },
+			card: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "14px", padding: "12px 14px", marginBottom: "8px", background: "var(--dsw-alias-bg-layer-1, #ffffff)", boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)" },
 			cardHead: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" },
 			cardTitle: { fontSize: "13px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)" },
 			cardBody: { fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)", whiteSpace: "pre-wrap", lineHeight: "20px", margin: "6px 0 0", wordBreak: "break-word" },
-			btn: { padding: "4px 10px", borderRadius: "6px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", background: "transparent", cursor: "pointer", fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)" },
-			btnPrimary: { padding: "4px 10px", borderRadius: "6px", border: "none", background: "var(--dsw-alias-brand-6, #3370ff)", color: "#fff", cursor: "pointer", fontSize: "12px" },
-			btnDanger: { padding: "4px 10px", borderRadius: "6px", border: "1px solid var(--dsw-alias-danger-5, #f53f3f)", background: "transparent", color: "var(--dsw-alias-danger-5, #f53f3f)", cursor: "pointer", fontSize: "12px" },
-			input: { width: "100%", boxSizing: "border-box", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", fontSize: "12px", background: "var(--dsw-alias-bg-layer-1, #fff)", color: "var(--dsw-alias-label-primary, #1f2329)", fontFamily: "inherit" },
-			textarea: { width: "100%", boxSizing: "border-box", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", fontSize: "12px", minHeight: "90px", resize: "vertical", background: "var(--dsw-alias-bg-layer-1, #fff)", color: "var(--dsw-alias-label-primary, #1f2329)", fontFamily: "inherit", lineHeight: "20px" },
+			btn: { padding: "5px 11px", borderRadius: "8px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", background: "var(--dsw-alias-bg-layer-1, #fff)", cursor: "pointer", fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)", transition: "all 140ms ease-out" },
+			btnPrimary: { padding: "5px 11px", borderRadius: "8px", border: "1px solid transparent", background: "var(--dsw-alias-brand-6, #3370ff)", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: 550 },
+			btnDanger: { padding: "5px 11px", borderRadius: "8px", border: "1px solid var(--dsw-alias-danger-4, #fbaca3)", background: "transparent", color: "var(--dsw-alias-danger-5, #f53f3f)", cursor: "pointer", fontSize: "12px", transition: "all 140ms ease-out" },
+			input: { width: "100%", boxSizing: "border-box", padding: "7px 10px", borderRadius: "8px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", fontSize: "12px", background: "var(--dsw-alias-bg-layer-1, #fff)", color: "var(--dsw-alias-label-primary, #1f2329)", fontFamily: "inherit" },
+			textarea: { width: "100%", boxSizing: "border-box", padding: "7px 10px", borderRadius: "8px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", fontSize: "12px", minHeight: "90px", resize: "vertical", background: "var(--dsw-alias-bg-layer-1, #fff)", color: "var(--dsw-alias-label-primary, #1f2329)", fontFamily: "inherit", lineHeight: "20px" },
 			msg: { fontSize: "12px", color: "var(--dsw-alias-success-6, #00b42a)" },
 			msgErr: { fontSize: "12px", color: "var(--dsw-alias-danger-5, #f53f3f)" },
-			empty: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", padding: "12px 0", textAlign: "center" },
-			row: { display: "flex", alignItems: "center", gap: "8px", padding: "6px 8px", borderRadius: "8px", fontSize: "13px", borderBottom: "1px solid var(--dsw-alias-border-1, #e8eaee)" },
-			cmdName: { fontWeight: 600, color: "var(--dsw-alias-brand-6, #3370ff)", minWidth: "90px" },
-			cmdDesc: { flex: 1, color: "var(--dsw-alias-label-secondary, #4e5969)", fontSize: "12px" },
-			cmdHint: { color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "12px", fontFamily: "monospace" }
+			empty: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", padding: "16px 0", textAlign: "center" },
+			loading: { fontSize: "13px", color: "var(--dsw-alias-label-tertiary, #8a919f)", padding: "18px 0", textAlign: "center" },
+			search: { width: "100%", boxSizing: "border-box", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", fontSize: "13px", background: "var(--dsw-alias-bg-layer-1, #fff)", color: "var(--dsw-alias-label-primary, #1f2329)", fontFamily: "inherit", outline: "none", transition: "border-color 160ms ease-out, box-shadow 160ms ease-out" },
+			ruleSummary: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", lineHeight: "18px", margin: "4px 0 0", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" },
+			badge: { display: "inline-block", padding: "2px 8px", borderRadius: "999px", fontSize: "11px", fontWeight: 600, lineHeight: "18px", whiteSpace: "nowrap" },
+			badgeA: { background: "var(--dsw-alias-danger-1, #ffece8)", color: "var(--dsw-alias-danger-6, #d92d20)" },
+			badgeB: { background: "#fff3e0", color: "#ed7b2f" },
+			badgeC: { background: "var(--dsw-alias-brand-1, #e8f3ff)", color: "var(--dsw-alias-brand-6, #3370ff)" },
+			badgeD: { background: "var(--dsw-alias-fill-1, #f2f3f5)", color: "var(--dsw-alias-label-tertiary, #8a919f)" },
+			badgeM: { background: "#f4ecff", color: "#722ed1" },
+			badgeGreen: { background: "#d3f8df", color: "#067647" },
+			badgeGray: { background: "var(--dsw-alias-fill-1, #f2f3f5)", color: "var(--dsw-alias-label-tertiary, #8a919f)" },
+			overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: "16px" },
+			modal: { background: "var(--dsw-alias-bg-layer-1, #fff)", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", borderRadius: "14px", padding: "18px", maxWidth: "420px", width: "100%", boxShadow: "0 8px 24px rgba(0,0,0,0.15)" },
+			modalTitle: { fontSize: "14px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)", marginBottom: "8px" },
+			modalBody: { fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)", lineHeight: "20px", whiteSpace: "pre-wrap" },
+			modalActions: { display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "14px" },
+			groupHead: { display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", padding: "11px 14px", userSelect: "none", borderRadius: "12px", transition: "background 160ms ease-out" },
+			groupChevron: { fontSize: "11px", color: "var(--dsw-alias-label-tertiary, #8a919f)", transition: "transform 160ms ease-out" },
+			statWrap: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" },
+			statCard: { background: "var(--dsw-alias-bg-layer-1, #fff)", border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "14px", padding: "12px 14px", boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)", minHeight: "72px" },
+			statValue: { fontSize: "22px", fontWeight: 650, color: "var(--dsw-alias-label-primary, #1f2329)", lineHeight: "26px", fontVariantNumeric: "tabular-nums" },
+			statLabel: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", marginTop: "4px" },
+			skillGrid: { display: "grid", gridTemplateColumns: "1fr", gap: "10px" },
+			skillCard: { marginBottom: 0, display: "flex", flexDirection: "column", gap: "8px", padding: "12px 14px" },
+			skillDesc: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", lineHeight: "18px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" },
+			skillFallback: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)", fontStyle: "italic" },
+			statusGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" },
+			statusItem: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "10px", padding: "10px 12px", background: "var(--dsw-alias-fill-1, #f7f8fa)" },
+			statusLabel: { fontSize: "11px", color: "var(--dsw-alias-label-tertiary, #8a919f)" },
+			statusValue: { fontSize: "14px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)", marginTop: "2px" },
+			hoverCard: { transition: "box-shadow 160ms ease-out, border-color 160ms ease-out" },
+			row: { display: "flex", alignItems: "center", gap: "10px", padding: "11px 14px", borderRadius: "0px", fontSize: "13px", borderBottom: "1px solid var(--dsw-alias-border-1, #e8eaee)" },
+			groupContainer: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "14px", background: "var(--dsw-alias-bg-layer-1, #ffffff)", boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)", overflow: "hidden" },
+			groupBody: { display: "flex", flexDirection: "column" },
+			ruleRow: { display: "flex", flexDirection: "column", gap: "8px", padding: "12px 14px", borderTop: "1px solid var(--dsw-alias-border-1, #e8eaee)", background: "var(--dsw-alias-bg-layer-1, #fff)" },
+			listContainer: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "14px", background: "var(--dsw-alias-bg-layer-1, #fff)", boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)", overflow: "hidden" },
+			listRow: { display: "flex", alignItems: "flex-start", gap: "12px", padding: "12px 14px", borderTop: "1px solid var(--dsw-alias-border-1, #e8eaee)", background: "var(--dsw-alias-bg-layer-1, #fff)" },
+			cmdName: { fontWeight: 600, color: "var(--dsw-alias-brand-6, #3370ff)", width: "130px", minWidth: "130px", flexShrink: 0, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingTop: "2px" },
+			cmdDesc: { flex: 1, minWidth: 0, color: "var(--dsw-alias-label-secondary, #4e5969)", fontSize: "12px", lineHeight: "18px", wordBreak: "break-word", maxHeight: "60px", overflowY: "auto" },
+			cmdHint: { width: "150px", minWidth: "150px", flexShrink: 0, color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "11px", fontFamily: "monospace", lineHeight: "16px", wordBreak: "break-word", maxHeight: "60px", overflowY: "auto" }
 		};
 
 		/** 解包 RPC 信封：client 端 Remote 方法返回 {ok, value}，value 才是 host 返回值 */
@@ -381,6 +417,59 @@ window.__ModuleLoader__.load({
 			if (typeof e === "string") return e;
 			if (typeof e.message === "string") return e.message;
 			try { return JSON.stringify(e); } catch { return String(e); }
+		};
+
+		/** 从规则标题/正文里提取执行等级（如 A、A+D、C+D、M），用于徽章展示 */
+		const extractLevel = (title, body) => {
+			const text = (title || "") + "\n" + (body || "");
+			const m = text.match(/执行等级[：:]\s*([A-DM][^)）\n]*?)(?=[)）\n]|$)/);
+			return m ? m[1].trim() : "";
+		};
+		const levelBadgeStyle = (level) => {
+			const l = (level || "").toUpperCase();
+			if (l.startsWith("A")) return s.badgeA;
+			if (l.startsWith("B")) return s.badgeB;
+			if (l.startsWith("C")) return s.badgeC;
+			if (l.startsWith("D")) return s.badgeD;
+			if (l.startsWith("M")) return s.badgeM;
+			return s.badgeD;
+		};
+		/** 去掉标题里的“（执行等级：…）”，避免和徽章重复 */
+		const cleanRuleTitle = (title) => {
+			return (title || "")
+				.replace(/[（(]执行等级[：:][^)）]*[)）]/g, "")
+				.replace(/^\[?规则\s*[0-9A-Za-z]+\]?\s*/u, "")
+				.trim();
+		};
+		/** 从规则正文提取一句摘要：优先取“触发”内容，去掉 markdown 符号 */
+		const extractSummary = (body) => {
+			const lines = (body || "").split("\n");
+			const trigger = lines.find((x) => /触发[：:]/.test(x));
+			if (trigger) {
+				return trigger.replace(/^[-*\s]*\**\s*触发[：:]\s*/u, "").replace(/\*\*/g, "").trim();
+			}
+			const first = lines.map((x) => x.trim()).find((x) => x.length > 0);
+			return first ? first.replace(/\*\*/g, "").trim() : "（无正文）";
+		};
+		/** 把 ISO UTC 时间转成本地时间字符串（YYYY-MM-DD HH:mm:ss） */
+		const fmtLocal = (ts) => {
+			if (!ts) return "";
+			const d = new Date(ts);
+			if (Number.isNaN(d.getTime())) return String(ts);
+			const p = (n) => String(n).padStart(2, "0");
+			return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+		};
+		/** 规则编号排序：数字升序，同数字字母 A→Z（如 9 < 12A < 12B < 13A） */
+		const ruleIndexKey = (idx) => {
+			const s = String(idx == null ? "" : idx);
+			const m = s.match(/^(\d+)([A-Za-z]*)$/);
+			return m ? [Number(m[1]), m[2]] : [Infinity, s];
+		};
+		const compareRuleIndex = (a, b) => {
+			const ka = ruleIndexKey(a.index);
+			const kb = ruleIndexKey(b.index);
+			if (ka[0] !== kb[0]) return ka[0] - kb[0];
+			return ka[1].localeCompare(kb[1]);
 		};
 
 		function RulesCommandsPanel(props) {
@@ -396,6 +485,12 @@ window.__ModuleLoader__.load({
 			const [auditLog, setAuditLog] = useState(null);
 			const [auditError, setAuditError] = useState("");
 			const [tab, setTab] = useState("rules");
+			// UI 优化：搜索、折叠、面板内确认
+			const [confirm, setConfirm] = useState(null);
+			const [ruleQuery, setRuleQuery] = useState("");
+			const [expandedRules, setExpandedRules] = useState({});
+			const [collapsedSections, setCollapsedSections] = useState({});
+			const [cmdQuery, setCmdQuery] = useState("");
 			// 规则
 			const [rules, setRules] = useState(null);
 			const [rulesError, setRulesError] = useState("");
@@ -430,6 +525,16 @@ window.__ModuleLoader__.load({
 			const [skillMessage, setSkillMessage] = useState("");
 			const [skillDetail, setSkillDetail] = useState(null);
 			const [disabledSkills, setDisabledSkills] = useState(null);
+
+			const askConfirm = (message, onOk) => setConfirm({ message, onOk });
+			const runConfirm = () => {
+				if (!confirm) return;
+				const fn = confirm.onOk;
+				setConfirm(null);
+				fn();
+			};
+			const toggleExpand = (index) => setExpandedRules((prev) => ({ ...prev, [index]: !prev[index] }));
+			const toggleSection = (section) => setCollapsedSections((prev) => ({ ...prev, [section]: !prev[section] }));
 
 			const refresh = useCallback(async () => {
 				try {
@@ -490,8 +595,8 @@ window.__ModuleLoader__.load({
 				}
 			}, [engineApi]);
 			useEffect(() => {
-				if (tab === "engine" && auditLog === null) loadAudit();
-			}, [tab, auditLog, loadAudit]);
+				if (tab === "engine") loadAudit();
+			}, [tab, loadAudit]);
 
 			const loadDisabled = useCallback(async () => {
 				try {
@@ -517,8 +622,8 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => {
-				if (tab === "commands" && commands === null) loadCommands();
-			}, [tab, commands, loadCommands]);
+				if (commands === null) loadCommands();
+			}, [commands, loadCommands]);
 
 			const loadBackups = useCallback(async () => {
 				try {
@@ -543,8 +648,8 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => {
-				if (tab === "bk" && backups === null) loadBackups();
-			}, [tab, backups, loadBackups]);
+				if (tab === "bk") loadBackups();
+			}, [tab, loadBackups]);
 
 			const loadUserCommands = useCallback(async () => {
 				try {
@@ -575,8 +680,8 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => {
-				if (tab === "skills" && skills === null) loadSkills();
-			}, [tab, skills, loadSkills]);
+				if (skills === null) loadSkills();
+			}, [skills, loadSkills]);
 
 			const loadDisabledSkills = useCallback(async () => {
 				try {
@@ -606,28 +711,30 @@ window.__ModuleLoader__.load({
 				setEditing(null);
 				refresh();
 			};
-			const doDelete = async (index) => {
-				if (!window.confirm(`确定删除规则 ${index} 吗？删除前会自动备份到 ~/.dsh/.backups/，删除后编号不复用。`)) return;
-				try {
-					const res = await rulesApi.deleteRule(index);
-					const data = unwrap(res);
-					setMessage(data && data.ok ? `已删除规则 ${index}` : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				refresh();
+			const doDelete = (index) => {
+				askConfirm(`确定删除规则 ${index} 吗？删除前会自动备份到 ~/.dsh/.backups/，删除后编号不复用。`, async () => {
+					try {
+						const res = await rulesApi.deleteRule(index);
+						const data = unwrap(res);
+						setMessage(data && data.ok ? `已删除规则 ${index}` : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					refresh();
+				});
 			};
-			const doDisable = async (index) => {
-				if (!window.confirm(`确定禁用规则 ${index} 吗？禁用的规则会从 AGENTS.md 移除（不再生效），原样保存，随时可恢复。`)) return;
-				try {
-					const res = await rulesApi.disableRule(index);
-					const data = unwrap(res);
-					setMessage(data && data.ok ? `已禁用规则 ${index}（可在下方"已禁用"恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				refresh();
-				loadDisabled();
+			const doDisable = (index) => {
+				askConfirm(`确定禁用规则 ${index} 吗？禁用的规则会从 AGENTS.md 移除（不再生效），原样保存，随时可恢复。`, async () => {
+					try {
+						const res = await rulesApi.disableRule(index);
+						const data = unwrap(res);
+						setMessage(data && data.ok ? `已禁用规则 ${index}（可在下方"已禁用"恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					refresh();
+					loadDisabled();
+				});
 			};
 			const doEnable = async (index) => {
 				try {
@@ -640,19 +747,20 @@ window.__ModuleLoader__.load({
 				refresh();
 				loadDisabled();
 			};
-			const doRestore = async (name) => {
-				if (!window.confirm("将把 AGENTS.md 恢复到该备份的时刻。\n\n恢复前会先把当前文件再自动备份一份（双保险，恢复错了还能再退回去）。\n\n注意：恢复后当前会话可能仍在使用旧的规则缓存，建议之后新开一个会话验证生效。\n\n确定恢复这份备份吗？")) return;
-				setBkBusy(true);
-				try {
-					const res = await rulesApi.restoreBackup(name);
-					const data = unwrap(res);
-					setBkMessage(data && data.ok ? "已恢复备份！恢复前已自动备份当前文件，可随时再退回去。" : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setBkMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				setBkBusy(false);
-				loadBackups();
-				refresh();
+			const doRestore = (name) => {
+				askConfirm("将把 AGENTS.md 恢复到该备份的时刻。\n\n恢复前会先把当前文件再自动备份一份（双保险，恢复错了还能再退回去）。\n\n注意：恢复后当前会话可能仍在使用旧的规则缓存，建议之后新开一个会话验证生效。\n\n确定恢复这份备份吗？", async () => {
+					setBkBusy(true);
+					try {
+						const res = await rulesApi.restoreBackup(name);
+						const data = unwrap(res);
+						setBkMessage(data && data.ok ? "已恢复备份！恢复前已自动备份当前文件，可随时再退回去。" : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setBkMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					setBkBusy(false);
+					loadBackups();
+					refresh();
+				});
 			};
 			const doAdd = async () => {
 				try {
@@ -700,16 +808,17 @@ window.__ModuleLoader__.load({
 				setUcEditing(null);
 				loadUserCommands();
 			};
-			const doDeleteUserCommand = async (name) => {
-				if (!window.confirm(`确定删除自定义命令 /${name} 吗？`)) return;
-				try {
-					const res = await rulesApi.deleteUserCommand(name);
-					const data = unwrap(res);
-					setUcMessage(data && data.ok ? `已删除命令 /${name}` : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setUcMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				loadUserCommands();
+			const doDeleteUserCommand = (name) => {
+				askConfirm(`确定删除自定义命令 /${name} 吗？`, async () => {
+					try {
+						const res = await rulesApi.deleteUserCommand(name);
+						const data = unwrap(res);
+						setUcMessage(data && data.ok ? `已删除命令 /${name}` : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setUcMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					loadUserCommands();
+				});
 			};
 			const doDisableUserCommand = async (name) => {
 				try {
@@ -743,18 +852,19 @@ window.__ModuleLoader__.load({
 					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
 				}
 			};
-			const doDisableSkill = async (name) => {
-				if (!window.confirm(`确定禁用技能「${name}」吗？\n\n禁用 = 把它移出技能目录（内容原样保留，随时可恢复）。\n注意：需要重启 DSH 后才完全生效。`)) return;
-				try {
-					const res = await rulesApi.disableSkill(name);
-					const data = unwrap(res);
-					setSkillMessage(data && data.ok ? `已禁用技能「${name}」（重启 DSH 后完全生效）` : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				setSkillDetail(null);
-				loadSkills();
-				loadDisabledSkills();
+			const doDisableSkill = (name) => {
+				askConfirm(`确定禁用技能「${name}」吗？\n\n禁用 = 把它移出技能目录（内容原样保留，随时可恢复）。\n注意：需要重启 DSH 后才完全生效。`, async () => {
+					try {
+						const res = await rulesApi.disableSkill(name);
+						const data = unwrap(res);
+						setSkillMessage(data && data.ok ? `已禁用技能「${name}」（重启 DSH 后完全生效）` : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					setSkillDetail(null);
+					loadSkills();
+					loadDisabledSkills();
+				});
 			};
 			const doEnableSkill = async (name) => {
 				try {
@@ -767,18 +877,19 @@ window.__ModuleLoader__.load({
 				loadSkills();
 				loadDisabledSkills();
 			};
-			const doDeleteSkill = async (name) => {
-				if (!window.confirm(`确定删除技能「${name}」吗？\n\n删除 = 移入回收站（~/.dsh/.backups/trash-<时间戳>/），内容不丢失，随时可恢复。\n\n注意：需要重启 DSH 后才完全生效。`)) return;
-				try {
-					const res = await rulesApi.deleteSkill(name);
-					const data = unwrap(res);
-					setSkillMessage(data && data.ok ? `已删除技能「${name}」（已移入回收站，可恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
-				} catch (e) {
-					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
-				}
-				setSkillDetail(null);
-				loadSkills();
-				loadDisabledSkills();
+			const doDeleteSkill = (name) => {
+				askConfirm(`确定删除技能「${name}」吗？\n\n删除 = 移入回收站（~/.dsh/.backups/trash-<时间戳>/），内容不丢失，随时可恢复。\n\n注意：需要重启 DSH 后才完全生效。`, async () => {
+					try {
+						const res = await rulesApi.deleteSkill(name);
+						const data = unwrap(res);
+						setSkillMessage(data && data.ok ? `已删除技能「${name}」（已移入回收站，可恢复）` : `出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					setSkillDetail(null);
+					loadSkills();
+					loadDisabledSkills();
+				});
 			};
 
 			// 按分区分组
@@ -800,22 +911,51 @@ window.__ModuleLoader__.load({
 						react.createElement("div", { style: s.sub }, "可视化编辑你的全局规则（AGENTS.md，保存即生效、自动备份）；查看全部斜杠命令；创建自定义命令（支持禁用/启用）；管理技能（查看说明、禁用、启用、删除进回收站）。")
 					)
 				),
+				react.createElement("style", null, ".rm-hover-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);border-color:var(--dsw-alias-border-2,#d5d9e0)}.rm-stat-grid{grid-template-columns:repeat(4,1fr)}.rm-search:focus{border-color:var(--dsw-alias-brand-6,#3370ff);box-shadow:0 0 0 3px var(--dsw-alias-brand-1,#e8f3ff)}.rm-group-head:hover{background:var(--dsw-alias-fill-1,#f2f3f5)}.rm-group-body>.rm-rule-row:first-child{border-top:none}.rm-list>.rm-list-row:first-child{border-top:none}@media(max-width:640px){.rm-stat-grid{grid-template-columns:repeat(2,1fr)}.rm-skill-grid{grid-template-columns:1fr}}"),
+				react.createElement("div", { style: s.statWrap, className: "rm-stat-grid" },
+					react.createElement("div", { style: s.statCard },
+						react.createElement("div", { style: s.statValue }, rules ? rules.length : "—"),
+						react.createElement("div", { style: s.statLabel }, "规则总数")
+					),
+					react.createElement("div", { style: s.statCard },
+						react.createElement("div", { style: s.statValue }, rules ? rules.length : "—"),
+						react.createElement("div", { style: s.statLabel }, "已启用规则")
+					),
+					react.createElement("div", { style: s.statCard },
+						react.createElement("div", { style: s.statValue }, commands ? commands.length : "—"),
+						react.createElement("div", { style: s.statLabel }, "命令")
+					),
+					react.createElement("div", { style: s.statCard },
+						react.createElement("div", { style: s.statValue }, skills ? skills.length : "—"),
+						react.createElement("div", { style: s.statLabel }, "技能")
+					)
+				),
 				react.createElement("div", { style: s.tabs },
 					react.createElement("button", { style: tab === "rules" ? s.tabActive : s.tab, onClick: () => setTab("rules") }, "规则"),
+					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "规则备份与恢复"),
+					react.createElement("button", { style: tab === "engine" ? s.tabActive : s.tab, onClick: () => setTab("engine") }, "规则引擎"),
 					react.createElement("button", { style: tab === "commands" ? s.tabActive : s.tab, onClick: () => setTab("commands") }, "命令"),
 					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令"),
-					react.createElement("button", { style: tab === "skills" ? s.tabActive : s.tab, onClick: () => setTab("skills") }, "技能"),
-					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "备份与恢复"),
-					react.createElement("button", { style: tab === "engine" ? s.tabActive : s.tab, onClick: () => setTab("engine") }, "规则引擎")
+					react.createElement("button", { style: tab === "skills" ? s.tabActive : s.tab, onClick: () => setTab("skills") }, "技能")
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
-				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : tab === "engine" ? renderRuleEngine() : renderBackups()
+				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : tab === "engine" ? renderRuleEngine() : renderBackups(),
+				confirm ? react.createElement("div", { style: s.overlay, onClick: () => setConfirm(null) },
+					react.createElement("div", { style: s.modal, onClick: (e) => e.stopPropagation() },
+						react.createElement("div", { style: s.modalTitle }, "请确认"),
+						react.createElement("div", { style: s.modalBody }, confirm.message),
+						react.createElement("div", { style: s.modalActions },
+							react.createElement("button", { style: s.btn, onClick: () => setConfirm(null) }, "取消"),
+							react.createElement("button", { style: s.btnPrimary, onClick: runConfirm }, "确认")
+						)
+					)
+				) : null
 			));
 
 			function renderRuleEngine() {
 				try {
 				if (engineError && !engine) return react.createElement("div", { style: s.msgErr }, `加载失败：${engineError}`);
-				if (!engine) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (!engine) return react.createElement("div", { style: s.loading }, "正在加载规则引擎…");
 
 				const versionNodes = (updateInfo?.impacts || []).map((ver, i) =>
 					react.createElement("div", { key: i, style: s.card },
@@ -827,18 +967,33 @@ window.__ModuleLoader__.load({
 					)
 				);
 
-				const auditNodes = (auditLog || []).map((e, i) =>
+				const auditNodes = [...(auditLog || [])].sort((a, b) => new Date(b.ts) - new Date(a.ts)).map((e, i) =>
 					react.createElement("div", { key: i, style: s.row },
-						react.createElement("span", { style: { color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "12px", fontFamily: "monospace" } }, String(e.ts || "").replace("T", " ").slice(0, 19)),
+						react.createElement("span", { style: { color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "12px", fontFamily: "monospace" } }, fmtLocal(e.ts)),
 						react.createElement("span", { style: { flex: 1, fontSize: "12px" } }, `[${e.rule || "?"}] ${e.name || ""}${e.reason ? "：" + e.reason : ""}`)
 					)
 				);
 
 				return react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "8px" } },
-					react.createElement("div", { style: s.card },
+					react.createElement("div", { style: s.card, className: "rm-hover-card" },
 						react.createElement("div", { style: s.cardTitle }, "引擎状态"),
-						react.createElement("div", { style: s.cardBody },
-							`版本：${engine.version || "?"}｜开关：${engine.enabled ? "开启" : "关闭"}｜规则数：${engine.rulesCount ?? "?"}｜mountRevision：${engine.mountRevision ?? 0}｜配置：${engine.configOk ? "正常" : "异常"}`
+						react.createElement("div", { style: s.statusGrid },
+							react.createElement("div", { style: s.statusItem },
+								react.createElement("div", { style: s.statusLabel }, "版本"),
+								react.createElement("div", { style: s.statusValue }, engine.version || "?")
+							),
+							react.createElement("div", { style: s.statusItem },
+								react.createElement("div", { style: s.statusLabel }, "开关"),
+								react.createElement("div", { style: s.statusValue }, engine.enabled ? "开启" : "关闭")
+							),
+							react.createElement("div", { style: s.statusItem },
+								react.createElement("div", { style: s.statusLabel }, "规则数"),
+								react.createElement("div", { style: s.statusValue }, engine.rulesCount ?? "?")
+							),
+							react.createElement("div", { style: s.statusItem },
+								react.createElement("div", { style: s.statusLabel }, "配置"),
+								react.createElement("div", { style: { ...s.statusValue, color: engine.configOk ? "var(--dsw-alias-success-6, #00b42a)" : "var(--dsw-alias-danger-5, #f53f3f)" } }, engine.configOk ? "正常" : "异常")
+							)
 						)
 					),
 					react.createElement("div", { style: s.card },
@@ -866,10 +1021,21 @@ window.__ModuleLoader__.load({
 
 
 			function renderRules() {
-				if (rules === null && !rulesError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (rules === null && !rulesError) return react.createElement("div", { style: s.loading }, "正在加载规则…");
 				if (rulesError) return react.createElement("div", { style: s.msgErr }, `加载失败：${rulesError}`);
+				const q = ruleQuery.trim().toLowerCase();
+				const filtered = (rules || []).filter((r) => !q || ((r.title || "") + "\n" + (r.body || "")).toLowerCase().indexOf(q) !== -1);
+				const groups = [];
+				const map = new Map();
+				for (const r of filtered) {
+					const list = map.get(r.section) ?? [];
+					list.push(r);
+					map.set(r.section, list);
+				}
+				for (const [section, list] of map) { list.sort(compareRuleIndex); groups.push({ section, list }); }
 				return react.createElement("div", null,
-					react.createElement("div", { style: { display: "flex", justifyContent: "flex-end", marginBottom: "8px" } },
+					react.createElement("div", { style: { display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" } },
+						react.createElement("input", { style: { ...s.search, flex: 1, minWidth: "160px" }, className: "rm-search", placeholder: "搜索规则编号、标题或正文…", value: ruleQuery, onChange: (e) => setRuleQuery(e.target.value) }),
 						react.createElement("button", { style: s.btnPrimary, onClick: () => setShowAdd(!showAdd) }, showAdd ? "收起新增" : "＋ 新增规则")
 					),
 					showAdd ? react.createElement("div", { style: s.card },
@@ -881,29 +1047,49 @@ window.__ModuleLoader__.load({
 							)
 						)
 					) : null,
-					groups.length === 0 ? react.createElement("div", { style: s.empty }, "尚未发现规则") : null,
-					groups.map((g) => react.createElement("div", { key: g.section },
-						react.createElement("div", { style: s.groupTitle }, g.section),
-						g.list.map((rule) => react.createElement("div", { key: rule.index, style: s.card },
-							react.createElement("div", { style: s.cardHead },
-								react.createElement("div", { style: s.cardTitle }, `[${rule.index}] ${rule.title}`),
-								react.createElement("div", { style: { display: "flex", gap: "6px" } },
-									editing === rule.index
-										? react.createElement("button", { style: s.btnPrimary, onClick: doSaveEdit }, "保存")
-										: react.createElement("button", { style: s.btn, onClick: () => doEdit(rule) }, "编辑"),
-									editing === rule.index
-										? react.createElement("button", { style: s.btn, onClick: () => setEditing(null) }, "取消")
-										: react.createElement("button", { style: s.btn, onClick: () => doDisable(rule.index) }, "禁用"),
-									editing === rule.index
-										? null
-										: react.createElement("button", { style: s.btnDanger, onClick: () => doDelete(rule.index) }, "删除")
-								)
+					groups.length === 0 ? react.createElement("div", { style: s.empty }, q ? "没有匹配的规则" : "尚未发现规则") : null,
+					groups.map((g) => {
+						const collapsed = !!collapsedSections[g.section];
+						return react.createElement("div", { key: g.section, style: { ...s.groupContainer, marginBottom: "8px" } },
+							react.createElement("div", { style: s.groupHead, className: "rm-group-head", onClick: () => toggleSection(g.section) },
+								react.createElement("span", { style: { ...s.groupChevron, transform: collapsed ? "rotate(-90deg)" : "none" } }, "▼"),
+								react.createElement("span", { style: { ...s.groupTitle, margin: 0 } }, g.section),
+								react.createElement("span", { style: { ...s.sub, marginLeft: "auto" } }, `${g.list.length} 条`)
 							),
-							editing === rule.index
-								? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, value: editBody, onChange: (e) => setEditBody(e.target.value) })
-								: react.createElement("div", { style: s.cardBody }, rule.body)
-						))
-					)),
+							!collapsed ? react.createElement("div", { style: s.groupBody, className: "rm-group-body" },
+								g.list.map((rule) => {
+									const level = extractLevel(rule.title, rule.body);
+									const badgeStyle = level ? levelBadgeStyle(level) : null;
+									const open = !!expandedRules[rule.index];
+									return react.createElement("div", { key: rule.index, style: { ...s.ruleRow, ...s.hoverCard }, className: "rm-rule-row rm-hover-card" },
+										react.createElement("div", { style: s.cardHead },
+											react.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1, flexWrap: "nowrap", overflow: "hidden" } },
+												react.createElement("span", { style: { ...s.cardTitle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, `[${rule.index}] ${cleanRuleTitle(rule.title)}`),
+												level ? react.createElement("span", { style: { ...s.badge, ...badgeStyle, flexShrink: 0 } }, level) : null
+											),
+											react.createElement("div", { style: { display: "flex", gap: "4px", flexWrap: "nowrap", flexShrink: 0 } },
+												editing === rule.index
+													? react.createElement("button", { style: s.btnPrimary, onClick: doSaveEdit }, "保存")
+													: react.createElement("button", { style: s.btn, onClick: () => doEdit(rule) }, "编辑"),
+												editing === rule.index
+													? react.createElement("button", { style: s.btn, onClick: () => setEditing(null) }, "取消")
+													: react.createElement("button", { style: s.btn, onClick: () => doDisable(rule.index) }, "禁用"),
+												editing === rule.index
+													? null
+													: react.createElement("button", { style: s.btn, onClick: () => toggleExpand(rule.index) }, open ? "收起" : "详情"),
+												editing === rule.index
+													? null
+													: react.createElement("button", { style: s.btnDanger, onClick: () => doDelete(rule.index) }, "删除")
+											)
+										),
+										editing === rule.index
+											? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, value: editBody, onChange: (e) => setEditBody(e.target.value) })
+											: (open ? react.createElement("div", { style: s.cardBody }, rule.body) : null)
+									);
+								})
+							) : null
+						);
+					}),
 					(disabledRules && disabledRules.length > 0) ? react.createElement("div", { style: { marginTop: "16px" } },
 						react.createElement("div", { style: s.groupTitle }, `已禁用规则（${disabledRules.length}）— 已从 AGENTS.md 移除，恢复后自动重新生效`),
 						disabledRules.map((d) => react.createElement("div", { key: d.index, style: { ...s.card, opacity: 0.6 } },
@@ -917,21 +1103,28 @@ window.__ModuleLoader__.load({
 			}
 
 			function renderCommands() {
-				if (commands === null && !cmdError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (commands === null && !cmdError) return react.createElement("div", { style: s.loading }, "正在加载…");
 				if (cmdError) return react.createElement("div", { style: s.msgErr }, `加载失败：${cmdError}`);
 				if (commands.length === 0) return react.createElement("div", { style: s.empty }, "暂无可用命令");
+				const q = cmdQuery.trim().toLowerCase();
+				const filtered = commands.filter((c) => !q || ((c.name || "") + "\n" + (c.description || "") + "\n" + (c.hint || "")).toLowerCase().indexOf(q) !== -1);
 				return react.createElement("div", null,
-					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, `共 ${commands.length} 个可用命令（由各插件注册，仅只读展示）`),
-					commands.map((c) => react.createElement("div", { key: c.name, style: s.row },
-						react.createElement("div", { style: s.cmdName }, `/${c.name}`),
-						react.createElement("div", { style: s.cmdDesc }, c.description),
-						c.hint ? react.createElement("div", { style: s.cmdHint }, c.hint) : null
-					))
+					react.createElement("div", { style: { display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" } },
+						react.createElement("input", { style: { ...s.search, flex: 1, minWidth: "160px" }, className: "rm-search", placeholder: "搜索命令…", value: cmdQuery, onChange: (e) => setCmdQuery(e.target.value) }),
+						react.createElement("span", { style: { ...s.sub, alignSelf: "center" } }, `共 ${commands.length} 个可用命令（由各插件注册，仅只读展示）`)
+					),
+					filtered.length === 0 ? react.createElement("div", { style: s.empty }, "没有匹配的命令") : react.createElement("div", { style: s.listContainer, className: "rm-list" },
+						filtered.map((c) => react.createElement("div", { key: c.name, style: s.listRow, className: "rm-list-row" },
+							react.createElement("div", { style: s.cmdName }, `/${c.name}`),
+							react.createElement("div", { style: s.cmdDesc }, c.description),
+							c.hint ? react.createElement("div", { style: s.cmdHint }, c.hint) : null
+						))
+					)
 				);
 			}
 
 			function renderUserCommands() {
-				if (userCmds === null && !ucError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (userCmds === null && !ucError) return react.createElement("div", { style: s.loading }, "正在加载…");
 				if (ucError) return react.createElement("div", { style: s.msgErr }, `加载失败：${ucError}`);
 				return react.createElement("div", null,
 					ucMessage ? react.createElement("div", { style: s.msg, marginBottom: "8px" }, ucMessage) : null,
@@ -979,33 +1172,43 @@ window.__ModuleLoader__.load({
 			}
 
 			function renderSkills() {
-				if (skills === null && !skillError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (skills === null && !skillError) return react.createElement("div", { style: s.loading }, "正在加载技能…");
 				if (skillError) return react.createElement("div", { style: s.msgErr }, `加载失败：${skillError}`);
 				return react.createElement("div", null,
 					skillMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, skillMessage) : null,
 					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "技能 = 教会 AI 特定本领的说明书，存放在 ~/.dsh/skills/ 下。禁用 = 把它移到旁边的存放区（内容原样保留，可随时恢复）；删除 = 移入回收站（可恢复）。禁用或删除都需要重启 DSH 后才完全生效。"),
 					(skills || []).length === 0 ? react.createElement("div", { style: s.empty }, "尚未发现技能") : null,
-					(skills || []).map((sk) => react.createElement("div", { key: sk.name, style: s.card },
-						react.createElement("div", { style: s.cardHead },
-							react.createElement("div", { style: s.cardTitle }, sk.title === sk.name ? sk.name : `${sk.title}（${sk.name}）`),
-							react.createElement("div", { style: { display: "flex", gap: "6px" } },
-								skillDetail && skillDetail.name === sk.name
-									? react.createElement("button", { style: s.btn, onClick: () => setSkillDetail(null) }, "收起")
-									: react.createElement("button", { style: s.btn, onClick: () => doShowSkill(sk.name) }, "查看"),
-								react.createElement("button", { style: s.btn, onClick: () => doDisableSkill(sk.name) }, "禁用"),
-								react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(sk.name) }, "删除")
-							)
-						),
-						sk.description ? react.createElement("div", { style: s.cardBody }, sk.description) : null,
-						skillDetail && skillDetail.name === sk.name
-							? react.createElement("pre", { style: { ...s.cardBody, background: "var(--dsw-alias-bg-layer-2, #f5f6f8)", borderRadius: "6px", padding: "8px", maxHeight: "260px", overflow: "auto" } }, skillDetail.content)
-							: null
-					)),
+					react.createElement("div", { style: s.skillGrid, className: "rm-skill-grid" },
+						(skills || []).map((sk) => react.createElement("div", { key: sk.name, style: { ...s.card, ...s.skillCard, ...s.hoverCard }, className: "rm-hover-card" },
+							react.createElement("div", { style: s.cardHead },
+								react.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: "6px", minWidth: 0, flex: 1, flexWrap: "wrap" } },
+									react.createElement("span", { style: { ...s.cardTitle, whiteSpace: "normal", wordBreak: "break-word" } }, sk.title === sk.name ? sk.name : `${sk.title}（${sk.name}）`),
+									react.createElement("span", { style: { ...s.badge, ...s.badgeGreen, flexShrink: 0 } }, "启用")
+								),
+								react.createElement("div", { style: { display: "flex", gap: "4px", flexWrap: "nowrap", flexShrink: 0 } },
+									skillDetail && skillDetail.name === sk.name
+										? react.createElement("button", { style: s.btn, onClick: () => setSkillDetail(null) }, "收起")
+										: react.createElement("button", { style: s.btn, onClick: () => doShowSkill(sk.name) }, "查看"),
+									react.createElement("button", { style: s.btn, onClick: () => doDisableSkill(sk.name) }, "禁用"),
+									react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(sk.name) }, "删除")
+								)
+							),
+							skillDetail && skillDetail.name === sk.name
+								? react.createElement("div", null,
+									react.createElement("div", { style: { ...s.sub, marginBottom: "4px" } }, "技能说明（可滚动查看）"),
+									react.createElement("pre", { style: { ...s.cardBody, background: "var(--dsw-alias-bg-layer-2, #f5f6f8)", borderRadius: "6px", padding: "8px", maxHeight: "180px", overflow: "auto", marginTop: "4px" } }, skillDetail.content)
+								)
+								: null
+						))
+					),
 					(disabledSkills && disabledSkills.length > 0) ? react.createElement("div", { style: { marginTop: "16px" } },
 						react.createElement("div", { style: s.groupTitle }, `已禁用技能（${disabledSkills.length}）— 已移出技能目录，恢复后自动重新生效`),
 						disabledSkills.map((d) => react.createElement("div", { key: d.name, style: { ...s.card, opacity: 0.6 } },
 							react.createElement("div", { style: s.cardHead },
-								react.createElement("div", { style: s.cardTitle }, d.name),
+								react.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" } },
+									react.createElement("span", { style: s.cardTitle }, d.name),
+									react.createElement("span", { style: { ...s.badge, ...s.badgeGray } }, "已禁用")
+								),
 								react.createElement("div", { style: { display: "flex", gap: "6px" } },
 									react.createElement("button", { style: s.btnPrimary, onClick: () => doEnableSkill(d.name) }, "启用"),
 									react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(d.name) }, "删除")
@@ -1017,21 +1220,21 @@ window.__ModuleLoader__.load({
 			}
 
 			function renderBackups() {
-				if (backups === null && !bkError) return react.createElement("div", { style: s.empty }, "加载中…");
+				if (backups === null && !bkError) return react.createElement("div", { style: s.loading }, "正在加载…");
 				if (bkError) return react.createElement("div", { style: s.msgErr }, `加载失败：${bkError}`);
 				return react.createElement("div", null,
 					bkMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, bkMessage) : null,
 					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "每次修改规则前，系统都会自动把 AGENTS.md 备份到 ~/.dsh/.backups/，自动保留最近 5 份——打开本页时，超出 5 份的旧备份会自动移入回收站（~/.dsh/.backups/trash-<时间戳>/，可恢复）。这里可以看到每份备份，点「恢复」即可回到该时刻的规则文件。"),
 					backups.length === 0 ? react.createElement("div", { style: s.empty }, "还没有备份。修改任意规则（编辑 / 新增 / 删除 / 禁用）后，这里就会出现备份。") : null,
-					[...backups].reverse().map((b) => react.createElement("div", { key: b.name, style: s.card },
-						react.createElement("div", { style: s.cardHead },
-							react.createElement("div", null,
+					react.createElement("div", { style: s.listContainer, className: "rm-list" },
+						[...backups].sort((a, b) => b.time.localeCompare(a.time)).map((b) => react.createElement("div", { key: b.name, style: s.listRow, className: "rm-list-row" },
+							react.createElement("div", { style: { flex: 1 } },
 								react.createElement("div", { style: s.cardTitle }, b.time),
 								react.createElement("div", { style: { ...s.sub, marginTop: "2px" } }, `${b.rulesCount} 条规则 · ${(b.size / 1024).toFixed(1)} KB`)
 							),
 							react.createElement("button", { style: bkBusy ? { ...s.btnPrimary, opacity: 0.5 } : s.btnPrimary, disabled: bkBusy, onClick: () => doRestore(b.name) }, "恢复")
-						)
-					))
+						))
+					)
 				);
 			}
 		}

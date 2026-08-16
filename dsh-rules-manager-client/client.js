@@ -1014,7 +1014,8 @@ window.__ModuleLoader__.load({
 			// ctx.get 走内部服务表（不经 Proxy 属性守卫），拿到 rulesManager 服务实例；
 			// 以普通对象注入组件 props，避免组件内访问 ctx.remote.<svc> 触发 "without inject"。
 			const rulesApi = ctx.get("remote.rulesManager");
-			const engineApi = ctx.get("remote.ruleEngine");
+			let engineApi = null;
+			try { engineApi = ctx.get("remote.ruleEngine"); } catch (e) { engineApi = null; }
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
 				id: "rules-commands",

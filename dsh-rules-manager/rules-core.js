@@ -191,14 +191,21 @@ export function backupsDir() {
 	return join(resolveDshHome(), ".backups");
 }
 
-/** 把备份文件名里的 UTC 时间戳转成本地时间字符串（文件名来自 toISOString，UTC；毫秒可选） */
+/** 把备份文件名里的 UTC 时间戳转成本地时间字符串（兼容标准 ISO 与紧凑 YYYYMMDDTHHMM[SS] 两种命名） */
 function backupTimeLocal(name) {
-	const m = name.match(/^AGENTS\.md-(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})(?:-(\d{3}))?\.bak$/);
-	if (!m) return "";
-	const d = new Date(`${m[1]}T${m[2]}:${m[3]}:${m[4]}${m[5] ? "." + m[5] : ""}Z`);
-	if (Number.isNaN(d.getTime())) return "";
 	const p = (n) => String(n).padStart(2, "0");
-	return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+	const fmt = (d) => Number.isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+	const base = String(name || "").replace(/^AGENTS\.md-/, "").replace(/\.bak$/, "");
+	// 标准格式：YYYY-MM-DDTHH-MM-SS[-mmm]（可能在文件名开头，也可能带前缀）
+	let m = base.match(/(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})(?:-(\d{3}))?/);
+	if (m) return fmt(new Date(`${m[1]}T${m[2]}:${m[3]}:${m[4]}${m[5] ? "." + m[5] : ""}Z`));
+	// 紧凑格式：YYYYMMDDTHHMMSS（例如 before-rules-...-20260816T063650）
+	m = base.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/);
+	if (m) return fmt(new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`));
+	// 紧凑格式：YYYYMMDDTHHMM（例如 20260816T0000-rule9-audit）
+	m = base.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/);
+	if (m) return fmt(new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00Z`));
+	return "";
 }
 
 /** 统计文本中的规则条数（宽松匹配标题行，与 loadRules 的正则口径一致） */
@@ -240,7 +247,7 @@ export async function listBackups() {
  * @returns {{ok:true, safety:string} | {error:string}}
  */
 export async function restoreBackupOp(name) {
-	if (typeof name !== "string" || !/^AGENTS\.md-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3})?\.bak$/u.test(name)) {
+	if (typeof name !== "string" || !/^AGENTS\.md-.+\.bak$/u.test(name)) {
 		return { error: "备份文件名不合法" };
 	}
 	const file = join(backupsDir(), name);

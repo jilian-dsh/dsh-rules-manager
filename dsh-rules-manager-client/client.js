@@ -787,6 +787,7 @@ window.__ModuleLoader__.load({
 			);
 
 			function renderRuleEngine() {
+				try {
 				if (engineError && !engine) return react.createElement("div", { style: s.msgErr }, `加载失败：${engineError}`);
 				if (!engine) return react.createElement("div", { style: s.empty }, "加载中…");
 
@@ -832,6 +833,9 @@ window.__ModuleLoader__.load({
 						auditNodes.length ? auditNodes : react.createElement("div", { style: s.empty }, "暂无审计记录")
 					)
 				);
+				} catch (e) {
+					return react.createElement("div", { style: s.msgErr }, `规则引擎页渲染出错：${String((e && e.message) || e)}`);
+				}
 			}
 
 

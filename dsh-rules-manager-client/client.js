@@ -270,6 +270,59 @@ window.__ModuleLoader__.load({
 					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledSkills:result", schema: passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 148, column: 1 }
 				}
+				,
+				{
+					id: "rule-engine#ruleEngine/getStatus",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "getStatus",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getStatus:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/getVersion",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "getVersion",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getVersion:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/checkUpdate",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "checkUpdate",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/checkUpdate:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/getAuditLog",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "getAuditLog",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "n", wire: "n", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:n", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/getUnderstanding",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "getUnderstanding",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getUnderstanding:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				}
 			]
 		};
 
@@ -307,6 +360,15 @@ window.__ModuleLoader__.load({
 		function RulesCommandsPanel(props) {
 			// props.rulesApi = rulesManager 服务实例（apply 里 ctx.get() 取得，普通对象，无代理守卫）
 			const rulesApi = props.rulesApi;
+			// props.engineApi = ruleEngine 服务实例（dsh-rule-engine 提供）
+			const engineApi = props.engineApi;
+			// 规则引擎
+			const [engine, setEngine] = useState(null);
+			const [engineError, setEngineError] = useState("");
+			const [updateInfo, setUpdateInfo] = useState(null);
+			const [updateError, setUpdateError] = useState("");
+			const [auditLog, setAuditLog] = useState(null);
+			const [auditError, setAuditError] = useState("");
 			const [tab, setTab] = useState("rules");
 			// 规则
 			const [rules, setRules] = useState(null);
@@ -356,6 +418,54 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => { refresh(); }, [refresh]);
+
+			const loadEngine = useCallback(async () => {
+				if (!engineApi) { setEngineError("规则引擎服务不可用"); return; }
+				try {
+					const res = await engineApi.getStatus();
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setEngine(data.status);
+						setEngineError("");
+					} else setEngineError((data && data.error) || "未知错误");
+				} catch (e) {
+					setEngineError(String((e && e.message) || e));
+				}
+			}, [engineApi]);
+			useEffect(() => {
+				if (tab === "engine" && engine === null) loadEngine();
+			}, [tab, engine, loadEngine]);
+
+			const doCheckUpdate = useCallback(async () => {
+				if (!engineApi) { setUpdateError("规则引擎服务不可用"); return; }
+				setUpdateError("");
+				setUpdateInfo(null);
+				try {
+					const res = await engineApi.checkUpdate();
+					const data = unwrap(res);
+					if (data && data.ok) setUpdateInfo(data);
+					else setUpdateError((data && data.error) || "未知错误");
+				} catch (e) {
+					setUpdateError(String((e && e.message) || e));
+				}
+			}, [engineApi]);
+
+			const loadAudit = useCallback(async () => {
+				if (!engineApi) { setAuditError("规则引擎服务不可用"); return; }
+				try {
+					const res = await engineApi.getAuditLog(20);
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setAuditLog(data.entries);
+						setAuditError("");
+					} else setAuditError((data && data.error) || "未知错误");
+				} catch (e) {
+					setAuditError(String((e && e.message) || e));
+				}
+			}, [engineApi]);
+			useEffect(() => {
+				if (tab === "engine" && auditLog === null) loadAudit();
+			}, [tab, auditLog, loadAudit]);
 
 			const loadDisabled = useCallback(async () => {
 				try {
@@ -669,11 +779,61 @@ window.__ModuleLoader__.load({
 					react.createElement("button", { style: tab === "commands" ? s.tabActive : s.tab, onClick: () => setTab("commands") }, "命令"),
 					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令"),
 					react.createElement("button", { style: tab === "skills" ? s.tabActive : s.tab, onClick: () => setTab("skills") }, "技能"),
-					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "备份与恢复")
+					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "备份与恢复"),
+					react.createElement("button", { style: tab === "engine" ? s.tabActive : s.tab, onClick: () => setTab("engine") }, "规则引擎")
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
-				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : renderBackups()
+				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : tab === "engine" ? renderRuleEngine() : renderBackups()
 			);
+
+			function renderRuleEngine() {
+				if (engineError && !engine) return react.createElement("div", { style: s.msgErr }, `加载失败：${engineError}`);
+				if (!engine) return react.createElement("div", { style: s.empty }, "加载中…");
+
+				const versionNodes = (updateInfo?.impacts || []).map((ver, i) =>
+					react.createElement("div", { key: i, style: s.card },
+						react.createElement("div", { style: s.cardTitle }, `v${ver.version || ""}：${ver.summary || ""}`),
+						(ver.impacts || []).map((imp, j) =>
+							react.createElement("div", { key: j, style: s.cardBody }, `规则 ${imp.rule || "?"} [${imp.level || "impact"}]：${imp.description || ""}`)
+						),
+						ver.userRulesUnaffected ? react.createElement("div", { style: { marginTop: "4px", fontSize: "12px", color: "var(--dsw-alias-success-6, #00b42a)" } }, "不修改用户规则文件") : null
+					)
+				);
+
+				const auditNodes = (auditLog || []).map((e, i) =>
+					react.createElement("div", { key: i, style: s.row },
+						react.createElement("span", { style: { color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "12px", fontFamily: "monospace" } }, String(e.ts || "").replace("T", " ").slice(0, 19)),
+						react.createElement("span", { style: { flex: 1, fontSize: "12px" } }, `[${e.rule || "?"}] ${e.name || ""}${e.reason ? "：" + e.reason : ""}`)
+					)
+				);
+
+				return react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "8px" } },
+					react.createElement("div", { style: s.card },
+						react.createElement("div", { style: s.cardTitle }, "引擎状态"),
+						react.createElement("div", { style: s.cardBody },
+							`版本：${engine.version || "?"}｜开关：${engine.enabled ? "开启" : "关闭"}｜规则数：${engine.rulesCount ?? "?"}｜mountRevision：${engine.mountRevision ?? 0}｜配置：${engine.configOk ? "正常" : "异常"}`
+						)
+					),
+					react.createElement("div", { style: s.card },
+						react.createElement("div", { style: s.cardHead },
+							react.createElement("span", { style: s.cardTitle }, "版本更新"),
+							react.createElement("button", { style: s.btnPrimary, onClick: () => doCheckUpdate() }, "检查更新")
+						),
+						updateError ? react.createElement("div", { style: s.msgErr }, updateError) : null,
+						updateInfo ? react.createElement("div", { style: s.cardBody },
+							`当前 ${updateInfo.current || "?"} → ${updateInfo.hasUpdate ? "最新 " + (updateInfo.latest?.tag_name || "") : "已是最新"}`,
+							updateInfo.hasUpdate && updateInfo.latest?.html_url ? react.createElement("div", null, react.createElement("a", { href: updateInfo.latest.html_url, target: "_blank", rel: "noreferrer" }, "查看 Release Notes")) : null,
+							versionNodes.length ? versionNodes : null
+						) : null
+					),
+					react.createElement("div", { style: s.card },
+						react.createElement("div", { style: s.cardTitle }, "最近审计"),
+						auditError ? react.createElement("div", { style: s.msgErr }, auditError) : null,
+						auditNodes.length ? auditNodes : react.createElement("div", { style: s.empty }, "暂无审计记录")
+					)
+				);
+			}
+
 
 			function renderRules() {
 				if (rules === null && !rulesError) return react.createElement("div", { style: s.empty }, "加载中…");
@@ -854,12 +1014,13 @@ window.__ModuleLoader__.load({
 			// ctx.get 走内部服务表（不经 Proxy 属性守卫），拿到 rulesManager 服务实例；
 			// 以普通对象注入组件 props，避免组件内访问 ctx.remote.<svc> 触发 "without inject"。
 			const rulesApi = ctx.get("remote.rulesManager");
+			const engineApi = ctx.get("remote.ruleEngine");
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
 				id: "rules-commands",
 				order: 100,
 				label: () => "规则、命令与技能",
-				inject: () => ({ rulesApi })
+				inject: () => ({ rulesApi, engineApi })
 			}, RulesCommandsPanel));
 		}
 

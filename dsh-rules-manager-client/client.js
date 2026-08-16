@@ -13,6 +13,26 @@ window.__ModuleLoader__.load({
 		let react = require("react");
 		let { useState, useEffect, useCallback } = react;
 
+		class ErrorBoundary extends react.Component {
+			constructor(props) {
+				super(props);
+				this.state = { error: null };
+			}
+			static getDerivedStateFromError(error) {
+				return { error };
+			}
+			componentDidCatch(error) {
+				console.error("[rules-manager-client]", error);
+			}
+			render() {
+				if (this.state.error) {
+					return react.createElement("div", { style: { padding: "12px", color: "#f53f3f", fontSize: "12px", whiteSpace: "pre-wrap" } }, `面板渲染出错：${String((this.state.error && this.state.error.message) || this.state.error)}`);
+				}
+				return this.props.children;
+			}
+		}
+
+
 		// ── 1. Remote 贡献：rulesManager 服务（client 端调用面）──────────────
 		// schema 用 passthrough：client 侧只做传输，不做强校验（host 端是权威）。
 		const passthrough = { parse: (v) => v };
@@ -356,6 +376,12 @@ window.__ModuleLoader__.load({
 
 		/** 解包 RPC 信封：client 端 Remote 方法返回 {ok, value}，value 才是 host 返回值 */
 		const unwrap = (res) => (res && res.value !== void 0 ? res.value : res);
+		const errText = (e) => {
+			if (e == null) return "未知错误";
+			if (typeof e === "string") return e;
+			if (typeof e.message === "string") return e.message;
+			try { return JSON.stringify(e); } catch { return String(e); }
+		};
 
 		function RulesCommandsPanel(props) {
 			// props.rulesApi = rulesManager 服务实例（apply 里 ctx.get() 取得，普通对象，无代理守卫）
@@ -427,9 +453,9 @@ window.__ModuleLoader__.load({
 					if (data && data.ok) {
 						setEngine(data.status);
 						setEngineError("");
-					} else setEngineError((data && data.error) || "未知错误");
+					} else setEngineError(errText((data && data.error) || "未知错误"));
 				} catch (e) {
-					setEngineError(String((e && e.message) || e));
+					setEngineError(errText(e));
 				}
 			}, [engineApi]);
 			useEffect(() => {
@@ -444,9 +470,9 @@ window.__ModuleLoader__.load({
 					const res = await engineApi.checkUpdate();
 					const data = unwrap(res);
 					if (data && data.ok) setUpdateInfo(data);
-					else setUpdateError((data && data.error) || "未知错误");
+					else setUpdateError(errText((data && data.error) || "未知错误"));
 				} catch (e) {
-					setUpdateError(String((e && e.message) || e));
+					setUpdateError(errText(e));
 				}
 			}, [engineApi]);
 
@@ -458,9 +484,9 @@ window.__ModuleLoader__.load({
 					if (data && data.ok) {
 						setAuditLog(data.entries);
 						setAuditError("");
-					} else setAuditError((data && data.error) || "未知错误");
+					} else setAuditError(errText((data && data.error) || "未知错误"));
 				} catch (e) {
-					setAuditError(String((e && e.message) || e));
+					setAuditError(errText(e));
 				}
 			}, [engineApi]);
 			useEffect(() => {
@@ -767,7 +793,7 @@ window.__ModuleLoader__.load({
 				for (const [section, list] of map) groups.push({ section, list });
 			}
 
-			return react.createElement("div", { style: s.wrap },
+			return react.createElement(ErrorBoundary, null, react.createElement("div", { style: s.wrap },
 				react.createElement("div", { style: s.header },
 					react.createElement("div", null,
 						react.createElement("div", { style: s.title }, "规则、命令与技能"),
@@ -784,7 +810,7 @@ window.__ModuleLoader__.load({
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
 				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : tab === "engine" ? renderRuleEngine() : renderBackups()
-			);
+			));
 
 			function renderRuleEngine() {
 				try {
@@ -820,7 +846,7 @@ window.__ModuleLoader__.load({
 							react.createElement("span", { style: s.cardTitle }, "版本更新"),
 							react.createElement("button", { style: s.btnPrimary, onClick: () => doCheckUpdate() }, "检查更新")
 						),
-						updateError ? react.createElement("div", { style: s.msgErr }, updateError) : null,
+						updateError ? react.createElement("div", { style: s.msgErr }, String(updateError)) : null,
 						updateInfo ? react.createElement("div", { style: s.cardBody },
 							`当前 ${updateInfo.current || "?"} → ${updateInfo.hasUpdate ? "最新 " + (updateInfo.latest?.tag_name || "") : "已是最新"}`,
 							updateInfo.hasUpdate && updateInfo.latest?.html_url ? react.createElement("div", null, react.createElement("a", { href: updateInfo.latest.html_url, target: "_blank", rel: "noreferrer" }, "查看 Release Notes")) : null,
@@ -829,7 +855,7 @@ window.__ModuleLoader__.load({
 					),
 					react.createElement("div", { style: s.card },
 						react.createElement("div", { style: s.cardTitle }, "最近审计"),
-						auditError ? react.createElement("div", { style: s.msgErr }, auditError) : null,
+						auditError ? react.createElement("div", { style: s.msgErr }, String(auditError)) : null,
 						auditNodes.length ? auditNodes : react.createElement("div", { style: s.empty }, "暂无审计记录")
 					)
 				);

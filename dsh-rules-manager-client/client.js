@@ -1065,7 +1065,10 @@ window.__ModuleLoader__.load({
 									return react.createElement("div", { key: rule.index, style: { ...s.ruleRow, ...s.hoverCard }, className: "rm-rule-row rm-hover-card" },
 										react.createElement("div", { style: s.cardHead },
 											react.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1, flexWrap: "nowrap", overflow: "hidden" } },
-												react.createElement("span", { style: { ...s.cardTitle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, `[${rule.index}] ${cleanRuleTitle(rule.title)}`),
+												react.createElement("span", { style: open
+													? { ...s.cardTitle, display: "block", whiteSpace: "normal", wordBreak: "break-all", maxWidth: "100%", flexShrink: 1 }
+													: { ...s.cardTitle, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%", flexShrink: 1 }
+												}, `[${rule.index}] ${cleanRuleTitle(rule.title)}`),
 												level ? react.createElement("span", { style: { ...s.badge, ...badgeStyle, flexShrink: 0 } }, level) : null,
 												rule.free ? react.createElement("span", { style: { ...s.badge, ...s.badgeFree, flexShrink: 0 } }, "🕊 自由") : null
 											),

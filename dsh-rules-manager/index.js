@@ -34,10 +34,10 @@ function parseCommand(rawInput) {
 	const text = rawInput.trim();
 	if (!text || /^(list|ls)$/i.test(text)) return { kind: "list" };
 	if (/^(help|\?)$/i.test(text)) return { kind: "help" };
-	let m = text.match(/^(?:show|view|get)\s+(\d+)$/i);
-	if (m) return { kind: "show", index: Number(m[1]) };
-	m = text.match(/^edit\s+(\d+)\s+([\s\S]+)$/i);
-	if (m) return { kind: "edit", index: Number(m[1]), body: m[2].trim() };
+	let m = text.match(/^(?:show|view|get)\s+([0-9A-Za-z]+)$/i);
+	if (m) return { kind: "show", index: m[1] };
+	m = text.match(/^edit\s+([0-9A-Za-z]+)\s+([\s\S]+)$/i);
+	if (m) return { kind: "edit", index: m[1], body: m[2].trim() };
 	m = text.match(/^add\s+([\s\S]+)$/i);
 	if (m) {
 		const sep = m[1].match(/^(.+?)\s*[｜|]\s*([\s\S]+)$/);
@@ -46,8 +46,8 @@ function parseCommand(rawInput) {
 		}
 		return { kind: "add-invalid" };
 	}
-	m = text.match(/^(?:delete|del|remove|rm)\s+(\d+)$/i);
-	if (m) return { kind: "delete", index: Number(m[1]) };
+	m = text.match(/^(?:delete|del|remove|rm)\s+([0-9A-Za-z]+)$/i);
+	if (m) return { kind: "delete", index: m[1] };
 	return { kind: "invalid" };
 }
 
@@ -79,7 +79,7 @@ async function executeRules(ctx, invocation) {
 			return { kind: "success", text: parts.join("\n") };
 		}
 		case "show": {
-			const rule = rules.find((r) => r.index === command.index);
+			const rule = rules.find((r) => String(r.index) === String(command.index));
 			if (!rule) {
 				const available = rules.map((r) => r.index).join("、");
 				return { kind: "error", text: `没有编号 ${command.index} 的规则。当前规则编号：${available || "无"}` };

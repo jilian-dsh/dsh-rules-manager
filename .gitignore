@@ -11,3 +11,6 @@ node_modules/
 # OS
 Thumbs.db
 .DS_Store
+
+# 独立仓库（jilian-dsh/dsh-rule-engine），由自身 git 管理，不纳入本仓库
+dsh-rule-engine/

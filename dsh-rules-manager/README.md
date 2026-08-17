@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则、命令与技能管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.2-blue)
+![version](https://img.shields.io/badge/version-1.4.3-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -54,6 +54,17 @@
 输入：/hello             ← 不带参数
 发送：请热情地欢迎我
 ```
+
+## 🕊️ 自由区域（Free Zone）支持（1.4.3）
+
+AGENTS.md 支持一个**自由区域**：被 `<!-- free-zone:start -->` / `<!-- free-zone:end -->` 注释标记框住的区段。**模型可读、正常生效，但规则引擎（dsh-rule-engine）不解析、不强制**（不硬拦、不审计、不进 /guard rules）——适合放"想生效但不想被机器强制"的软约束、第三方守则（如法律工作守则）等。
+
+- **区内条目格式**：`### [规则 F<n>]`（F = Free 前缀，如 `F1`、`F2`），禁止使用主编号 `### [规则 N]`；
+- **管理**：自由区域条目在 `/rules list` 与设置页「规则」中以独立「自由区域」分组展示，**可编辑 / 禁用 / 删除**（与普通规则操作一致）；
+- **新增普通规则**：`/rules add` 自动插入到 `free-zone:start` **之前**，不会掉进自由区；
+- **新增自由规则**：需手动在 `free-zone:start/end` 标记内写 `### [规则 F2]` 格式；
+- **转正**：把 F 编号改为主编号并移出本区，规则引擎自动接管强制执行；
+- **命令支持**：`/rules show F1`、`/rules edit F1 新正文`、`/rules delete F1`（1.4.3 起支持字母编号）。
 
 ## 🛡️ 安全设计
 

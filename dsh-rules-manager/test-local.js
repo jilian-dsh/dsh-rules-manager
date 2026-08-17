@@ -90,6 +90,50 @@ t("add 缺分隔符: error", addBad.kind === "error");
 t("规则 1 仍在", afterDel.includes("### [规则 1] 规则一标题"));
 t("规则 3 仍在", afterDel.includes("### [规则 3] 规则三标题"));
 
+// 8. 自由区域测试（独立 fixture：free-zone 区 + 区内 F 规则）
+const FIXTURE_FREE = `# 测试规则（free-zone fixture）
+
+## 一、通用行为
+
+### [规则 1] 规则一标题（来源 test-1）
+规则一正文内容。
+
+## 五、自由区域（引擎不强制，正常生效）
+
+<!-- free-zone:start -->
+
+### [规则 F1] 中国法律工作守则
+任务涉及中国法律实务时：
+- 所有法律输出均为律师审查草稿。
+
+<!-- free-zone:end -->
+`;
+await writeFile(join(home, "AGENTS.md"), FIXTURE_FREE, "utf8");
+
+const list2 = await invoke("");
+t("free: list 含 F1", list2.kind === "success" && list2.text.includes("F1"));
+t("free: list 含自由区域分区", list2.text.includes("自由区域"));
+
+// add：新规则应插入在 free-zone:start 之前，不进自由区
+const add2 = await invoke("add 新规则｜新规则正文");
+t("free: add 成功", add2.kind === "success");
+const afterAdd2 = await readFile(join(home, "AGENTS.md"), "utf8");
+const zoneIdx = afterAdd2.indexOf("free-zone:start");
+const newRuleIdx = afterAdd2.indexOf("### [规则 2] 新规则");
+t("free: 新规则在自由区之前", newRuleIdx !== -1 && newRuleIdx < zoneIdx);
+
+// edit F1
+const editF1 = await invoke("edit F1 修改后的守则正文");
+t("free: edit F1 成功", editF1.kind === "success");
+const afterEditF1 = await readFile(join(home, "AGENTS.md"), "utf8");
+t("free: F1 正文已改", afterEditF1.includes("修改后的守则正文"));
+
+// delete F1
+const delF1 = await invoke("delete F1");
+t("free: delete F1 成功", delF1.kind === "success");
+const afterDelF1 = await readFile(join(home, "AGENTS.md"), "utf8");
+t("free: F1 已删除", !afterDelF1.includes("### [规则 F1]"));
+
 await rm(home, { recursive: true, force: true });
 console.log(failed === 0 ? "\nALL TESTS PASSED" : `\n${failed} TEST(S) FAILED`);
 process.exit(failed === 0 ? 0 : 1);

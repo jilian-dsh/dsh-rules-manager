@@ -22,6 +22,8 @@ export function today() {
  * 读取并解析 AGENTS.md。
  * @returns {Promise<{lines: string[], rules: Array, bom: boolean, missing: boolean}>}
  * rules 每条含 index/title/section/startLine/endLine（endLine 不含）。
+ * 自由区域（<!-- free-zone:start/end -->）内的 `### [规则 F<n>]` 同样解析为规则，
+ * 供 UI 可见可管理，但标记 free: true（引擎侧不解析、不强制）。
  */
 export async function loadRules() {
 	const file = agentsFilePath();
@@ -38,8 +40,22 @@ export async function loadRules() {
 	const rules = [];
 	let currentSection = "未分区";
 	let current = null;
+	let inFreeZone = false;
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
+		if (/^\s*<!--\s*free-zone:start\s*-->\s*$/.test(line)) {
+			if (current) rules.push(current);
+			currentSection = "自由区域";
+			current = null;
+			inFreeZone = true;
+			continue;
+		}
+		if (/^\s*<!--\s*free-zone:end\s*-->\s*$/.test(line)) {
+			if (current) rules.push(current);
+			current = null;
+			inFreeZone = false;
+			continue;
+		}
 		const sec = line.match(/^##\s+(.+?)\s*$/);
 		if (sec) {
 			if (current) rules.push(current);
@@ -54,6 +70,7 @@ export async function loadRules() {
 				index: /^\d+$/.test(rule[1]) ? Number(rule[1]) : rule[1],
 				title: rule[2].trim(),
 				section: currentSection,
+				free: inFreeZone,
 				startLine: i,
 				endLine: i + 1
 			};
@@ -132,8 +149,14 @@ export function addRuleOp(lines, rules, title, body) {
 	const header = `### [规则 ${next}] ${title.trim()}（来源：/rules 命令 ${today()}）`;
 	const bodyLines = body.trimEnd().split("\n");
 	const nextLines = [...lines];
-	if (nextLines.length > 0 && nextLines[nextLines.length - 1] !== "") nextLines.push("");
-	nextLines.push(header, ...bodyLines);
+	// 插入点：自由区域（free-zone:start）之前，防止新规则掉进自由区
+	const zoneStart = lines.findIndex((l) => /^\s*<!--\s*free-zone:start\s*-->\s*$/.test(l));
+	let insertAt = zoneStart >= 0 ? zoneStart : lines.length;
+	if (insertAt > 0 && lines[insertAt - 1] !== "") {
+		nextLines.splice(insertAt, 0, "");
+		insertAt++;
+	}
+	nextLines.splice(insertAt, 0, header, ...bodyLines);
 	return {
 		lines: nextLines,
 		rule: { index: next, title: title.trim() }

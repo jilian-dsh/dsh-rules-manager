@@ -379,6 +379,7 @@ window.__ModuleLoader__.load({
 			badgeM: { background: "#f4ecff", color: "#722ed1" },
 			badgeGreen: { background: "#d3f8df", color: "#067647" },
 			badgeGray: { background: "var(--dsw-alias-fill-1, #f2f3f5)", color: "var(--dsw-alias-label-tertiary, #8a919f)" },
+			badgeFree: { background: "#e8f7f0", color: "#0e8a5f" },
 			overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999, padding: "16px" },
 			modal: { background: "var(--dsw-alias-bg-layer-1, #fff)", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", borderRadius: "14px", padding: "18px", maxWidth: "420px", width: "100%", boxShadow: "0 8px 24px rgba(0,0,0,0.15)" },
 			modalTitle: { fontSize: "14px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)", marginBottom: "8px" },
@@ -1065,7 +1066,8 @@ window.__ModuleLoader__.load({
 										react.createElement("div", { style: s.cardHead },
 											react.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1, flexWrap: "nowrap", overflow: "hidden" } },
 												react.createElement("span", { style: { ...s.cardTitle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, `[${rule.index}] ${cleanRuleTitle(rule.title)}`),
-												level ? react.createElement("span", { style: { ...s.badge, ...badgeStyle, flexShrink: 0 } }, level) : null
+												level ? react.createElement("span", { style: { ...s.badge, ...badgeStyle, flexShrink: 0 } }, level) : null,
+												rule.free ? react.createElement("span", { style: { ...s.badge, ...s.badgeFree, flexShrink: 0 } }, "🕊 自由") : null
 											),
 											react.createElement("div", { style: { display: "flex", gap: "4px", flexWrap: "nowrap", flexShrink: 0 } },
 												editing === rule.index

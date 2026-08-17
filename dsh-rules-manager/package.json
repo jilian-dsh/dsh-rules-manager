@@ -1,6 +1,6 @@
 {
   "name": "dsh-rules-manager",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "DeepSeek Harness (dsh) rules, commands & skills manager: /rules slash command, settings panel with visual rule editing, command list, user-defined custom commands (with {input} argument support, disable/enable), skill management (view/disable/enable/delete-to-trash), and backup restore. Installable as an official dsh bundle.",
   "type": "module",
   "main": "index.js",
@@ -38,7 +38,7 @@
     }
   },
   "dependencies": {
-    "dsh-rules-manager-client": "1.3.1"
+    "dsh-rules-manager-client": "^1.3.2"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4",

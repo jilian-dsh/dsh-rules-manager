@@ -136,6 +136,7 @@ export function ruleView(rule, lines) {
 		index: rule.index,
 		title: rule.title,
 		section: rule.section,
+		free: rule.free === true,
 		body: lines.slice(rule.startLine + 1, rule.endLine).join("\n").trim()
 	};
 }

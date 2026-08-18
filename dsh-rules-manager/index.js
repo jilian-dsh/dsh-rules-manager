@@ -22,6 +22,7 @@ export const inject = ["commands"];
 const USAGE = [
 	"用法：",
 	"  /rules                  列出全部规则",
+	"  /rules status           查看规则文件状态（数量/路径/BOM）",
 	"  /rules show <编号>      查看某条规则的完整内容",
 	"  /rules add <标题>｜<正文>  新增一条规则（用｜分隔标题和正文）",
 	"  /rules edit <编号> <新正文>  修改某条规则的正文",
@@ -33,6 +34,7 @@ const USAGE = [
 function parseCommand(rawInput) {
 	const text = rawInput.trim();
 	if (!text || /^(list|ls)$/i.test(text)) return { kind: "list" };
+	if (/^(status|state)$/i.test(text)) return { kind: "status" };
 	if (/^(help|\?)$/i.test(text)) return { kind: "help" };
 	let m = text.match(/^(?:show|view|get)\s+([0-9A-Za-z]+)$/i);
 	if (m) return { kind: "show", index: m[1] };
@@ -76,6 +78,16 @@ async function executeRules(ctx, invocation) {
 				for (const rule of list) parts.push(`  [${rule.index}] ${rule.title}`);
 				parts.push("");
 			}
+			return { kind: "success", text: parts.join("\n") };
+		}
+		case "status": {
+			const parts = [
+				"【规则文件状态】",
+				`  规则数量：${rules.length}`,
+				`  文件：$DSH_HOME/AGENTS.md`,
+				`  BOM：${bom ? "带 BOM" : "无 BOM"}`,
+				`  修改方式：/rules add|edit|delete 均会自动备份到 $DSH_HOME/.backups/（保留最近 5 份）`
+			];
 			return { kind: "success", text: parts.join("\n") };
 		}
 		case "show": {

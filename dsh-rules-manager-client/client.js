@@ -520,6 +520,8 @@ window.__ModuleLoader__.load({
 			const [ucEditing, setUcEditing] = useState(null);
 			const [ucEditPrompt, setUcEditPrompt] = useState("");
 			const [ucMessage, setUcMessage] = useState("");
+			// 自定义命令展开/收起（长预设内容默认收起，点「详情」展开）
+			const [expandedCmds, setExpandedCmds] = useState({});
 			// 技能
 			const [skills, setSkills] = useState(null);
 			const [skillError, setSkillError] = useState("");
@@ -535,6 +537,7 @@ window.__ModuleLoader__.load({
 				fn();
 			};
 			const toggleExpand = (index) => setExpandedRules((prev) => ({ ...prev, [index]: !prev[index] }));
+			const toggleCmdExpand = (name) => setExpandedCmds((prev) => ({ ...prev, [name]: !prev[name] }));
 			const toggleSection = (section) => setCollapsedSections((prev) => ({ ...prev, [section]: !prev[section] }));
 
 			const refresh = useCallback(async () => {
@@ -1163,12 +1166,17 @@ window.__ModuleLoader__.load({
 										: react.createElement("button", { style: s.btn, onClick: () => doDisableUserCommand(cmd.name) }, "禁用"),
 								(ucEditing === cmd.name && !cmd.disabled)
 									? null
+									: react.createElement("button", { style: s.btn, onClick: () => toggleCmdExpand(cmd.name) }, expandedCmds[cmd.name] ? "收起" : "详情"),
+								(ucEditing === cmd.name && !cmd.disabled)
+									? null
 									: react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteUserCommand(cmd.name) }, "删除")
 							)
 						),
 						ucEditing === cmd.name
 							? react.createElement("textarea", { style: { ...s.textarea, marginTop: "8px" }, placeholder: "支持带参数：内容里写 {input} 会被替换成你输入的内容", value: ucEditPrompt, onChange: (e) => setUcEditPrompt(e.target.value) })
-							: react.createElement("div", { style: s.cardBody }, cmd.prompt),
+							: expandedCmds[cmd.name]
+								? react.createElement("div", { style: s.cardBody }, cmd.prompt)
+								: react.createElement("div", { style: { ...s.cardBody, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, cmd.prompt),
 						ucEditing !== cmd.name && cmd.prompt.includes("{input}")
 							? react.createElement("div", { style: { ...s.sub, marginTop: "4px", color: "var(--dsw-alias-brand-6, #3370ff)" } }, "支持参数：{input} = 你输入的内容")
 							: null

@@ -223,14 +223,14 @@ class RulesManagerService extends TypertRemoteService {
 			rules: rules.map((r) => ruleView(r, lines))
 		};
 	}
-	/** 新增规则（自动编号 + 来源标注 + 自动备份） */
+	/** 新增规则（自动编号 + 来源标注 + 自动备份；P1-5：未声明执行等级时自动补 D 级并返回提示） */
 	async addRule(title, body) {
 		const { lines, rules, bom, missing } = await loadRules();
 		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
 		const op = addRuleOp(lines, rules, title, body);
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
-		return { ok: true, rule: op.rule, backup };
+		return { ok: true, rule: op.rule, backup, levelNote: op.levelNote || "" };
 	}
 	/** 修改规则正文（标题与来源保持不变） */
 	async editRule(index, body) {

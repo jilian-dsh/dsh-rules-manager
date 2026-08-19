@@ -1,14 +1,14 @@
 # dsh-rules-manager (Rules, Commands & Skills Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.2-blue)
+![version](https://img.shields.io/badge/version-1.4.8-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
 
 > A DeepSeek Harness (DSH) plugin for managing your user-global rules and commands:
 > the **`/rules` slash command** plus a **settings panel "规则、命令与技能"** with visual rule editing,
-> a slash-command list, **user-defined custom commands**, and **backup restore**.
+> a slash-command list, **user-defined custom commands**, **skill management**, and **backup restore**.
 >
 > ⚡ Rules live in `$DSH_HOME/AGENTS.md`; every change takes effect **immediately**
 > (DSH hot-reloads the file) and is **automatically backed up** before each write —
@@ -18,9 +18,10 @@
 
 | Capability | Where | Notes |
 |---|---|---|
-| List / view / add / edit / delete rules | `/rules` command or Settings → 规则、命令与技能 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
+| List / view / add / edit / delete / **disable / restore** rules | `/rules` command or Settings → 规则、命令与技能 | Rules are the user-global instructions (AGENTS.md), grouped by section, full-text visual editing |
 | Command list | Settings → 规则、命令与技能 → 命令 | Read-only list of all available slash commands (name/description/usage) |
-| **Custom commands** | Settings → 规则、命令与技能 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI; **supports arguments** (see below) |
+| **Custom commands** | Settings → 规则、命令与技能 → 自定义命令 | Define your own shortcuts: type `/name` in the chat box to send a preset prompt to the AI; **supports arguments** (see below); **disable/enable** supported; long presets are collapsed by default — click "详情" to expand |
+| **Skill management** | Settings → 规则、命令与技能 → 技能 | View installed skills (name/description/full text), **disable** (moved out of the skills dir, content preserved), **enable** (moved back), **delete** (moved to `~/.dsh/.backups/trash-<timestamp>/`, recoverable); disable/delete fully takes effect after restarting DSH |
 | **Backup & restore** | Settings → 规则、命令与技能 → 备份与恢复 | Browse all auto backups (time / rule count / size), restore to any snapshot with one click |
 
 ### Examples
@@ -34,6 +35,22 @@
 ```
 
 Custom commands: define `hello` = "Please greet me warmly" in the panel, then type `/hello` in the chat box.
+
+### ⚖️ Execution levels (must-read for new users)
+
+Every rule title ends with an **execution level**, e.g. `### [规则 9] PS 编码与命令执行（执行等级：A+D）`. It decides how strictly the rule is **machine-enforced**:
+
+| Level | Meaning | Machine behavior |
+|---|---|---|
+| **A** | Hard block | Rule-violating tool calls are **directly denied** (the model cannot bypass) |
+| **B** | Audit & correct | Violating text is **logged + a correction reminder is injected** |
+| **C** | Sequence check | Judged by event order; violations are **denied** (e.g. authorize before acting) |
+| **D** | Self-certify | Requires a **self-certification statement**, no hard block |
+| **M** | Meta | Rules about the rules themselves |
+
+- Levels can combine (e.g. `A+D` = hard block + self-certify).
+- **When adding a rule without a level in the title**, `（执行等级：D）` is appended automatically with a hint — level D is only a self-certify reminder and **never hard-blocks**. For a hard block, write `（执行等级：A）` in the title (combinable).
+- The rule engine (dsh-rule-engine) only hard-blocks tool calls for rules whose level contains A/C/M; B/D levels get text auditing and self-certify hints.
 
 ### Custom commands with arguments
 
@@ -57,6 +74,33 @@ Preset: Please greet me warmly
 Type:   /hello                       ← no argument
 Sent:   Please greet me warmly
 ```
+
+## 🕊️ Free Zone
+
+AGENTS.md supports a **free zone**: the section framed by the `<!-- free-zone:start -->` / `<!-- free-zone:end -->` comment markers. **The model can read it and it still works as instructions, but the rule engine (dsh-rule-engine) does not parse or enforce it** (no hard block, no auditing, not in `/guard rules`) — ideal for soft constraints, third-party codes of conduct (e.g. a legal work code), etc.
+
+- **Entries inside use** `### [规则 F<n>]` (F = Free prefix, e.g. `F1`, `F2`); using the main numbering `### [规则 N]` inside the zone is forbidden;
+- **Management**: free-zone entries appear under a separate "自由区域" group in `/rules list` and the settings panel — **editable / disableable / deletable** like normal rules;
+- **Adding normal rules**: `/rules add` always inserts **before** `free-zone:start`, so new rules never fall into the free zone;
+- **Adding free-zone rules**: must be written manually between the `free-zone:start/end` markers using the `### [规则 F2]` format;
+- **Promotion**: rename the F number to a main number and move it out of the zone — the rule engine takes over enforcement automatically;
+- **Command support**: `/rules show F1`, `/rules edit F1 新正文`, `/rules delete F1` (letter indices supported since 1.4.3).
+
+### 📝 Adding a free-zone rule (3 steps)
+
+`/rules add` **cannot** place a rule into the free zone (by design — it prevents normal rules from landing in an area the engine does not enforce). Do this instead:
+
+1. If dsh-rule-engine is installed: first type **`/guard unlock`** in the chat box (AGENTS.md is write-protected; unlock allows edits for 10 minutes by default; only the user holds the key);
+2. Open `$DSH_HOME/AGENTS.md` with a text editor (typically `D:\DeepSeek harness\.dsh\AGENTS.md`), scroll to the **end**, find the `<!-- free-zone:start -->` and `<!-- free-zone:end -->` markers, and paste **between them** in this format (numbering continues from F2; F1 is already taken by the example; never reuse an existing number):
+
+   ```markdown
+   ### [规则 F2] Your code-of-conduct title
+   Your content here (multiple lines are fine).
+   ```
+
+3. Save the file — **takes effect immediately, no restart needed**. You can also ask your AI assistant to write it for you (run `/guard unlock` first).
+
+> Note: **do not** write outside the free-zone markers — the rule engine would parse it as a normal rule (without an execution level it will not hard-block, but it will appear in `/guard rules`).
 
 ## Safety
 
@@ -125,8 +169,8 @@ dsh-rules-manager-client/       client plugin (browser bundle)
 ## Development
 
 ```sh
-node test-service.js   # 73 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
-node test-local.js     # 16 assertions: /rules command end-to-end (isolated)
+node test-service.js   # 101 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
+node test-local.js     # 29 assertions: /rules command end-to-end (isolated)
 ```
 
 Both tests use a **temporary DSH_HOME + AGENTS.md copy**; they never touch your real files.

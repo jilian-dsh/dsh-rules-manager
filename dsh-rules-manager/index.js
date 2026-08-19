@@ -105,7 +105,7 @@ async function executeRules(ctx, invocation) {
 			const backup = await saveLines(op.lines, bom);
 			return {
 				kind: "success",
-				text: `已新增【规则 ${op.rule.index}】${op.rule.title}，并写入 AGENTS.md（已实时生效）。\n修改前备份：${backup}`,
+				text: `已新增【规则 ${op.rule.index}】${op.rule.title}，并写入 AGENTS.md（已实时生效）。\n${op.levelNote ? op.levelNote + "\n" : ""}修改前备份：${backup}`,
 			};
 		}
 		case "edit": {

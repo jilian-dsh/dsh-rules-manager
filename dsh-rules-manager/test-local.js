@@ -59,12 +59,14 @@ t("list: 含规则三标题", list.text.includes("规则三标题"));
 const show = await invoke("show 2");
 t("show 2: success", show.kind === "success" && /【规则 2】规则二标题/.test(show.text));
 
-// 3. add（追加规则 4，自动编号 + 来源标注 + 备份）
+// 3. add（追加规则 4，自动编号 + 来源标注 + 备份；P1-5：自动补执行等级 D）
 const add = await invoke("add 测试规则｜这是一条测试规则正文");
 t("add: success", add.kind === "success" && add.text.includes("【规则 4】测试规则"));
 const afterAdd = await readFile(join(home, "AGENTS.md"), "utf8");
-t("add: 已写入文件", afterAdd.includes("### [规则 4] 测试规则（来源：/rules 命令"));
+t("add: 已写入文件", afterAdd.includes("### [规则 4] 测试规则（执行等级：D）（来源：/rules 命令"));
 t("add: 备份目录已生成", add.text.includes(".backups"));
+t("add: 未声明等级默认补 D 级提示", add.text.includes("默认补 D 级"));
+t("add: 文件含执行等级 D", afterAdd.includes("测试规则（执行等级：D）"));
 
 // 4. edit
 const edit = await invoke("edit 4 修改后的正文内容");
@@ -133,6 +135,14 @@ const delF1 = await invoke("delete F1");
 t("free: delete F1 成功", delF1.kind === "success");
 const afterDelF1 = await readFile(join(home, "AGENTS.md"), "utf8");
 t("free: F1 已删除", !afterDelF1.includes("### [规则 F1]"));
+
+// 9. P1-5：标题已声明执行等级时不再追加默认等级
+await writeFile(join(home, "AGENTS.md"), FIXTURE, "utf8");
+const addLevel = await invoke("add 硬拦规则（执行等级：A）｜这是一条 A 级规则正文");
+t("p1-5: 自带等级 add 成功", addLevel.kind === "success");
+const afterAddLevel = await readFile(join(home, "AGENTS.md"), "utf8");
+t("p1-5: 保留原等级不重复补", afterAddLevel.includes("### [规则 4] 硬拦规则（执行等级：A）（来源：/rules 命令"));
+t("p1-5: 自带等级无默认提示", !addLevel.text.includes("默认补 D 级"));
 
 await rm(home, { recursive: true, force: true });
 console.log(failed === 0 ? "\nALL TESTS PASSED" : `\n${failed} TEST(S) FAILED`);

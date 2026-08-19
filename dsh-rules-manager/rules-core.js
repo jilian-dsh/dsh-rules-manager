@@ -147,7 +147,15 @@ export function addRuleOp(lines, rules, title, body) {
 	if (!body.trim()) return { error: "正文不能为空" };
 	const maxIndex = rules.reduce((m, r) => Math.max(m, parseInt(String(r.index), 10) || 0), 0);
 	const next = maxIndex + 1;
-	const header = `### [规则 ${next}] ${title.trim()}（来源：/rules 命令 ${today()}）`;
+	// P1-5：标题未声明执行等级时默认补 D 级并提示——否则规则引擎提取不到等级，
+	// 新规则只会是"自证提示"而永不硬拦，用户会误以为规则已强制生效。
+	const LEVEL_RE = /执行等级[：:]\s*[A-DM+]+(?:\s*[强弱])?/i;
+	const hasLevel = LEVEL_RE.test(title);
+	const finalTitle = hasLevel ? title.trim() : `${title.trim()}（执行等级：D）`;
+	const levelNote = hasLevel
+		? ""
+		: "（未指定执行等级，已默认补 D 级：仅自证提示、不硬拦；如需硬拦请在标题写「（执行等级：A）」）";
+	const header = `### [规则 ${next}] ${finalTitle}（来源：/rules 命令 ${today()}）`;
 	const bodyLines = body.trimEnd().split("\n");
 	const nextLines = [...lines];
 	// 插入点：自由区域（free-zone:start）之前，防止新规则掉进自由区
@@ -160,7 +168,8 @@ export function addRuleOp(lines, rules, title, body) {
 	nextLines.splice(insertAt, 0, header, ...bodyLines);
 	return {
 		lines: nextLines,
-		rule: { index: next, title: title.trim() }
+		rule: { index: next, title: title.trim() },
+		levelNote
 	};
 }
 

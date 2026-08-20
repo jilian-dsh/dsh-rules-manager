@@ -342,6 +342,28 @@ window.__ModuleLoader__.load({
 					parameters: [],
 					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getUnderstanding:result", schema: passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/getTaskContractConfig",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "getTaskContractConfig",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTaskContractConfig:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
+				},
+				{
+					id: "rule-engine#ruleEngine/setTaskContractConfig",
+					service: "ruleEngine",
+					namespace: "ruleEngine",
+					method: "setTaskContractConfig",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "partial", wire: "partial", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:partial", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:result", schema: passthrough },
+					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				}
 			]
 		};
@@ -485,6 +507,9 @@ window.__ModuleLoader__.load({
 			const [updateError, setUpdateError] = useState("");
 			const [auditLog, setAuditLog] = useState(null);
 			const [auditError, setAuditError] = useState("");
+			const [taskCfg, setTaskCfg] = useState(null);
+			const [taskCfgError, setTaskCfgError] = useState("");
+			const [taskBusy, setTaskBusy] = useState(false);
 			const [tab, setTab] = useState("rules");
 			// UI 优化：搜索、折叠、面板内确认
 			const [confirm, setConfirm] = useState(null);
@@ -601,6 +626,41 @@ window.__ModuleLoader__.load({
 			useEffect(() => {
 				if (tab === "engine") loadAudit();
 			}, [tab, loadAudit]);
+
+			const loadTaskCfg = useCallback(async () => {
+				if (!engineApi) { setTaskCfgError("规则引擎服务不可用"); return; }
+				try {
+					const res = await engineApi.getTaskContractConfig();
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setTaskCfg(data.config);
+						setTaskCfgError("");
+					} else setTaskCfgError(errText((data && data.error) || "未知错误"));
+				} catch (e) {
+					setTaskCfgError(errText(e));
+				}
+			}, [engineApi]);
+			useEffect(() => {
+				if (tab === "engine" && taskCfg === null) loadTaskCfg();
+			}, [tab, taskCfg, loadTaskCfg]);
+
+			const saveTaskCfg = useCallback(async (patch) => {
+				if (!engineApi || !taskCfg) return;
+				setTaskBusy(true);
+				try {
+					const next = { ...taskCfg, ...patch };
+					const res = await engineApi.setTaskContractConfig(next);
+					const data = unwrap(res);
+					if (data && data.ok) {
+						setTaskCfg(data.config);
+						setTaskCfgError("");
+					} else setTaskCfgError(errText((data && data.error) || "未知错误"));
+				} catch (e) {
+					setTaskCfgError(errText(e));
+				} finally {
+					setTaskBusy(false);
+				}
+			}, [engineApi, taskCfg]);
 
 			const loadDisabled = useCallback(async () => {
 				try {
@@ -999,6 +1059,29 @@ window.__ModuleLoader__.load({
 								react.createElement("div", { style: { ...s.statusValue, color: engine.configOk ? "var(--dsw-alias-success-6, #00b42a)" : "var(--dsw-alias-danger-5, #f53f3f)" } }, engine.configOk ? "正常" : "异常")
 							)
 						)
+					),
+					react.createElement("div", { style: s.card },
+						react.createElement("div", { style: s.cardTitle }, "任务边界与反过度工程"),
+						taskCfgError ? react.createElement("div", { style: s.msgErr }, String(taskCfgError)) : null,
+						taskCfg ? react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "6px", marginTop: "6px" } },
+							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
+								react.createElement("input", { type: "checkbox", checked: !!taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ taskContractEnabled: e.target.checked }) }),
+								"启用任务契约/反过度工程（默认关闭）"
+							),
+							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
+								react.createElement("input", { type: "checkbox", checked: !!taskCfg.askEnabled, disabled: !taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ askEnabled: e.target.checked }) }),
+								"允许弹窗询问（默认关闭）"
+							),
+							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
+								"模式：",
+								react.createElement("select", { value: taskCfg.taskContractMode || "observe", disabled: !taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ taskContractMode: e.target.value }) },
+									react.createElement("option", { value: "observe" }, "观察（只记录提醒）"),
+									react.createElement("option", { value: "armed" }, "armed（真正拦截）")
+								)
+							),
+							taskBusy ? react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "保存中…") : null,
+							react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "说明：总开关关闭时不会产生新弹窗/新拦截；开启后默认观察模式，弹窗默认关闭。")
+						) : react.createElement("div", { style: s.loading }, "正在加载任务契约配置…")
 					),
 					react.createElement("div", { style: s.card },
 						react.createElement("div", { style: s.cardHead },

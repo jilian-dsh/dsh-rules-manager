@@ -1,7 +1,7 @@
 # dsh-rules-manager (Rules, Commands & Skills Manager)
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.8-blue)
+![version](https://img.shields.io/badge/version-1.5.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-English%20%7C%20%E4%B8%AD%E6%96%87-lightgrey)
@@ -32,6 +32,7 @@
 /rules add 我的规则｜这是正文   add a rule (｜ separates title and body)
 /rules edit 2 新正文       edit rule 2's body
 /rules delete 3           delete rule 3 (numbers are never reused)
+/rules health             rule health check: counts, sections, free zone, missing level, empty/long body, duplicate titles
 ```
 
 Custom commands: define `hello` = "Please greet me warmly" in the panel, then type `/hello` in the chat box.
@@ -170,7 +171,7 @@ dsh-rules-manager-client/       client plugin (browser bundle)
 
 ```sh
 node test-service.js   # 101 assertions: Remote markers + rule CRUD + user commands (with args) + backup restore (isolated)
-node test-local.js     # 29 assertions: /rules command end-to-end (isolated)
+node test-local.js     # 33 assertions: /rules command end-to-end (including health check, isolated)
 ```
 
 Both tests use a **temporary DSH_HOME + AGENTS.md copy**; they never touch your real files.

@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则、命令与技能管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.8-blue)
+![version](https://img.shields.io/badge/version-1.5.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -28,6 +28,7 @@
 /rules add 我的规则｜这是正文  新增规则（｜ 分隔标题和正文，全角半角均可）
 /rules edit 2 新正文       修改规则 2 正文
 /rules delete 3           删除规则 3（编号不复用）
+/rules health             规则体检：统计条数/分区/自由区域，检查缺等级/空正文/长正文/重复标题
 ```
 
 自定义命令：设置页定义 `hello` = "请热情地欢迎我"，聊天框输入 `/hello` 即可触发。
@@ -190,7 +191,7 @@ dsh-rules-manager-client/       client 插件（浏览器 bundle）
 
 ```sh
 node test-service.js   # 101 项断言：Remote 标记 + 规则 CRUD + 用户命令（含参数）+ 备份恢复（隔离环境）
-node test-local.js     # 29 项断言：/rules 命令全场景（隔离环境）
+node test-local.js     # 33 项断言：/rules 命令全场景（含规则体检，隔离环境）
 ```
 
 两个测试都用**临时 DSH_HOME + AGENTS.md 副本**，不触碰真实文件。

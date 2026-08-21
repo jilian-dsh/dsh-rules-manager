@@ -144,6 +144,13 @@ const afterAddLevel = await readFile(join(home, "AGENTS.md"), "utf8");
 t("p1-5: 保留原等级不重复补", afterAddLevel.includes("### [规则 4] 硬拦规则（执行等级：A）（来源：/rules 命令"));
 t("p1-5: 自带等级无默认提示", !addLevel.text.includes("默认补 D 级"));
 
+// 10. 规则体检（只读命令）
+const health = await invoke("health");
+t("health: success", health.kind === "success");
+t("health: 规则总数 4", health.text.includes("规则总数：4"));
+t("health: 缺失执行等级提示", health.text.includes("缺失执行等级：3"));
+t("health: 含分区统计", health.text.includes("【分区】"));
+
 await rm(home, { recursive: true, force: true });
 console.log(failed === 0 ? "\nALL TESTS PASSED" : `\n${failed} TEST(S) FAILED`);
 process.exit(failed === 0 ? 0 : 1);

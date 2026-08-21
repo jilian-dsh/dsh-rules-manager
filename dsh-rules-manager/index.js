@@ -11,6 +11,7 @@ import {
 	addRuleOp,
 	deleteRuleOp,
 	editRuleOp,
+	healthRules,
 	loadRules,
 	ruleView,
 	saveLines
@@ -27,6 +28,7 @@ const USAGE = [
 	"  /rules add <标题>｜<正文>  新增一条规则（用｜分隔标题和正文）",
 	"  /rules edit <编号> <新正文>  修改某条规则的正文",
 	"  /rules delete <编号>    删除某条规则",
+	"  /rules health            规则体检：条数/分区/自由区域/缺等级/空正文/长正文/重复标题",
 	"说明：每次修改前自动备份到 ~/.dsh/.backups/（保留最近 5 份）",
 ].join("\n");
 
@@ -35,6 +37,7 @@ function parseCommand(rawInput) {
 	const text = rawInput.trim();
 	if (!text || /^(list|ls)$/i.test(text)) return { kind: "list" };
 	if (/^(status|state)$/i.test(text)) return { kind: "status" };
+	if (/^(health|check|lint)$/i.test(text)) return { kind: "health" };
 	if (/^(help|\?)$/i.test(text)) return { kind: "help" };
 	let m = text.match(/^(?:show|view|get)\s+([0-9A-Za-z]+)$/i);
 	if (m) return { kind: "show", index: m[1] };
@@ -90,6 +93,33 @@ async function executeRules(ctx, invocation) {
 			];
 			return { kind: "success", text: parts.join("\n") };
 		}
+		case "health": {
+			const health = healthRules(lines, rules);
+			const parts = [
+				"【规则体检（只读，不修改）】",
+				`  规则总数：${health.total}`,
+				`  自由区域规则：${health.free}`,
+				`  缺失执行等级：${health.missingLevel}`,
+				`  空正文：${health.empty}`,
+				`  长正文：${health.long}`,
+				`  重复标题：${health.duplicateTitles}`,
+				"",
+				"【分区】"
+			];
+			for (const s of health.sections) parts.push(`  ${s.name}：${s.count} 条`);
+			if (health.issues.length === 0) {
+				parts.push("", "未发现明显问题。");
+			} else {
+				parts.push("", "【需要关注】");
+				const limit = 20;
+				for (const item of health.issues.slice(0, limit)) {
+					parts.push(`- [${item.level}] 规则 ${item.index} ${item.title}`);
+					parts.push(`  ${item.message}`);
+				}
+				if (health.issues.length > limit) parts.push(`… 还有 ${health.issues.length - limit} 条，可用 /rules show <编号> 查看。`);
+			}
+			return { kind: "success", text: parts.join("\n") };
+		}
 		case "show": {
 			const rule = rules.find((r) => String(r.index) === String(command.index));
 			if (!rule) {
@@ -140,8 +170,8 @@ export function apply(ctx) {
 	ctx.effect(function* () {
 		yield ctx.commands.register({
 			name: "rules",
-			description: "管理用户全局规则（AGENTS.md）：列出、查看、新增、修改、删除",
-			input: { hint: "[list|show <编号>|add <标题>｜<正文>|edit <编号> <正文>|delete <编号>]" },
+			description: "管理用户全局规则（AGENTS.md）：列出、查看、新增、修改、删除、体检",
+			input: { hint: "[list|show <编号>|add <标题>｜<正文>|edit <编号> <正文>|delete <编号>|health]" },
 			handler: async (invocation) => {
 				try {
 					return await executeRules(ctx, invocation);

@@ -141,6 +141,59 @@ export function ruleView(rule, lines) {
 	};
 }
 
+/** 规则健康检查（只读）：统计条数、分区、自由区域、缺失等级、空正文、长正文、重复标题 */
+export function healthRules(lines, rules) {
+	const LONG_CHARS = 500;
+	const LONG_LINES = 15;
+	const issues = [];
+	const sections = new Map();
+	let free = 0;
+	let missingLevel = 0;
+	let empty = 0;
+	let long = 0;
+	let duplicateTitles = 0;
+	const titleSeen = new Map();
+	for (const rule of rules) {
+		const view = ruleView(rule, lines);
+		const section = view.section || "未分区";
+		sections.set(section, (sections.get(section) || 0) + 1);
+		if (view.free) free++;
+		const hasLevel = /执行等级[：:]\s*[A-DM+]+/i.test(view.title);
+		if (!hasLevel) {
+			missingLevel++;
+			issues.push({ level: "warn", index: view.index, title: view.title, message: "标题未标注执行等级（不会硬拦，建议补 A/C/M 或明确为 D）" });
+		}
+		const bodyText = view.body || "";
+		if (!bodyText.trim()) {
+			empty++;
+			issues.push({ level: "warn", index: view.index, title: view.title, message: "正文为空" });
+		}
+		const lineCount = bodyText ? bodyText.split("\n").length : 0;
+		if (bodyText.length > LONG_CHARS || lineCount > LONG_LINES) {
+			long++;
+			issues.push({ level: "info", index: view.index, title: view.title, message: `正文较长（${bodyText.length} 字符 / ${lineCount} 行），考虑精简` });
+		}
+		const key = view.title.replace(/\s+/g, " ").trim();
+		const seen = titleSeen.get(key) || [];
+		if (seen.length) {
+			duplicateTitles++;
+			issues.push({ level: "warn", index: view.index, title: view.title, message: `与规则 ${seen.join("、")} 标题重复` });
+		}
+		seen.push(String(view.index));
+		titleSeen.set(key, seen);
+	}
+	return {
+		total: rules.length,
+		free,
+		sections: [...sections.entries()].map(([name, count]) => ({ name, count })),
+		missingLevel,
+		empty,
+		long,
+		duplicateTitles,
+		issues
+	};
+}
+
 /** 新增规则：返回新行数组与规则信息，或 { error } */
 export function addRuleOp(lines, rules, title, body) {
 	if (!title.trim()) return { error: "标题不能为空" };

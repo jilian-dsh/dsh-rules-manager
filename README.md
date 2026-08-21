@@ -1,7 +1,7 @@
 # dsh-rules-manager
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.4.2-blue)
+![version](https://img.shields.io/badge/version-1.4.8-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 
@@ -14,6 +14,7 @@
 | 能力 | 入口 | 说明 |
 |---|---|---|
 | 规则管理 | `/rules` 命令 或 设置→规则、命令与技能 | 列出 / 查看 / 新增 / 修改 / 删除 / **禁用 / 恢复**用户全局规则（AGENTS.md），**保存即生效**，每次修改**自动备份** |
+| 规则体检 | `/rules health` | 只读检查：条数/分区/自由区域/缺等级/空正文/长正文/重复标题 |
 | 命令清单 | 设置→规则、命令与技能 →「命令」 | 只读展示所有可用斜杠命令 |
 | 自定义命令 | 设置→规则、命令与技能 →「自定义命令」 | 定义你自己的快捷指令：聊天框输入 `/名字`，把预设内容发送给 AI 执行；**支持带参数**：预设里写 `{input}` 会被替换成你输入的内容，没写则参数自动追加到末尾；**支持禁用/启用**（禁用后斜杠命令停用、内容保留） |
 | **技能管理** | 设置→规则、命令与技能 →「技能」 | 查看已安装技能（名称+简介+全文）、**禁用**（移出技能目录，内容原样保留）、**启用**（原样搬回）、**删除**（移入回收站 `~/.dsh/.backups/trash-<时间戳>/`，随时可恢复）；禁用/删除需重启 DSH 后完全生效 |

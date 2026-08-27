@@ -60,10 +60,13 @@ const t = (name, cond) => {
 
 // ── 1. 手动 Remote 标记 ─────────────────────────────────────────────
 const methods = remoteMethods(svc).map((m) => m.method);
-t("remoteMethods 标记 22 个方法", methods.length === 22);
-for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "pruneBackups", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand", "disableUserCommand", "enableUserCommand", "listSkills", "getSkill", "disableSkill", "enableSkill", "deleteSkill", "listDisabledSkills"]) {
+t("remoteMethods 标记 23 个方法", methods.length === 23);
+for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "pruneBackups", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand", "disableUserCommand", "enableUserCommand", "listSkills", "getSkill", "disableSkill", "enableSkill", "deleteSkill", "listDisabledSkills", "whitelistStatus"]) {
 	t(`含 ${m}`, methods.includes(m));
 }
+// 0.5.10 白名单状态（fixture home 无文件 → 空清单也应为 ok 响应）
+const wl = await svc.whitelistStatus();
+t("whitelistStatus ok（容错空清单）", wl.ok === true && Array.isArray(wl.permanent) && Array.isArray(wl.sessionAdded));
 
 // ── 2. 规则方法（fixture）───────────────────────────────────────────
 const list = await svc.listRules();

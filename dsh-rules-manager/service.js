@@ -54,7 +54,8 @@ const REMOTE_METHODS = [
 	"disableSkill",
 	"enableSkill",
 	"deleteSkill",
-	"listDisabledSkills"
+	"listDisabledSkills",
+	"whitelistStatus"
 ];
 
 /** 用户自定义命令存储文件 */
@@ -213,6 +214,37 @@ class RulesManagerService extends TypertRemoteService {
 	}
 
 	// ── Remote: 规则 ─────────────────────────────────────────────────────
+
+	/** 0.5.10 建议（用户要求面板可视化）：工具放行白名单状态——永久清单（rule-engine-tools.json）+ 近 24h 会话放行记录（审计派生） */
+	async whitelistStatus() {
+		const home = resolveDshHome();
+		const permanent = [];
+		try {
+			const raw = await readFile(join(home, "rule-engine-tools.json"), "utf8");
+			const arr = JSON.parse(raw);
+			if (Array.isArray(arr)) {
+				for (const it of arr) {
+					if (typeof it === "string") permanent.push({ name: it, time: null, session: null });
+					else if (it && typeof it.name === "string") permanent.push({ name: it.name, time: it.time ?? null, session: it.session ?? null });
+				}
+			}
+		} catch { /* 无文件/损坏 = 空清单 */ }
+		const sessionAdded = [];
+		try {
+			const log = await readFile(join(home, "rule-engine.log.jsonl"), "utf8");
+			const cutoff = Date.now() - 24 * 3600 * 1000;
+			for (const line of log.split("\n")) {
+				if (!line.includes("unknown-tool-whitelist")) continue;
+				const name = line.match(/"reason":"[^"]*允许使用 ([A-Za-z_][A-Za-z0-9_:.-]*)/);
+				const ts = line.match(/"ts":"([^"]+)"/);
+				const sid = line.match(/"session":"([^"]+)"/);
+				if (name && sid && ts && new Date(ts[1]).getTime() >= cutoff) {
+					sessionAdded.push({ name: name[1], session: sid[1], time: ts[1] });
+				}
+			}
+		} catch { /* 无日志 = 无派生记录 */ }
+		return { ok: true, permanent, sessionAdded: sessionAdded.slice(-50).reverse() };
+	}
 
 	/** 规则清单（含分区/编号/标题/正文原文），供可视化编辑 */
 	async listRules() {

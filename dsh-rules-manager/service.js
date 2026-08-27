@@ -215,12 +215,15 @@ class RulesManagerService extends TypertRemoteService {
 
 	// ── Remote: 规则 ─────────────────────────────────────────────────────
 
-	/** 0.5.10 建议（用户要求面板可视化）：工具放行白名单状态——永久清单（rule-engine-tools.json）+ 近 24h 会话放行记录（审计派生） */
+	/** 0.5.10 建议（用户要求面板可视化）：工具放行白名单状态——永久清单（rule-engine-tools.json）+ 近 24h 会话放行记录（审计派生）
+	 *  1.5.3 诊断增强：返回 debug（home/读取长度/错误明细）——面板白名单异常时一眼定位（无异常时仅 home）。 */
 	async whitelistStatus() {
 		const home = resolveDshHome();
+		const debug = { home };
 		const permanent = [];
 		try {
 			const raw = await readFile(join(home, "rule-engine-tools.json"), "utf8");
+			debug.fileLen = raw.length;
 			const arr = JSON.parse(raw);
 			if (Array.isArray(arr)) {
 				for (const it of arr) {
@@ -228,7 +231,7 @@ class RulesManagerService extends TypertRemoteService {
 					else if (it && typeof it.name === "string") permanent.push({ name: it.name, time: it.time ?? null, session: it.session ?? null });
 				}
 			}
-		} catch { /* 无文件/损坏 = 空清单 */ }
+		} catch (e) { debug.readError = String((e && e.message) || e); }
 		const sessionAdded = [];
 		try {
 			const log = await readFile(join(home, "rule-engine.log.jsonl"), "utf8");
@@ -243,7 +246,7 @@ class RulesManagerService extends TypertRemoteService {
 				}
 			}
 		} catch { /* 无日志 = 无派生记录 */ }
-		return { ok: true, permanent, sessionAdded: sessionAdded.slice(-50).reverse() };
+		return { ok: true, debug, permanent, sessionAdded: sessionAdded.slice(-50).reverse() };
 	}
 
 	/** 规则清单（含分区/编号/标题/正文原文），供可视化编辑 */

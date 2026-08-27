@@ -527,7 +527,13 @@ window.__ModuleLoader__.load({
 			useEffect(() => {
 				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") return;
 				rulesApi.whitelistStatus()
-					.then((r) => { if (r && r.ok) setWlData(r); else setWlError((r && r.error) || "加载失败"); })
+					.then((r) => {
+						if (r && r.ok) {
+							setWlData({ permanent: r.permanent || [], sessionAdded: r.sessionAdded || [] });
+						} else {
+							setWlError((r && r.error) || "加载失败");
+						}
+					})
 					.catch((e) => setWlError(String((e && e.message) || e)));
 			}, [rulesApi]);
 			// UI 优化：搜索、折叠、面板内确认
@@ -1083,11 +1089,11 @@ window.__ModuleLoader__.load({
 						react.createElement("div", { style: s.cardTitle }, "工具放行白名单"),
 						wlError ? react.createElement("div", { style: s.msgErr }, String(wlError)) : null,
 						!wlData ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
-							wlData.permanent.length === 0 && wlData.sessionAdded.length === 0
+							(wlData.permanent || []).length === 0 && (wlData.sessionAdded || []).length === 0
 								? react.createElement("div", { style: s.empty }, "白名单为空（工具无放行记录）")
 								: react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
-									wlData.permanent.map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "永久：" + r.name + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
-									wlData.sessionAdded.map((r, i) => react.createElement("div", { key: "s" + i, style: { whiteSpace: "pre-wrap" } }, "近24h放行：" + r.name + "（" + r.time + " 会话=" + r.session + "）"))
+									(wlData.permanent || []).map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "永久：" + r.name + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
+									(wlData.sessionAdded || []).map((r, i) => react.createElement("div", { key: "s" + i, style: { whiteSpace: "pre-wrap" } }, "近24h放行：" + r.name + "（" + r.time + " 会话=" + r.session + "）"))
 								)
 						)
 					),

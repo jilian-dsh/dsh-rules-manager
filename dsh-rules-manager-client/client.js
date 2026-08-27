@@ -525,11 +525,18 @@ window.__ModuleLoader__.load({
 			const [wlData, setWlData] = useState(null);
 			const [wlError, setWlError] = useState("");
 			useEffect(() => {
-				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") return;
+				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") {
+					setWlError("白名单 API 不可用（rulesApi.whitelistStatus 缺失）");
+					return;
+				}
 				rulesApi.whitelistStatus()
 					.then((r) => {
-						if (r && r.ok) {
-							setWlData({ permanent: r.permanent || [], sessionAdded: r.sessionAdded || [] });
+						// 0.5.11 根因实锤（用户截图"原始返回"）：DSH @Remote 调用返回两层壳 {ok, value:{...}}
+						// ——数据在 r.value（permanent/sessionAdded/debug 都在 value 层）；旧代码读 r.permanent（外层）
+						// → undefined → 渲染空。修正：读 r.value（兼容直返：无 value 时回退 r）。
+						const data = (r && r.value) || r;
+						if (r && r.ok !== false && data) {
+							setWlData({ permanent: data.permanent || [], sessionAdded: data.sessionAdded || [] });
 						} else {
 							setWlError((r && r.error) || "加载失败");
 						}
@@ -1088,14 +1095,14 @@ window.__ModuleLoader__.load({
 					react.createElement("div", { style: s.card },
 						react.createElement("div", { style: s.cardTitle }, "工具放行白名单"),
 						wlError ? react.createElement("div", { style: s.msgErr }, String(wlError)) : null,
-						!wlData ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
-							(wlData.permanent || []).length === 0 && (wlData.sessionAdded || []).length === 0
+						wlData === null && !wlError ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
+							wlData && (wlData.permanent || []).length === 0 && (wlData.sessionAdded || []).length === 0
 								? react.createElement("div", { style: s.empty }, "白名单为空（工具无放行记录）")
-								: react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
+								: wlData ? react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
 									(wlData.permanent || []).map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "永久：" + r.name + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
 									(wlData.sessionAdded || []).map((r, i) => react.createElement("div", { key: "s" + i, style: { whiteSpace: "pre-wrap" } }, "近24h放行：" + r.name + "（" + r.time + " 会话=" + r.session + "）"))
-								)
-						)
+								) : null
+						),
 					),
 					react.createElement("div", { style: s.card },
 						react.createElement("div", { style: s.cardTitle }, "任务边界与反过度工程"),

@@ -289,6 +289,16 @@ window.__ModuleLoader__.load({
 					parameters: [],
 					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledSkills:result", schema: passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 148, column: 1 }
+				},
+				{
+					id: "rules-manager#rulesManager/whitelistStatus",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "whitelistStatus",
+					invocation: { kind: "direct" },
+					parameters: [],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/whitelistStatus:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 156, column: 1 }
 				}
 				,
 				{
@@ -511,6 +521,15 @@ window.__ModuleLoader__.load({
 			const [taskCfgError, setTaskCfgError] = useState("");
 			const [taskBusy, setTaskBusy] = useState(false);
 			const [tab, setTab] = useState("rules");
+			// 工具放行白名单（0.5.10 建议 b：可视化"谁被永久放行/谁被会话放行"）
+			const [wlData, setWlData] = useState(null);
+			const [wlError, setWlError] = useState("");
+			useEffect(() => {
+				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") return;
+				rulesApi.whitelistStatus()
+					.then((r) => { if (r && r.ok) setWlData(r); else setWlError((r && r.error) || "加载失败"); })
+					.catch((e) => setWlError(String((e && e.message) || e)));
+			}, [rulesApi]);
 			// UI 优化：搜索、折叠、面板内确认
 			const [confirm, setConfirm] = useState(null);
 			const [ruleQuery, setRuleQuery] = useState("");
@@ -1058,6 +1077,18 @@ window.__ModuleLoader__.load({
 								react.createElement("div", { style: s.statusLabel }, "配置"),
 								react.createElement("div", { style: { ...s.statusValue, color: engine.configOk ? "var(--dsw-alias-success-6, #00b42a)" : "var(--dsw-alias-danger-5, #f53f3f)" } }, engine.configOk ? "正常" : "异常")
 							)
+						)
+					),
+					react.createElement("div", { style: s.card },
+						react.createElement("div", { style: s.cardTitle }, "工具放行白名单"),
+						wlError ? react.createElement("div", { style: s.msgErr }, String(wlError)) : null,
+						!wlData ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
+							wlData.permanent.length === 0 && wlData.sessionAdded.length === 0
+								? react.createElement("div", { style: s.empty }, "白名单为空（工具无放行记录）")
+								: react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
+									wlData.permanent.map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "永久：" + r.name + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
+									wlData.sessionAdded.map((r, i) => react.createElement("div", { key: "s" + i, style: { whiteSpace: "pre-wrap" } }, "近24h放行：" + r.name + "（" + r.time + " 会话=" + r.session + "）"))
+								)
 						)
 					),
 					react.createElement("div", { style: s.card },

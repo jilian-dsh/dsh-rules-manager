@@ -42,3 +42,8 @@ npm install dsh-rules-manager dsh-rules-manager-client
 ## 许可证
 
 [MIT](LICENSE)。
+
+
+## 变更记录
+
+- **1.4.4（2026-08-28 发布）**：白名单面板渲染修复——DSH @Remote 调用返回两层壳 `{ok, value:{...}}`，数据在 `r.value`；旧代码读外层 `r.permanent` 致面板恒显"白名单为空"（文件有 3 条不显示）。修复 = 读 `r.value`（兼容直返）+ 三态渲染（加载/错误/空区分）+ 错误可见。根因与修复详版本记录 v4.75。

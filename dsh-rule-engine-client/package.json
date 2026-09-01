@@ -1,0 +1,48 @@
+{
+  "name": "dsh-rule-engine-client",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness (dsh) rule-engine client bundle: 回合末裁决卡片（可折叠对/错卡片 + 判例登记）+ 设置页开关（与任务契约同组，默认关）",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "rules",
+    "guard",
+    "agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilian-dsh/dsh-rule-engine.git"
+  },
+  "homepage": "https://github.com/jilian-dsh/dsh-rule-engine",
+  "engines": {
+    "node": ">=22"
+  },
+  "dshCompat": {
+    "min": "0.1.0-rc.3",
+    "max": "0.2.0"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

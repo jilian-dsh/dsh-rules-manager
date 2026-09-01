@@ -523,6 +523,7 @@ window.__ModuleLoader__.load({
 			const [tab, setTab] = useState("rules");
 			// 工具放行白名单（0.5.10 建议 b：可视化"谁被永久放行/谁被会话放行"）
 			const [wlData, setWlData] = useState(null);
+			const [wlCollapsed, setWlCollapsed] = useState(false);
 			const [wlError, setWlError] = useState("");
 			useEffect(() => {
 				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") {
@@ -1093,15 +1094,27 @@ window.__ModuleLoader__.load({
 						)
 					),
 					react.createElement("div", { style: s.card },
-						react.createElement("div", { style: s.cardTitle }, "工具放行白名单"),
+						react.createElement("div", { style: s.cardHead },
+							react.createElement("span", { style: s.cardTitle }, "工具放行白名单"),
+							react.createElement("button", { style: s.btnPrimary, onClick: () => setWlCollapsed(!wlCollapsed) }, wlCollapsed ? "展开" : "收起")
+						),
 						wlError ? react.createElement("div", { style: s.msgErr }, String(wlError)) : null,
 						wlData === null && !wlError ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
 							wlData && (wlData.permanent || []).length === 0 && (wlData.sessionAdded || []).length === 0
 								? react.createElement("div", { style: s.empty }, "白名单为空（工具无放行记录）")
-								: wlData ? react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
-									(wlData.permanent || []).map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "永久：" + r.name + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
-									(wlData.sessionAdded || []).map((r, i) => react.createElement("div", { key: "s" + i, style: { whiteSpace: "pre-wrap" } }, "近24h放行：" + r.name + "（" + r.time + " 会话=" + r.session + "）"))
-								) : null
+								: wlData ? (wlCollapsed ? null : react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
+									react.createElement("div", { style: { fontWeight: "600", marginTop: "2px" } }, "已生效白名单（文件，永久）· " + (wlData.permanent || []).length + " 项"),
+									(wlData.permanent || []).map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "✓ " + r.name + ((wlData.sessionAdded || []).some((x) => x.name === r.name) ? "（近24h有放行动作）" : "") + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
+									(() => {
+										const permNames = new Set((wlData.permanent || []).map((x) => x.name));
+										const removed = (wlData.sessionAdded || []).filter((x) => !permNames.has(x.name));
+										if (removed.length === 0) return null;
+										return [
+											react.createElement("div", { key: "hdr-rm", style: { fontWeight: "600", marginTop: "4px" } }, "近 24h 曾放行但已不在白名单（已撤销）· " + removed.length + " 项"),
+											...removed.map((r, i) => react.createElement("div", { key: "rm" + i, style: { whiteSpace: "pre-wrap", opacity: 0.7, color: "#8a919f" } }, "⚠ " + r.name + "（" + r.time + " 会话=" + r.session + "）"))
+										];
+									})()
+								)) : null
 						),
 					),
 					react.createElement("div", { style: s.card },
@@ -1122,6 +1135,10 @@ window.__ModuleLoader__.load({
 									react.createElement("option", { value: "observe" }, "观察（只记录提醒）"),
 									react.createElement("option", { value: "armed" }, "armed（真正拦截）")
 								)
+							),
+							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
+								react.createElement("input", { type: "checkbox", checked: !!(taskCfg.turnCard && taskCfg.turnCard.enabled), onChange: (e) => saveTaskCfg({ turnCard: { enabled: e.target.checked } }) }),
+								"回合末裁决卡片（默认关闭）"
 							),
 							taskBusy ? react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "保存中…") : null,
 							react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "说明：总开关关闭时不会产生新弹窗/新拦截；开启后默认观察模式，弹窗默认关闭。")

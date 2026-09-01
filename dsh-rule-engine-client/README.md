@@ -29,6 +29,19 @@ DeepSeek Harness (DSH) 规则引擎的浏览器端（client bundle）：**回合
 
 卡片与判例登记**落盘**到 `~/.dsh/rule-engine-turn-cards.json`（上限 200 条）——重启 DSH 后历史裁决按钮/判例状态依然存在（判例=教学数据，不因进程重启丢失）。
 
+## 跨回合补裁（机制 + 边界）
+
+卡片按**消息**（messageId）索引挂在每条被拦的消息上，数据落盘——因此：
+
+- **可以跨回合补裁**：某回合被拦时没裁，过了几个回合后回到那条消息，按钮仍在，点开即可补裁 ✅/❌；
+- 已裁的保持锁定（一次性）；未裁的随时可补。
+
+**边界**：
+
+1. **保留上限 200 条**（`TURN_CARDS_MAX`）：历史超过上限时最老的卡片会被裁剪，其按钮消失；
+2. **会话边界**：卡片按 messageId + sessionId 记录——切换会话/工作区后，当前会话视图没有其他会话的消息，按钮只出现在**所属会话**内；
+3. 判例登记**一次性**：已判的不可在卡片上改判（改判走 `/guard label` 命令行，见上节）。
+
 ## 开关
 
 默认**关闭**（面向大众/通用性——用户按需打开）。设置页「规则、命令与技能 → 规则引擎」页签中与「任务契约」同组的「回合末裁决卡片」开关控制；关闭时卡片不显示、也不产生任何远程调用开销。
@@ -40,6 +53,6 @@ DeepSeek Harness (DSH) 规则引擎的浏览器端（client bundle）：**回合
 ## 契约要点（手写 bundle）
 
 - 槽位：`conversation.chat.assistant-actions`（list，多 entry 共存；官方 feedback 为 order 10，本卡片 order 20）；
-- Remote：`ruleEngine.getTurnCard(messageId)` / `ruleEngine.rateTurnCard(messageId, verdict, expectedVerdict)`；
+- Remote：`ruleEngine.getTurnCard(messageId)` / `ruleEngine.rateTurnCard(messageId, verdict, expectedVerdict, blockIndex)`；
 - 组件为 React 函数组件、`react.createElement` 构建（无 JSX 构建链）；
 - 无卡片 / 开关关闭 / 拉取失败 → 渲染 null（静默，不占位、不报错）。

@@ -176,6 +176,10 @@ node test-local.js     # 33 assertions: /rules command end-to-end (including hea
 
 Both tests use a **temporary DSH_HOME + AGENTS.md copy**; they never touch your real files.
 
+## Fixed source
+
+- **1.5.4 (current)** is pinned to main commit `e28cac0a4f4856b09210d656bda0dbbc31b9f748` (full 40-char; `git checkout e28cac0` reproduces the source shipped as npm `dsh-rules-manager@1.5.4` and GitHub Release v1.5.4).
+
 ## License
 
 [MIT](LICENSE). Copyright (c) 2026 dsh-rules-manager contributors.

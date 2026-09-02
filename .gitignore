@@ -14,4 +14,6 @@ dsh-rule-engine/
 # 独立仓库：技能库/法律技能库（各有独立远程，不随本仓库提交）
 dsh-rule-engine-skill/
 claude-for-legal-ZH/
+# 独立仓库：DSH 插件精选列表 fork（awesome-dsh-plugin，独立远程）
+awesome-dsh-plugin/
 *.tgz

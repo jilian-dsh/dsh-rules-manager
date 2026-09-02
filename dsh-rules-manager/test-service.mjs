@@ -1,5 +1,5 @@
 // service.js 隔离测试：手动 Remote 标记 + 全部 Remote 方法 + C3 用户自定义命令
-// 运行：node "D:\DeepSeek harness\.dsh\profiles\web\rules-manager\test-service.js"
+// 运行：node "$DSH_HOME\profiles\web\rules-manager\test-service.js"
 // 使用固定 fixture（不依赖真实 AGENTS.md），测试稳定可重复。
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";

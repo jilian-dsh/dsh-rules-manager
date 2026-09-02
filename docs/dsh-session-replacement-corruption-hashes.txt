@@ -1,7 +1,7 @@
 # Evidence Hashes for Discussion #1912
 
 Session: `session-568ea370-f2ca-45f2-9218-71fc5c9e304f`
-All paths physical (D: drive). C:\Users\example\.dsh is a Junction to D:\example workspace\.dsh.
+All paths physical (D: drive). %USERPROFILE%\.dsh is a Junction to $DSH_HOME.
 
 ## Session log artifacts
 

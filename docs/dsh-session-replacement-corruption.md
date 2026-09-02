@@ -7,7 +7,7 @@
 
 ## 0. Environment Paths (important)
 
-`C:\Users\example\.dsh` is a **Windows Junction** pointing to `D:\example workspace\.dsh`. All data physically resides on drive D; the C: path is only a junction pointer. Physical paths are used throughout.
+%USERPROFILE%\.dsh is a **Windows Junction** pointing to `$DSH_HOME`. All data physically resides on drive D; the C: path is only a junction pointer. Physical paths are used throughout.
 
 ## 1. Summary
 
@@ -21,9 +21,9 @@ The resulting log failed three independent validation layers, in order:
 
 ## 2. Session and Plugin Inventory
 
-- Session: `session-568ea370-f2ca-45f2-9218-71fc5c9e304f` (title "读取交接报告继续工作"), workspace `D:\example workspace\dsh-project`
-- Session file: `D:\example workspace\.dsh\sessions\--D-DeepSeek~0020harness-dsh-project--\session-568ea370-f2ca-45f2-9218-71fc5c9e304f\session.jsonl.zstd` (multi-frame Zstandard; header frame plus appended frames with checksum flag)
-- Profile bundles (from `D:\example workspace\.dsh\profiles\web\package.json`, `dsh.profile.bundles`):
+- Session: `session-568ea370-f2ca-45f2-9218-71fc5c9e304f` (title "读取交接报告继续工作"), workspace `<workspace>`
+- Session file: `$DSH_HOME\sessions\<workspace-slug>\session-568ea370-f2ca-45f2-9218-71fc5c9e304f\session.jsonl.zstd` (multi-frame Zstandard; header frame plus appended frames with checksum flag)
+- Profile bundles (from `$DSH_HOME\profiles\web\package.json`, `dsh.profile.bundles`):
   - `@deepseek-ai/dsh-base`
   - `@deepseek-ai/dsh-web-app`
   - `dsh-rules-manager` (user-developed plugin; includes `dsh-rules-manager-client`)
@@ -110,7 +110,7 @@ All work was done on byte-level copies with full backups and hash verification. 
 2. Splice repair: simulate inbox replay; clamp 3 illegal values (163268 start 1 to 0; 164220 start 2 to 1; 164564 removed 1 to 0). Verified: load OK; replay ALL SPLICES VALID; messages intact.
 3. Tool pairing: **not cleanly fixable in-log** (see 6.3).
 
-Repair artifacts: `D:\example workspace\dsh-project\_session-repair\` (rebuild-session.mjs, fix-splices.mjs, fix-orphans.mjs, replay-inbox.mjs, test-load.mjs, scan-orphans.mjs) plus 4 timestamped backups in `backup\`.
+Repair artifacts: `<workspace>\research\_session-repair\` (rebuild-session.mjs, fix-splices.mjs, fix-orphans.mjs, replay-inbox.mjs, test-load.mjs, scan-orphans.mjs) plus 4 timestamped backups in `backup\`.
 
 ## 8. Suggested Product Improvements
 

@@ -4,13 +4,14 @@ node_modules/
 # logs & temp
 *.log
 *.tmp
-
 # local backups
 .backups/
-
 # OS
 Thumbs.db
 .DS_Store
-
-# ¶ÀÁ¢²Ö¿â£¨jilian-dsh/dsh-rule-engine£©£¬ÓÉ×ÔÉí git ¹ÜÀí£¬²»ÄÉÈë±¾²Ö¿â
+# ç‹¬ç«‹ä»“åº“ï¼šdsh-rule-engine æ˜¯ç‹¬ç«‹ git ä»“åº“ï¼Œä¸éšæœ¬ä»“åº“æäº¤
 dsh-rule-engine/
+# ç‹¬ç«‹ä»“åº“ï¼šæŠ€èƒ½åº“/æ³•å¾‹æŠ€èƒ½åº“ï¼ˆå„æœ‰ç‹¬ç«‹è¿œç¨‹ï¼Œä¸éšæœ¬ä»“åº“æäº¤ï¼‰
+dsh-rule-engine-skill/
+claude-for-legal-ZH/
+*.tgz

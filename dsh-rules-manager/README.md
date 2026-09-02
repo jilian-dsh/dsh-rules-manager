@@ -88,7 +88,7 @@ AGENTS.md 支持一个**自由区域**：被 `<!-- free-zone:start -->` / `<!-- 
 `/rules add` **不能**把规则加进自由区域（这是刻意设计，防止普通规则掉进"引擎不强制"的区域）。请按下面三步操作：
 
 1. 若装有 dsh-rule-engine：先在聊天框输入 **`/guard unlock`**（AGENTS.md 受写保护，unlock 默认放行 10 分钟，钥匙只在用户手里）；
-2. 用记事本打开 `$DSH_HOME/AGENTS.md`（本机通常是 `D:\example workspace\.dsh\AGENTS.md`），拉到文件**末尾**，找到 `<!-- free-zone:start -->` 和 `<!-- free-zone:end -->` 两行标记，在**两行之间**按下面格式粘贴（编号从 F2 开始顺延，F1 已被示例占用，不能与已有编号重复）：
+2. 用记事本打开 `$DSH_HOME/AGENTS.md`（`$DSH_HOME` 即本机 DSH 数据目录，Windows 默认 `%USERPROFILE%\.dsh`），拉到文件**末尾**，找到 `<!-- free-zone:start -->` 和 `<!-- free-zone:end -->` 两行标记，在**两行之间**按下面格式粘贴（编号从 F2 开始顺延，F1 已被示例占用，不能与已有编号重复）：
 
    ```markdown
    ### [规则 F2] 你的守则标题

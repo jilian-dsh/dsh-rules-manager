@@ -20,17 +20,30 @@ import {
 export const name = "rules-manager";
 export const inject = ["commands"];
 
+// ── /rules 子命令单一真源（2026-08-31：hint 手写漏 status/help 修复，与 /guard 同工艺）──
+// hint（输入框提示）与 USAGE（完整帮助）均由此派生：未来新增子命令只改这一个数组。
+const RULES_SPECS = [
+	{ name: "list", args: "", desc: "列出全部规则" },
+	{ name: "status", args: "", desc: "查看规则文件状态（数量/路径/BOM）" },
+	{ name: "show", args: "<编号>", desc: "查看某条规则的完整内容" },
+	{ name: "add", args: "<标题>｜<正文>", desc: "新增一条规则（用｜分隔标题和正文）" },
+	{ name: "edit", args: "<编号> <新正文>", desc: "修改某条规则的正文" },
+	{ name: "delete", args: "<编号>", desc: "删除某条规则" },
+	{ name: "health", args: "", desc: "规则体检：条数/分区/自由区域/缺等级/空正文/长正文/重复标题" },
+	{ name: "help", args: "", desc: "查看用法" }
+];
+
 const USAGE = [
 	"用法：",
-	"  /rules                  列出全部规则",
-	"  /rules status           查看规则文件状态（数量/路径/BOM）",
-	"  /rules show <编号>      查看某条规则的完整内容",
-	"  /rules add <标题>｜<正文>  新增一条规则（用｜分隔标题和正文）",
-	"  /rules edit <编号> <新正文>  修改某条规则的正文",
-	"  /rules delete <编号>    删除某条规则",
-	"  /rules health            规则体检：条数/分区/自由区域/缺等级/空正文/长正文/重复标题",
+	...RULES_SPECS.map((s) => `  /rules ${s.name}${s.args ? " " + s.args : ""}   ${s.desc}`),
 	"说明：每次修改前自动备份到 ~/.dsh/.backups/（保留最近 5 份）",
 ].join("\n");
+
+// 输入框提示：由子命令清单自动派生（顶层命令名去重，新子命令/别名自动同步）
+const RULES_HINT = "[" + [...new Set(RULES_SPECS.map((s) => s.name.split(" ")[0]))].map((n) => {
+	const spec = RULES_SPECS.find((s) => s.name === n || s.name.startsWith(n + " "));
+	return n + (spec?.args ? " " + spec.args : "");
+}).join("|") + "]";
 
 /** 解析 /rules 命令输入 */
 function parseCommand(rawInput) {
@@ -171,7 +184,7 @@ export function apply(ctx) {
 		yield ctx.commands.register({
 			name: "rules",
 			description: "管理用户全局规则（AGENTS.md）：列出、查看、新增、修改、删除、体检",
-			input: { hint: "[list|show <编号>|add <标题>｜<正文>|edit <编号> <正文>|delete <编号>|health]" },
+			input: { hint: RULES_HINT },
 			handler: async (invocation) => {
 				try {
 					return await executeRules(ctx, invocation);

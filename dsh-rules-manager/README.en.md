@@ -92,7 +92,7 @@ AGENTS.md supports a **free zone**: the section framed by the `<!-- free-zone:st
 `/rules add` **cannot** place a rule into the free zone (by design — it prevents normal rules from landing in an area the engine does not enforce). Do this instead:
 
 1. If dsh-rule-engine is installed: first type **`/guard unlock`** in the chat box (AGENTS.md is write-protected; unlock allows edits for 10 minutes by default; only the user holds the key);
-2. Open `$DSH_HOME/AGENTS.md` with a text editor (typically `D:\DeepSeek harness\.dsh\AGENTS.md`), scroll to the **end**, find the `<!-- free-zone:start -->` and `<!-- free-zone:end -->` markers, and paste **between them** in this format (numbering continues from F2; F1 is already taken by the example; never reuse an existing number):
+2. Open `$DSH_HOME/AGENTS.md` with a text editor (typically `D:\\example\\workspace\.dsh\AGENTS.md`), scroll to the **end**, find the `<!-- free-zone:start -->` and `<!-- free-zone:end -->` markers, and paste **between them** in this format (numbering continues from F2; F1 is already taken by the example; never reuse an existing number):
 
    ```markdown
    ### [规则 F2] Your code-of-conduct title

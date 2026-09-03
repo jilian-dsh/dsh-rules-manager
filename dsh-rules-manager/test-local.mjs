@@ -1,6 +1,6 @@
 // rules-manager 本地隔离测试（不触碰真实 AGENTS.md）
 // 用临时 DSH_HOME + 固定 fixture，端到端测试 /rules 命令全部功能。
-// 运行：node "D:\DeepSeek harness\.dsh\profiles\web\rules-manager\test-local.js"
+// 运行：node "D:\\example\\workspace\.dsh\profiles\web\rules-manager\test-local.js"
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

@@ -178,7 +178,7 @@ Both tests use a **temporary DSH_HOME + AGENTS.md copy**; they never touch your 
 
 ## Fixed source
 
-- **1.5.4 (current)** is pinned to main commit `e28cac0a4f4856b09210d656bda0dbbc31b9f748` (full 40-char; `git checkout e28cac0` reproduces the source shipped as npm `dsh-rules-manager@1.5.4` and GitHub Release v1.5.4).
+- **1.5.4 (current)** is pinned to main commit `ee1f7669176744b71b2e3faeeb572e54cc6a5523` (full 40-char; `git checkout ee1f766` reproduces the source shipped as npm `dsh-rules-manager@1.5.4` and GitHub Release v1.5.4).
 
 ## License
 

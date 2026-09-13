@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则、命令与技能管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.5.4-blue)
+![version](https://img.shields.io/badge/version-1.6.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -9,6 +9,8 @@
 > DeepSeek Harness（DSH）的规则、命令与技能管理插件：**/rules 斜杠命令** + 设置页**「规则、命令与技能」面板**（可视化编辑规则、查看命令清单、**自定义你自己的命令**（支持禁用/启用）、**管理技能**（查看/禁用/启用/删除进回收站）、**备份与一键恢复**）。
 >
 > ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**，可随时**一键恢复到任意备份时刻**。
+>
+> 当前版本 **1.6.0**（技能列表过滤无 `SKILL.md` 的目录；技能卡片新增「用过 N 次／未使用」徽章与「⚠️ 核心」保护标记及开/关按钮；修正 CRLF 格式技能描述解析）。
 
 ## ✨ 功能
 
@@ -124,7 +126,7 @@ AGENTS.md 支持一个**自由区域**：被 `<!-- free-zone:start -->` / `<!-- 
 - **外部服务**：无。
 - **失败边界**：规则修改**先备份后写入**，写失败保持原文件；技能移动采用"整目录改名"，目标已存在时**拒绝**（绝不覆盖）；恢复备份前会把当前文件再备份一次（双保险）；所有操作失败均不静默——详见上文「🛡️ 安全设计」与下文「⚠️ 已知问题与踩坑」。
 - **权限等级**（保守自评）：**高**（可写用户规则/命令/技能数据并移动技能目录）——建议安装前阅读「安全设计」章节并按需二次审查。
-- **发行固定源**：1.5.4（当前）固定于 main Commit `ee1f7669176744b71b2e3faeeb572e54cc6a5523`（40 位完整；`git checkout ee1f766` 可复现 npm `dsh-rules-manager@1.5.4` 与 GitHub Release v1.5.4 同源代码）。
+- **发行固定源**：见文末「发行固定源」章节（唯一真相源，由发布脚本自动维护）。
 
 ## ⚠️ 已知问题与踩坑
 
@@ -210,6 +212,21 @@ node test-local.js     # 33 项断言：/rules 命令全场景（含规则体检
 ```
 
 两个测试都用**临时 DSH_HOME + AGENTS.md 副本**，不触碰真实文件。
+
+## 版本历史
+
+| 版本 | 日期 | 要点 |
+|---|---|---|
+| **1.6.0** | 2026-09-14 | 技能列表过滤无 `SKILL.md` 的目录；新增技能使用次数统计（记分板口径，`dsh-skill-scoreboard`）与核心资产保护机制——**是否保护由技能自声明**（其 `SKILL.md` frontmatter 写 `protected: true`），面板可标记/取消；修复 CRLF 换行技能描述解析（影响 9 个技能） |
+| **1.5.4** | 2026-09-07 | 规则 / 命令 / 技能三面板稳定版；技能管理支持查看、禁用/启用、删除进回收站 |
+
+> 更早版本见 git 提交历史。
+
+## 发行固定源
+
+- **1.6.0（当前）** 固定于 main Commit `77cca8d`（`git checkout 77cca8d` + 发布 bump 可复现 npm `dsh-rules-manager@1.6.0` 与 GitHub Release v1.6.0 同源代码）。**注：release 提交号由发布脚本自动回填。**
+
+> **1.5.4** 固定于 main 分支的发布提交（`git checkout <hash>` 可复现 npm `dsh-rules-manager@1.5.4` 与 GitHub Release v1.5.4 同源代码）。**发布 commit 由发布脚本在三通道完成后自动回填。**
 
 ## 📄 许可证
 

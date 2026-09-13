@@ -1396,8 +1396,11 @@ window.__ModuleLoader__.load({
 					(skills || []).length === 0 ? react.createElement("div", { style: s.empty }, "尚未发现技能") : null,
 					react.createElement("div", { style: s.skillGrid, className: "rm-skill-grid" },
 						(skills || []).map((sk) => react.createElement("div", { key: sk.name, style: { ...s.card, ...s.skillCard, ...s.hoverCard }, className: "rm-hover-card" },
-							react.createElement("div", { style: s.cardHead },
-								react.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: "6px", minWidth: 0, flex: 1, flexWrap: "wrap" } },
+							// 2026-09-14 布局调整（用户建议「做成两行」）：技能卡片头由单行 space-between 改为**纵向两行**——
+							// 第一行＝技能名 + 状态徽章（启用／核心／使用次数），第二行＝操作按钮（右对齐）。
+							// 原单行布局在「3 徽章 + 4 按钮」并存时过于拥挤（按钮被挤压、名称与徽章换行错乱）。
+							react.createElement("div", { style: { ...s.cardHead, flexDirection: "column", alignItems: "stretch", gap: "10px" } },
+								react.createElement("div", { style: { display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flexWrap: "wrap" } },
 									react.createElement("span", { style: { ...s.cardTitle, whiteSpace: "normal", wordBreak: "break-word" } }, sk.title === sk.name ? sk.name : `${sk.title}（${sk.name}）`),
 									react.createElement("span", { style: { ...s.badge, ...s.badgeGreen, flexShrink: 0 } }, "启用"),
 									sk.isProtected
@@ -1415,7 +1418,7 @@ window.__ModuleLoader__.load({
 										}, sk.usage && sk.usage.count > 0 ? `用过 ${sk.usage.count} 次` : "未使用")
 										: null
 								),
-								react.createElement("div", { style: { display: "flex", gap: "4px", flexWrap: "nowrap", flexShrink: 0 } },
+								react.createElement("div", { style: { display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "flex-end" } },
 									skillDetail && skillDetail.name === sk.name
 										? react.createElement("button", { style: s.btn, onClick: () => setSkillDetail(null) }, "收起")
 										: react.createElement("button", { style: s.btn, onClick: () => doShowSkill(sk.name) }, "查看"),

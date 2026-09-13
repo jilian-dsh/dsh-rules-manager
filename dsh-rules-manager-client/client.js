@@ -291,6 +291,19 @@ window.__ModuleLoader__.load({
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 148, column: 1 }
 				},
 				{
+					id: "rules-manager#rulesManager/setSkillProtected",
+					service: "rulesManager",
+					namespace: "rulesManager",
+					method: "setSkillProtected",
+					invocation: { kind: "direct" },
+					parameters: [
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:name", schema: passthrough } },
+						{ name: "value", wire: "value", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:value", schema: passthrough } }
+					],
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:result", schema: passthrough },
+					sourceLocation: { file: "profiles/rules-manager/service.js", line: 470, column: 1 }
+				},
+				{
 					id: "rules-manager#rulesManager/whitelistStatus",
 					service: "rulesManager",
 					namespace: "rulesManager",
@@ -962,6 +975,24 @@ window.__ModuleLoader__.load({
 					setSkillMessage(`出错了：${String((e && e.message) || e)}`);
 				}
 			};
+			const doToggleProtect = (name, next) => {
+				askConfirm(next
+					? `把技能「${name}」标记为核心资产吗？\n\n标记后：卡片显示「⚠️ 核心」徽章，禁用/删除时会额外弹出风险警示。\n实现 = 在该技能 SKILL.md 的 frontmatter 写入 protected: true（改写前自动备份到 ~/.dsh/.backups/）。`
+					: `取消「${name}」的核心保护标记吗？\n\n取消后：卡片不再显示「⚠️ 核心」徽章，禁用/删除不再有额外警示。\n实现 = 从该技能 SKILL.md 的 frontmatter 移除 protected 字段（改写前自动备份）。`, async () => {
+					try {
+						const res = await rulesApi.setSkillProtected(name, next);
+						const data = unwrap(res);
+						if (data && data.ok) {
+							setSkillMessage(data.unchanged
+								? `技能「${name}」已是${next ? "受保护" : "未受保护"}状态（未改动）`
+								: `已${next ? "标记为" : "取消"}核心保护：「${name}」${data.backup ? `（备份：${data.backup}）` : ""}。刷新页面后徽章更新。`);
+						} else setSkillMessage(`出错了：${(data && data.error) || "未知错误"}`);
+					} catch (e) {
+						setSkillMessage(`出错了：${String((e && e.message) || e)}`);
+					}
+					loadSkills();
+				});
+			};
 			const doDisableSkill = (name) => {
 				const sk = (skills || []).find((x) => x.name === name);
 				const warn = sk && sk.isProtected
@@ -1388,6 +1419,13 @@ window.__ModuleLoader__.load({
 									skillDetail && skillDetail.name === sk.name
 										? react.createElement("button", { style: s.btn, onClick: () => setSkillDetail(null) }, "收起")
 										: react.createElement("button", { style: s.btn, onClick: () => doShowSkill(sk.name) }, "查看"),
+									react.createElement("button", {
+										style: s.btn,
+										title: sk.isProtected
+											? "取消核心保护标记（从该技能 SKILL.md 的 frontmatter 移除 protected 字段；改写前自动备份）"
+											: "标记为核心资产（写入该技能 SKILL.md 的 frontmatter protected: true；判据＝缺失会破坏既有流程或工具链；改写前自动备份）",
+										onClick: () => doToggleProtect(sk.name, !sk.isProtected)
+									}, sk.isProtected ? "取消保护" : "保护"),
 									react.createElement("button", { style: s.btn, onClick: () => doDisableSkill(sk.name) }, "禁用"),
 									react.createElement("button", { style: s.btnDanger, onClick: () => doDeleteSkill(sk.name) }, "删除")
 								)

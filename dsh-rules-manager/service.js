@@ -28,7 +28,8 @@ import {
 	enableSkill as enableSkillOp,
 	getSkill as getSkillOp,
 	listDisabledSkills as listDisabledSkillsOp,
-	listSkills as listSkillsOp
+	listSkills as listSkillsOp,
+	setSkillProtected as setSkillProtectedOp
 } from "./skills-core.js";
 
 /** 需要暴露为 Remote 的方法名（顺序 = 声明顺序） */
@@ -55,6 +56,7 @@ const REMOTE_METHODS = [
 	"enableSkill",
 	"deleteSkill",
 	"listDisabledSkills",
+	"setSkillProtected",
 	"whitelistStatus"
 ];
 
@@ -461,6 +463,22 @@ class RulesManagerService extends TypertRemoteService {
 		try {
 			const skills = await listDisabledSkillsOp();
 			return { ok: true, skills };
+		} catch (error) {
+			return { ok: false, error: error instanceof Error ? error.message : String(error) };
+		}
+	}
+	/** 开/关单个技能的核心保护（改写 SKILL.md frontmatter 的 protected 字段；写前自动备份） */
+	async setSkillProtected(name, value) {
+		try {
+			const res = await setSkillProtectedOp(name, value === true);
+			if (res && res.error) return { ok: false, error: res.error };
+			return {
+				ok: true,
+				isProtected: res.isProtected === true,
+				unchanged: res.unchanged === true,
+				changed: res.changed === true,
+				backup: res.backup || null
+			};
 		} catch (error) {
 			return { ok: false, error: error instanceof Error ? error.message : String(error) };
 		}

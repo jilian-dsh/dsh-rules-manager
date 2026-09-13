@@ -60,8 +60,8 @@ const t = (name, cond) => {
 
 // ── 1. 手动 Remote 标记 ─────────────────────────────────────────────
 const methods = remoteMethods(svc).map((m) => m.method);
-t("remoteMethods 标记 23 个方法", methods.length === 23);
-for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "pruneBackups", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand", "disableUserCommand", "enableUserCommand", "listSkills", "getSkill", "disableSkill", "enableSkill", "deleteSkill", "listDisabledSkills", "whitelistStatus"]) {
+t("remoteMethods 标记 24 个方法", methods.length === 24);
+for (const m of ["listRules", "addRule", "editRule", "deleteRule", "disableRule", "enableRule", "listDisabledRules", "listBackups", "restoreBackup", "pruneBackups", "listCommands", "listUserCommands", "saveUserCommand", "deleteUserCommand", "disableUserCommand", "enableUserCommand", "listSkills", "getSkill", "disableSkill", "enableSkill", "deleteSkill", "listDisabledSkills", "setSkillProtected", "whitelistStatus"]) {
 	t(`含 ${m}`, methods.includes(m));
 }
 // 0.5.10 白名单状态（fixture home 无文件 → 空清单也应为 ok 响应）

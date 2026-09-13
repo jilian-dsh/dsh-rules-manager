@@ -6,7 +6,7 @@
 // 删除 = 整目录移入回收站 ~/.dsh/.backups/trash-<时间戳>/（可恢复，规则 13.4）。
 import { resolveDshHome } from "@deepseek-ai/dsh-home-paths";
 import { join } from "node:path";
-import { readdir, readFile, rename, mkdir, stat } from "node:fs/promises";
+import { readdir, readFile, rename, mkdir, stat, writeFile, copyFile } from "node:fs/promises";
 
 /** 技能目录 */
 export function skillsDir() {
@@ -45,7 +45,13 @@ export function parseFrontmatter(raw) {
 	const m = raw.match(/^---\s*\n([\s\S]*?)\n---/u);
 	if (!m) return {};
 	const out = {};
-	const lines = m[1].split("\n");
+	// 2026-09-14 修 CRLF 漏解析：原按 "\n" 切分后行尾残留 "\r"，而行正则的 (.*)$ **不匹配 \r**
+	// → 该行被整行跳过。实测影响面：21 个技能中 11 个是 CRLF 文件，其中 **9 个的 description 在面板显示为空**
+	// （含全机第三高频的 sansheng-distill，21 次调用）。
+	// 注意：第一版改成 split(/\r?\n/) **只修好了非末行**（中间行的 \r 随 \r\n 一并切掉，末行的 \r 仍残留）——
+	// dsh-benchmark-case 的 description 在中间故正常，plugin-test/sansheng-distill 的 description 恰是末行故仍为空。
+	// 现改为**先整体归一化 EOL 再切分**，彻底消除行尾 \r。
+	const lines = m[1].replace(/\r\n?/gu, "\n").split("\n");
 	for (let i = 0; i < lines.length; i++) {
 		const kv = lines[i].match(/^(name|description|protected)\s*:\s*(.*)$/u);
 		if (!kv) continue;
@@ -104,6 +110,52 @@ export async function listSkills() {
 	}
 	skills.sort((a, b) => a.name.localeCompare(b.name));
 	return skills;
+}
+
+/**
+ * 开/关单个技能的核心保护（2026-09-14 用户拍板）——改写该技能 SKILL.md frontmatter 的 `protected` 字段。
+ * 保护语义：该技能缺失会破坏既有流程/工具链（判据与技能页「⚠️ 核心」徽章一致）。
+ * 这是本模块**唯一改写用户技能文件**的操作，属高风险 → **写前必做备份**到 .backups/（规则 13A），
+ * 备份失败即中止、绝不裸写；幂等（目标状态与现状一致时直接返回 unchanged）。
+ */
+export async function setSkillProtected(name, value) {
+	if (!isValidSkillName(name)) return { error: `技能名不合法：${name}` };
+	const file = join(skillsDir(), name, "SKILL.md");
+	let raw;
+	try {
+		raw = await readFile(file, "utf8");
+	} catch {
+		return { error: `读取失败（技能不存在或 SKILL.md 不可读）：${name}` };
+	}
+	const m = raw.match(/^---\s*\n([\s\S]*?)\n---/u);
+	if (!m) return { error: "该技能的 SKILL.md 缺少 YAML frontmatter，无法设置保护标记" };
+	const want = value === true;
+	const fmText = m[1];
+	const hasKey = /^protected\s*:/mu.test(fmText);
+	const cur = String(parseFrontmatter(raw).protected ?? "").trim().toLowerCase() === "true";
+	if (want === cur) return { ok: true, unchanged: true, isProtected: cur };
+	let newFm;
+	if (want) {
+		newFm = hasKey ? fmText.replace(/^protected\s*:.*$/mu, "protected: true") : `${fmText}\nprotected: true`;
+	} else {
+		newFm = fmText.split("\n").filter((l) => !/^protected\s*:/u.test(l)).join("\n");
+	}
+	// 写前备份（规则 13A：改写用户技能文件必须可回滚）
+	const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+	const backup = join(backupsDir(), `${name}__SKILL.md-${stamp}.bak`);
+	try {
+		await mkdir(backupsDir(), { recursive: true });
+		await copyFile(file, backup);
+	} catch (error) {
+		return { error: `备份失败，已中止（未改写任何文件）：${(error && error.message) || error}` };
+	}
+	const out = `${raw.slice(0, m.index)}---\n${newFm}\n---${raw.slice(m.index + m[0].length)}`;
+	try {
+		await writeFile(file, out, "utf8");
+	} catch (error) {
+		return { error: `写入失败（原文件已备份到 ${backup}）：${(error && error.message) || error}` };
+	}
+	return { ok: true, changed: true, isProtected: want, backup };
 }
 
 /** 读取某个已安装技能的 SKILL.md 全文 */

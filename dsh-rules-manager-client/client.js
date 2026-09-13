@@ -313,81 +313,6 @@ window.__ModuleLoader__.load({
 					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/whitelistStatus:result", schema: passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 156, column: 1 }
 				}
-				,
-				{
-					id: "rule-engine#ruleEngine/getStatus",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "getStatus",
-					invocation: { kind: "direct" },
-					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getStatus:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/getVersion",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "getVersion",
-					invocation: { kind: "direct" },
-					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getVersion:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/checkUpdate",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "checkUpdate",
-					invocation: { kind: "direct" },
-					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/checkUpdate:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/getAuditLog",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "getAuditLog",
-					invocation: { kind: "direct" },
-					parameters: [
-						{ name: "n", wire: "n", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:n", schema: passthrough } }
-					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/getUnderstanding",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "getUnderstanding",
-					invocation: { kind: "direct" },
-					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getUnderstanding:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/getTaskContractConfig",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "getTaskContractConfig",
-					invocation: { kind: "direct" },
-					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTaskContractConfig:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				},
-				{
-					id: "rule-engine#ruleEngine/setTaskContractConfig",
-					service: "ruleEngine",
-					namespace: "ruleEngine",
-					method: "setTaskContractConfig",
-					invocation: { kind: "direct" },
-					parameters: [
-						{ name: "partial", wire: "partial", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:partial", schema: passthrough } }
-					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:result", schema: passthrough },
-					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
-				}
 			]
 		};
 
@@ -402,8 +327,7 @@ window.__ModuleLoader__.load({
 			tabActive: { padding: "7px 14px", borderRadius: "999px", border: "1px solid var(--dsw-alias-brand-2, #c9d9ff)", cursor: "pointer", fontSize: "13px", background: "var(--dsw-alias-interactive-bg-active, #e8f3ff)", color: "var(--dsw-alias-brand-6, #3370ff)", fontWeight: 550 },
 			groupTitle: { fontSize: "13px", fontWeight: 600, margin: "12px 0 6px", color: "var(--dsw-alias-label-primary, #1f2329)" },
 			card: { border: "1px solid var(--dsw-alias-border-1, #e8eaee)", borderRadius: "14px", padding: "12px 14px", marginBottom: "8px", background: "var(--dsw-alias-bg-layer-1, #ffffff)", boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06)" },
-			cardHead: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" },
-			cardTitle: { fontSize: "13px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)" },
+			cardHead: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" },			cardTitle: { fontSize: "13px", fontWeight: 600, color: "var(--dsw-alias-label-primary, #1f2329)" },
 			cardBody: { fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)", whiteSpace: "pre-wrap", lineHeight: "20px", margin: "6px 0 0", wordBreak: "break-word" },
 			btn: { padding: "5px 11px", borderRadius: "8px", border: "1px solid var(--dsw-alias-border-2, #d5d9e0)", background: "var(--dsw-alias-bg-layer-1, #fff)", cursor: "pointer", fontSize: "12px", color: "var(--dsw-alias-label-secondary, #4e5969)", transition: "all 140ms ease-out" },
 			btnPrimary: { padding: "5px 11px", borderRadius: "8px", border: "1px solid transparent", background: "var(--dsw-alias-brand-6, #3370ff)", color: "#fff", cursor: "pointer", fontSize: "12px", fontWeight: 550 },
@@ -521,43 +445,7 @@ window.__ModuleLoader__.load({
 		function RulesCommandsPanel(props) {
 			// props.rulesApi = rulesManager 服务实例（apply 里 ctx.get() 取得，普通对象，无代理守卫）
 			const rulesApi = props.rulesApi;
-			// props.engineApi = ruleEngine 服务实例（dsh-rule-engine 提供）
-			const engineApi = props.engineApi;
-			// 规则引擎
-			const [engine, setEngine] = useState(null);
-			const [engineError, setEngineError] = useState("");
-			const [updateInfo, setUpdateInfo] = useState(null);
-			const [updateError, setUpdateError] = useState("");
-			const [auditLog, setAuditLog] = useState(null);
-			const [auditError, setAuditError] = useState("");
-			const [taskCfg, setTaskCfg] = useState(null);
-			const [taskCfgError, setTaskCfgError] = useState("");
-			const [taskBusy, setTaskBusy] = useState(false);
 			const [tab, setTab] = useState("rules");
-			// 工具放行白名单（0.5.10 建议 b：可视化"谁被永久放行/谁被会话放行"）
-			const [wlData, setWlData] = useState(null);
-			const [wlCollapsed, setWlCollapsed] = useState(true);
-			const [auditCollapsed, setAuditCollapsed] = useState(true);
-			const [wlError, setWlError] = useState("");
-			useEffect(() => {
-				if (!rulesApi || typeof rulesApi.whitelistStatus !== "function") {
-					setWlError("白名单 API 不可用（rulesApi.whitelistStatus 缺失）");
-					return;
-				}
-				rulesApi.whitelistStatus()
-					.then((r) => {
-						// 0.5.11 根因实锤（用户截图"原始返回"）：DSH @Remote 调用返回两层壳 {ok, value:{...}}
-						// ——数据在 r.value（permanent/sessionAdded/debug 都在 value 层）；旧代码读 r.permanent（外层）
-						// → undefined → 渲染空。修正：读 r.value（兼容直返：无 value 时回退 r）。
-						const data = (r && r.value) || r;
-						if (r && r.ok !== false && data) {
-							setWlData({ permanent: data.permanent || [], sessionAdded: data.sessionAdded || [] });
-						} else {
-							setWlError((r && r.error) || "加载失败");
-						}
-					})
-					.catch((e) => setWlError(String((e && e.message) || e)));
-			}, [rulesApi]);
 			// UI 优化：搜索、折叠、面板内确认
 			const [confirm, setConfirm] = useState(null);
 			const [ruleQuery, setRuleQuery] = useState("");
@@ -625,89 +513,6 @@ window.__ModuleLoader__.load({
 				}
 			}, [rulesApi]);
 			useEffect(() => { refresh(); }, [refresh]);
-
-			const loadEngine = useCallback(async () => {
-				if (!engineApi) { setEngineError("规则引擎服务不可用"); return; }
-				try {
-					const res = await engineApi.getStatus();
-					const data = unwrap(res);
-					if (data && data.ok) {
-						setEngine(data.status);
-						setEngineError("");
-					} else setEngineError(errText((data && data.error) || "未知错误"));
-				} catch (e) {
-					setEngineError(errText(e));
-				}
-			}, [engineApi]);
-			useEffect(() => {
-				if (tab === "engine" && engine === null) loadEngine();
-			}, [tab, engine, loadEngine]);
-
-			const doCheckUpdate = useCallback(async () => {
-				if (!engineApi) { setUpdateError("规则引擎服务不可用"); return; }
-				setUpdateError("");
-				setUpdateInfo(null);
-				try {
-					const res = await engineApi.checkUpdate();
-					const data = unwrap(res);
-					if (data && data.ok) setUpdateInfo(data);
-					else setUpdateError(errText((data && data.error) || "未知错误"));
-				} catch (e) {
-					setUpdateError(errText(e));
-				}
-			}, [engineApi]);
-
-			const loadAudit = useCallback(async () => {
-				if (!engineApi) { setAuditError("规则引擎服务不可用"); return; }
-				try {
-					const res = await engineApi.getAuditLog(20);
-					const data = unwrap(res);
-					if (data && data.ok) {
-						setAuditLog(data.entries);
-						setAuditError("");
-					} else setAuditError(errText((data && data.error) || "未知错误"));
-				} catch (e) {
-					setAuditError(errText(e));
-				}
-			}, [engineApi]);
-			useEffect(() => {
-				if (tab === "engine") loadAudit();
-			}, [tab, loadAudit]);
-
-			const loadTaskCfg = useCallback(async () => {
-				if (!engineApi) { setTaskCfgError("规则引擎服务不可用"); return; }
-				try {
-					const res = await engineApi.getTaskContractConfig();
-					const data = unwrap(res);
-					if (data && data.ok) {
-						setTaskCfg(data.config);
-						setTaskCfgError("");
-					} else setTaskCfgError(errText((data && data.error) || "未知错误"));
-				} catch (e) {
-					setTaskCfgError(errText(e));
-				}
-			}, [engineApi]);
-			useEffect(() => {
-				if (tab === "engine" && taskCfg === null) loadTaskCfg();
-			}, [tab, taskCfg, loadTaskCfg]);
-
-			const saveTaskCfg = useCallback(async (patch) => {
-				if (!engineApi || !taskCfg) return;
-				setTaskBusy(true);
-				try {
-					const next = { ...taskCfg, ...patch };
-					const res = await engineApi.setTaskContractConfig(next);
-					const data = unwrap(res);
-					if (data && data.ok) {
-						setTaskCfg(data.config);
-						setTaskCfgError("");
-					} else setTaskCfgError(errText((data && data.error) || "未知错误"));
-				} catch (e) {
-					setTaskCfgError(errText(e));
-				} finally {
-					setTaskBusy(false);
-				}
-			}, [engineApi, taskCfg]);
 
 			const loadDisabled = useCallback(async () => {
 				try {
@@ -1082,13 +887,12 @@ window.__ModuleLoader__.load({
 				react.createElement("div", { style: s.tabs },
 					react.createElement("button", { style: tab === "rules" ? s.tabActive : s.tab, onClick: () => setTab("rules") }, "规则"),
 					react.createElement("button", { style: tab === "bk" ? s.tabActive : s.tab, onClick: () => setTab("bk") }, "规则备份与恢复"),
-					react.createElement("button", { style: tab === "engine" ? s.tabActive : s.tab, onClick: () => setTab("engine") }, "规则引擎"),
 					react.createElement("button", { style: tab === "commands" ? s.tabActive : s.tab, onClick: () => setTab("commands") }, "命令"),
 					react.createElement("button", { style: tab === "uc" ? s.tabActive : s.tab, onClick: () => setTab("uc") }, "自定义命令"),
 					react.createElement("button", { style: tab === "skills" ? s.tabActive : s.tab, onClick: () => setTab("skills") }, "技能")
 				),
 				message ? react.createElement("div", { style: s.msg }, message) : null,
-				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : tab === "engine" ? renderRuleEngine() : renderBackups(),
+				tab === "rules" ? renderRules() : tab === "commands" ? renderCommands() : tab === "uc" ? renderUserCommands() : tab === "skills" ? renderSkills() : renderBackups(),
 				confirm ? react.createElement("div", { style: s.overlay, onClick: () => setConfirm(null) },
 					react.createElement("div", { style: s.modal, onClick: (e) => e.stopPropagation() },
 						react.createElement("div", { style: s.modalTitle }, "请确认"),
@@ -1100,132 +904,6 @@ window.__ModuleLoader__.load({
 					)
 				) : null
 			));
-
-			function renderRuleEngine() {
-				try {
-				if (engineError && !engine) return react.createElement("div", { style: s.msgErr }, `加载失败：${engineError}`);
-				if (!engine) return react.createElement("div", { style: s.loading }, "正在加载规则引擎…");
-
-				const versionNodes = (updateInfo?.impacts || []).map((ver, i) =>
-					react.createElement("div", { key: i, style: s.card },
-						react.createElement("div", { style: s.cardTitle }, `v${ver.version || ""}：${ver.summary || ""}`),
-						(ver.impacts || []).map((imp, j) =>
-							react.createElement("div", { key: j, style: s.cardBody }, `规则 ${imp.rule || "?"} [${imp.level || "impact"}]：${imp.description || ""}`)
-						),
-						ver.userRulesUnaffected ? react.createElement("div", { style: { marginTop: "4px", fontSize: "12px", color: "var(--dsw-alias-success-6, #00b42a)" } }, "不修改用户规则文件") : null
-					)
-				);
-
-				const auditNodes = [...(auditLog || [])].sort((a, b) => new Date(b.ts) - new Date(a.ts)).map((e, i) =>
-					react.createElement("div", { key: i, style: s.row },
-						react.createElement("span", { style: { color: "var(--dsw-alias-label-tertiary, #8a919f)", fontSize: "12px", fontFamily: "monospace" } }, fmtLocal(e.ts)),
-						react.createElement("span", { style: { flex: 1, fontSize: "12px" } }, `[${e.rule || "?"}] ${e.name || ""}${e.reason ? "：" + e.reason : ""}`)
-					)
-				);
-
-				return react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "8px" } },
-					react.createElement("div", { style: s.card, className: "rm-hover-card" },
-						react.createElement("div", { style: s.cardTitle }, "引擎状态"),
-						react.createElement("div", { style: s.statusGrid },
-							react.createElement("div", { style: s.statusItem },
-								react.createElement("div", { style: s.statusLabel }, "版本"),
-								react.createElement("div", { style: s.statusValue }, engine.version || "?")
-							),
-							react.createElement("div", { style: s.statusItem },
-								react.createElement("div", { style: s.statusLabel }, "开关"),
-								react.createElement("div", { style: s.statusValue }, engine.enabled ? "开启" : "关闭")
-							),
-							react.createElement("div", { style: s.statusItem },
-								react.createElement("div", { style: s.statusLabel }, "规则数"),
-								react.createElement("div", { style: s.statusValue }, engine.rulesCount ?? "?")
-							),
-							react.createElement("div", { style: s.statusItem },
-								react.createElement("div", { style: s.statusLabel }, "配置"),
-								react.createElement("div", { style: { ...s.statusValue, color: engine.configOk ? "var(--dsw-alias-success-6, #00b42a)" : "var(--dsw-alias-danger-5, #f53f3f)" } }, engine.configOk ? "正常" : "异常")
-							)
-						)
-					),
-					react.createElement("div", { style: s.card },
-						react.createElement("div", { style: s.cardHead },
-							react.createElement("span", { style: s.cardTitle }, "版本更新"),
-							react.createElement("button", { style: s.btnPrimary, onClick: () => doCheckUpdate() }, "检查更新")
-						),
-						updateError ? react.createElement("div", { style: s.msgErr }, String(updateError)) : null,
-						updateInfo ? react.createElement("div", { style: s.cardBody },
-							`当前 ${updateInfo.current || "?"} → ${updateInfo.hasUpdate ? "最新 " + (updateInfo.latest?.tag_name || "") : "已是最新"}`,
-							updateInfo.hasUpdate && updateInfo.latest?.html_url ? react.createElement("div", null, react.createElement("a", { href: updateInfo.latest.html_url, target: "_blank", rel: "noreferrer" }, "查看 Release Notes")) : null,
-							versionNodes.length ? versionNodes : null
-						) : null
-					),
-					react.createElement("div", { style: s.card },
-						react.createElement("div", { style: s.cardTitle }, "任务边界与反过度工程"),
-						taskCfgError ? react.createElement("div", { style: s.msgErr }, String(taskCfgError)) : null,
-						taskCfg ? react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "6px", marginTop: "6px" } },
-							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-								react.createElement("input", { type: "checkbox", checked: !!taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ taskContractEnabled: e.target.checked }) }),
-								"启用任务契约/反过度工程（默认关闭）"
-							),
-							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-								react.createElement("input", { type: "checkbox", checked: !!taskCfg.askEnabled, disabled: !taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ askEnabled: e.target.checked }) }),
-								"允许弹窗询问（默认关闭）"
-							),
-							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-								"模式：",
-								react.createElement("select", { value: taskCfg.taskContractMode || "observe", disabled: !taskCfg.taskContractEnabled, onChange: (e) => saveTaskCfg({ taskContractMode: e.target.value }) },
-									react.createElement("option", { value: "observe" }, "观察（只记录提醒）"),
-									react.createElement("option", { value: "armed" }, "armed（真正拦截）")
-								)
-							),
-							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-								react.createElement("input", { type: "checkbox", checked: !!(taskCfg.turnCard && taskCfg.turnCard.enabled), onChange: (e) => saveTaskCfg({ turnCard: { enabled: e.target.checked } }) }),
-								"回合末裁决卡片（默认关闭）"
-							),
-							react.createElement("label", { style: { fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" } },
-								react.createElement("input", { type: "checkbox", checked: !!taskCfg.approveEnabled, onChange: (e) => saveTaskCfg({ approveEnabled: e.target.checked }) }),
-								"物理确认授权（/guard approve，默认关闭）"
-							),
-							taskBusy ? react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "保存中…") : null,
-							react.createElement("div", { style: { fontSize: "12px", color: "var(--dsw-alias-label-tertiary, #8a919f)" } }, "说明：总开关关闭时不会产生新弹窗/新拦截；开启后默认观察模式，弹窗默认关闭。")
-						) : react.createElement("div", { style: s.loading }, "正在加载任务契约配置…")
-					),
-					react.createElement("div", { style: s.card },
-						react.createElement("div", { style: s.cardHead },
-							react.createElement("span", { style: s.cardTitle }, "工具放行白名单"),
-							react.createElement("button", { style: s.btnPrimary, onClick: () => setWlCollapsed(!wlCollapsed) }, wlCollapsed ? "展开" : "收起")
-						),
-						wlError ? react.createElement("div", { style: s.msgErr }, String(wlError)) : null,
-						wlData === null && !wlError ? react.createElement("div", { style: { fontSize: "12px", color: "#8a919f" } }, "加载中…") : (
-							wlData && (wlData.permanent || []).length === 0 && (wlData.sessionAdded || []).length === 0
-								? react.createElement("div", { style: s.empty }, "白名单为空（工具无放行记录）")
-								: wlData ? (wlCollapsed ? null : react.createElement("div", { style: { display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px", fontSize: "12px" } },
-									react.createElement("div", { style: { fontWeight: "600", marginTop: "2px" } }, "已生效白名单（文件，永久）· " + (wlData.permanent || []).length + " 项"),
-									(wlData.permanent || []).map((r, i) => react.createElement("div", { key: "p" + i, style: { whiteSpace: "pre-wrap" } }, "✓ " + r.name + ((wlData.sessionAdded || []).some((x) => x.name === r.name) ? "（近24h有放行动作）" : "") + (r.time ? "（" + new Date(r.time).toISOString() + "）" : "") + (r.session ? " 来源会话=" + r.session : ""))),
-									(() => {
-										const permNames = new Set((wlData.permanent || []).map((x) => x.name));
-										const removed = (wlData.sessionAdded || []).filter((x) => !permNames.has(x.name));
-										if (removed.length === 0) return null;
-										return [
-											react.createElement("div", { key: "hdr-rm", style: { fontWeight: "600", marginTop: "4px" } }, "近 24h 曾放行但已不在白名单（已撤销）· " + removed.length + " 项"),
-											...removed.map((r, i) => react.createElement("div", { key: "rm" + i, style: { whiteSpace: "pre-wrap", opacity: 0.7, color: "#8a919f" } }, "⚠ " + r.name + "（" + r.time + " 会话=" + r.session + "）"))
-										];
-									})()
-								)) : null
-						),
-					),
-					react.createElement("div", { style: s.card },
-						react.createElement("div", { style: s.cardHead },
-							react.createElement("span", { style: s.cardTitle }, "最近审计"),
-							react.createElement("button", { style: s.btnPrimary, onClick: () => setAuditCollapsed(!auditCollapsed) }, auditCollapsed ? "展开" : "收起")
-						),
-						auditError ? react.createElement("div", { style: s.msgErr }, String(auditError)) : null,
-						auditCollapsed ? null : (auditNodes.length ? auditNodes : react.createElement("div", { style: s.empty }, "暂无审计记录"))
-					)
-				);
-				} catch (e) {
-					return react.createElement("div", { style: s.msgErr }, `规则引擎页渲染出错：${String((e && e.message) || e)}`);
-				}
-			}
-
 
 			function renderRules() {
 				if (rules === null && !rulesError) return react.createElement("div", { style: s.loading }, "正在加载规则…");
@@ -1489,14 +1167,12 @@ window.__ModuleLoader__.load({
 			// ctx.get 走内部服务表（不经 Proxy 属性守卫），拿到 rulesManager 服务实例；
 			// 以普通对象注入组件 props，避免组件内访问 ctx.remote.<svc> 触发 "without inject"。
 			const rulesApi = ctx.get("remote.rulesManager");
-			let engineApi = null;
-			try { engineApi = ctx.get("remote.ruleEngine"); } catch (e) { engineApi = null; }
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
 				id: "rules-commands",
 				order: 100,
 				label: () => "规则、命令与技能",
-				inject: () => ({ rulesApi, engineApi })
+				inject: () => ({ rulesApi })
 			}, RulesCommandsPanel));
 		}
 

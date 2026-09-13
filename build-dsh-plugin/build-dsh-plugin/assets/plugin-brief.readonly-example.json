@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "mode": "build-source",
+  "plugin": {
+    "name": "DSH Session Health Overview",
+    "summary": "Show failed or unresponsive sessions in a DSH settings view"
+  },
+  "targetUsers": ["DSH users managing many sessions"],
+  "problem": "Users cannot quickly identify failed or long-unresponsive sessions.",
+  "trigger": "The user opens the session health settings page.",
+  "outcome": {
+    "expectedResult": "The user sees abnormal sessions and a bounded reason summary.",
+    "acceptanceCriteria": [
+      "The page is visible in a disposable DSH Profile.",
+      "Failure and unresponsive fixtures are classified correctly.",
+      "The plugin does not modify sessions or Profile state."
+    ],
+    "nonGoals": ["Cancel or mutate sessions", "Modify the real Profile"]
+  },
+  "capabilities": [
+    {"name": "Read session status", "mode": "read"},
+    {"name": "Filter abnormal sessions", "mode": "read"},
+    {"name": "Show bounded details", "mode": "read"}
+  ],
+  "data": {
+    "read": ["session id", "status", "last activity", "bounded error summary"],
+    "write": []
+  },
+  "ui": {
+    "needed": true,
+    "surface": "settings",
+    "notes": "Use DSH theme variables and accessible tabs/filters."
+  },
+  "external": {
+    "network": "none",
+    "services": [],
+    "processes": [],
+    "accounts": [],
+    "credentials": "none",
+    "credentialHandling": "none",
+    "devices": []
+  },
+  "profile": {
+    "target": "",
+    "mutations": [],
+    "restart": false,
+    "restartOwner": "none"
+  },
+  "security": {
+    "sensitiveData": ["private paths", "system/plugin context", "model reasoning"],
+    "exposure": "local",
+    "authentication": "none",
+    "encryption": "local-only",
+    "forbiddenActions": ["session mutation", "Profile mutation", "secret projection"]
+  },
+  "constraints": {
+    "mustUse": ["standard DSH Host + Client Bundle"],
+    "mustNot": ["modify DSH core", "write real ~/.dsh"],
+    "privacy": ["project only bounded user-visible summaries"],
+    "compatibility": ["headless Profile must still boot without UI routes"]
+  },
+  "delivery": {
+    "workspace": "",
+    "repository": "",
+    "license": "MIT",
+    "releaseTarget": "none",
+    "artifactType": "dsh-bundle",
+    "publicDownload": false,
+    "metadataAuthority": "release-manifest",
+    "sourceLinkRequired": true,
+    "licenseNoticeRequired": true,
+    "marketplace": {
+      "target": "none",
+      "listingIntent": "none",
+      "repositoryUrl": "",
+      "manifestPath": "package.json",
+      "installPath": "",
+      "immutableCommit": "",
+      "categories": []
+    }
+  },
+  "acceptance": {
+    "targetEvidence": "E3",
+    "realProfileAllowed": false,
+    "externalAcceptanceAllowed": false
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "mode": "build-source",
+  "plugin": {
+    "name": "DSH Controlled Plugin Updater",
+    "summary": "Inspect plugins and update one selected package through a recoverable transaction"
+  },
+  "targetUsers": ["DSH Profile owners"],
+  "problem": "Plugin versions and sources are difficult to inspect and update consistently.",
+  "trigger": "The user selects one plugin, reviews a fresh plan, and enters the exact confirmation phrase.",
+  "outcome": {
+    "expectedResult": "The plugin starts read-only and can update one explicitly selected plugin with backup, health checks, and rollback after separate confirmation.",
+    "acceptanceCriteria": [
+      "Read-only inventory works without changing the Profile.",
+      "Transaction fault tests reject stale hashes, reuse, and concurrent changes.",
+      "Disposable Profile update and rollback pass at E3.",
+      "Real Profile remains unchanged until a new exact operation plan is confirmed."
+    ],
+    "nonGoals": ["Bulk update", "Modify DSH core", "Disable official inventory"]
+  },
+  "capabilities": [
+    {"name": "Inspect versions and immutable sources", "mode": "read"},
+    {"name": "Create a single-use update plan", "mode": "read"},
+    {"name": "Update one selected plugin", "mode": "control"},
+    {"name": "Rollback failed health checks", "mode": "control"}
+  ],
+  "data": {
+    "read": ["target Profile package metadata", "bundle ids", "effective config summary"],
+    "write": ["one selected package through official DSH CLI", "manager-owned transaction records"]
+  },
+  "ui": {
+    "needed": true,
+    "surface": "settings",
+    "notes": "Separate read-only discovery, plan review, and exact confirmation."
+  },
+  "external": {
+    "network": "internet",
+    "services": ["fixed-commit GitHub catalog and source"],
+    "processes": ["official DSH CLI"],
+    "accounts": [],
+    "credentials": "none",
+    "credentialHandling": "none",
+    "devices": []
+  },
+  "profile": {
+    "target": "",
+    "mutations": ["update one selected plugin package"],
+    "restart": true,
+    "restartOwner": "approved external supervisor or manual user action"
+  },
+  "security": {
+    "sensitiveData": ["Profile paths", "package source metadata"],
+    "exposure": "local",
+    "authentication": "none",
+    "encryption": "local-only",
+    "forbiddenActions": ["bulk mutation", "shell strings", "core writes", "plan reuse"]
+  },
+  "constraints": {
+    "mustUse": ["official DSH CLI fixed argv", "immutable source", "atomic rollback"],
+    "mustNot": ["modify official packages", "write without exact confirmation"],
+    "privacy": ["never log secrets or full Profile files"],
+    "compatibility": ["fail closed on unknown official components"]
+  },
+  "delivery": {
+    "workspace": "",
+    "repository": "",
+    "license": "MIT",
+    "releaseTarget": "none",
+    "artifactType": "dsh-bundle",
+    "publicDownload": false,
+    "metadataAuthority": "release-manifest",
+    "sourceLinkRequired": true,
+    "licenseNoticeRequired": true,
+    "marketplace": {
+      "target": "none",
+      "listingIntent": "none",
+      "repositoryUrl": "",
+      "manifestPath": "package.json",
+      "installPath": "",
+      "immutableCommit": "",
+      "categories": []
+    }
+  },
+  "acceptance": {
+    "targetEvidence": "E3",
+    "realProfileAllowed": false,
+    "externalAcceptanceAllowed": false
+  }
+}

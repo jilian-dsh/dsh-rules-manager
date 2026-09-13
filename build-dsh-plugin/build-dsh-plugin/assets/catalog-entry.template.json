@@ -1,0 +1,57 @@
+{
+  "id": "replace-with-unique-catalog-id",
+  "name": "Replace with plugin display name",
+  "packageName": "dsh-example-plugin",
+  "description": "Replace with a bounded user-facing description.",
+  "repositoryUrl": "https://github.com/owner/repository",
+  "defaultBranch": "main",
+  "manifestPath": "package.json",
+  "updatePolicy": "user-reviewed",
+  "commit": "replace-with-40-character-lowercase-commit-sha",
+  "version": "0.1.0",
+  "categories": ["replace-with-current-registry-category"],
+  "featured": false,
+  "source": {
+    "updatedAt": "replace-with-pinned-commit-ISO-date-time",
+    "observedAt": "replace-with-observation-ISO-date-time",
+    "provenance": "github-commit"
+  },
+  "assurance": {
+    "discovery": { "status": "unknown", "method": null, "checkedAt": null, "evidenceUrl": null, "dshRelease": null, "systems": [], "profiles": [], "summary": null },
+    "installability": { "status": "unknown", "method": null, "checkedAt": null, "evidenceUrl": null, "dshRelease": null, "systems": [], "profiles": [], "summary": null },
+    "runtime": { "status": "unknown", "method": null, "checkedAt": null, "evidenceUrl": null, "dshRelease": null, "systems": [], "profiles": [], "summary": null },
+    "securityReview": { "status": "unknown", "method": null, "checkedAt": null, "evidenceUrl": null, "dshRelease": null, "systems": [], "profiles": [], "summary": null }
+  },
+  "entryIds": ["dsh-example-plugin"],
+  "status": "approved",
+  "compatibility": {
+    "dsh": null,
+    "dshReleases": { "0.1.2-alpha.3": "unknown", "0.1.2-alpha.4": "unknown", "0.1.2-alpha.5": "unknown" },
+    "dshOperations": {
+      "0.1.2-alpha.3": { "install": "unknown", "start": "unknown", "uninstall": "unknown", "rollback": "unknown" },
+      "0.1.2-alpha.4": { "install": "unknown", "start": "unknown", "uninstall": "unknown", "rollback": "unknown" },
+      "0.1.2-alpha.5": { "install": "unknown", "start": "unknown", "uninstall": "unknown", "rollback": "unknown" }
+    },
+    "node": null,
+    "systems": [],
+    "profiles": []
+  },
+  "details": {
+    "pluginType": "unknown",
+    "installSource": "github",
+    "license": "MIT",
+    "permissions": {
+      "level": "unknown",
+      "files": "unknown",
+      "network": "unknown",
+      "commands": "unknown",
+      "credentials": ["unknown"]
+    },
+    "externalDependencies": [],
+    "reviewStatus": "unreviewed"
+  },
+  "risk": {
+    "installScripts": [],
+    "review": "curated-not-security-audited"
+  }
+}

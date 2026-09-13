@@ -1,0 +1,4 @@
+interface:
+  display_name: "构建 DSH 插件"
+  short_description: "生成 DSH 原生插件、可信商城契约与分级验收"
+  default_prompt: "Use $build-dsh-plugin to build or audit a standard DSH plugin, define replay-safe Tool card contracts, keep discovery candidates non-installable, prepare a trust-evidenced DSH STORE catalog entry only after promotion review, and keep repository, marketplace, Profile, and evidence gates separate."

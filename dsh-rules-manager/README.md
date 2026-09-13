@@ -224,7 +224,7 @@ node test-local.js     # 33 项断言：/rules 命令全场景（含规则体检
 
 ## 发行固定源
 
-- **1.6.0（当前）** 固定于 main Commit `77cca8d`（`git checkout 77cca8d` + 发布 bump 可复现 npm `dsh-rules-manager@1.6.0` 与 GitHub Release v1.6.0 同源代码）。**注：release 提交号由发布脚本自动回填。**
+- **1.6.0（当前）** 固定于 main Commit `1a8ff53`（`git checkout 1a8ff53` 可复现 npm `dsh-rules-manager@1.6.0` 与 GitHub Release v1.6.0 同源代码）。
 
 > **1.5.4** 固定于 main 分支的发布提交（`git checkout <hash>` 可复现 npm `dsh-rules-manager@1.5.4` 与 GitHub Release v1.5.4 同源代码）。**发布 commit 由发布脚本在三通道完成后自动回填。**
 

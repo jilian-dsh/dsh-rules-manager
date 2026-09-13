@@ -453,9 +453,22 @@ window.__ModuleLoader__.load({
 					const r = await engineApi.whitelistStatus();
 					// RPC 信封：数据在 r.value（兼容直返：无 value 时回退 r）
 					const data = (r && r.value) || r;
+					// 外层 ok 只表示"传输成功"；里层 ok:false 是 host 方法自己失败——必须显式暴露，
+					// 否则会被下面的空态分支伪装成"白名单为空"（2026-09-14 B0 实测踩到：readFile 导入错型）。
+					if (data && data.ok === false) {
+						setWlError("引擎侧读取失败：" + errText(data.error));
+						return;
+					}
 					if (r && r.ok !== false && data) {
-						setWlData({ permanent: data.permanent || [], sessionAdded: data.sessionAdded || [] });
-						setWlError("");
+						const perm = data.permanent || [];
+						const sess = data.sessionAdded || [];
+						setWlData({ permanent: perm, sessionAdded: sess });
+						// host 读文件失败时仍回 ok:true（降级设计）——用 debug.readError 把真相顶出来，
+						// 别让"读不出来"看起来像"本来就没有"。
+						const dbg = data.debug || {};
+						if (perm.length === 0 && sess.length === 0 && dbg.readError) {
+							setWlError("读白名单文件失败：" + String(dbg.readError) + "（home=" + String(dbg.home || "?") + "）");
+						} else setWlError("");
 					} else setWlError((r && r.error) || "加载失败");
 				} catch (e) { setWlError(errText(e)); }
 			}, [engineApi]);

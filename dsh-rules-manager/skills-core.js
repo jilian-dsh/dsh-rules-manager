@@ -31,12 +31,15 @@ export function isValidSkillName(name) {
 }
 
 /**
- * 解析 SKILL.md 的 YAML frontmatter（只取 name/description）。
+ * 解析 SKILL.md 的 YAML frontmatter（取 name/description/protected）。
  * 支持两种写法：
  *   1) 单行：description: 一句话
  *   2) YAML 块标量（多行）：description: |（或 >）后接缩进的多行文本
  *      ——实测本机 30 个技能中有 5 个用块标量写法，旧实现把它们读成 1 个字符（"|"），
  *        导致面板显示空白（2026-08-15 修复）。
+ * 2026-09-14：字段白名单补 `protected`（核心资产自声明，供保护名单机制识别）——
+ *   原实现只认 name|description，技能即便声明 `protected: true` 也被静默忽略
+ *   （由 verify-protected.mjs 探针抓出：手册已声明而面板仍显示无保护）。
  */
 export function parseFrontmatter(raw) {
 	const m = raw.match(/^---\s*\n([\s\S]*?)\n---/u);
@@ -44,7 +47,7 @@ export function parseFrontmatter(raw) {
 	const out = {};
 	const lines = m[1].split("\n");
 	for (let i = 0; i < lines.length; i++) {
-		const kv = lines[i].match(/^(name|description)\s*:\s*(.*)$/u);
+		const kv = lines[i].match(/^(name|description|protected)\s*:\s*(.*)$/u);
 		if (!kv) continue;
 		const key = kv[1];
 		const rest = kv[2].trim();
@@ -81,17 +84,23 @@ export async function listSkills() {
 	for (const e of entries) {
 		if (!e.isDirectory() || !isValidSkillName(e.name)) continue;
 		const skillFile = join(dir, e.name, "SKILL.md");
-		let description = "";
-		let title = e.name;
+		// 2026-09-14 过滤（用户拍板）：**无 SKILL.md 的目录不是技能**，跳过。
+		// 背景：`$DSH_HOME/skills/` 下存在 git 源仓库目录（如 dsh-plugin-upgrade-skill，内含 9 个子技能、带 .git），
+		// 此前"缺失也仍列入清单"会让它在技能页显示为可禁用/删除的条目——误操作会移动源仓库目录。
+		// 判据＝SKILL.md 必须存在且可读（技能定义文件）。
+		let raw;
 		try {
-			const raw = await readFile(skillFile, "utf8");
-			const fm = parseFrontmatter(raw);
-			description = fm.description ?? "";
-			title = fm.name ?? e.name;
+			raw = await readFile(skillFile, "utf8");
 		} catch {
-			/* SKILL.md 缺失/不可读：仍列入清单，描述为空 */
+			continue;
 		}
-		skills.push({ name: e.name, title, description });
+		const fm = parseFrontmatter(raw);
+		// 2026-09-14 保护标记（**通用机制——插件不预设任何名单**）：技能在自身 SKILL.md 的 frontmatter 里
+		// 声明 `protected: true` 即视为核心资产。判据（写给技能作者）＝**该技能的缺失会破坏既有流程或工具链**
+		// ——被规则/脚本/统一入口直接引用、承载核心工作流、或替代成本极高。由技能自己声明，插件只负责
+		// 呈现（徽章）与确认加强（禁用/删除二次确认），不硬编码任何具体技能名，故对任何使用者都成立。
+		const isProtected = String(fm.protected ?? "").trim().toLowerCase() === "true";
+		skills.push({ name: e.name, title: fm.name ?? e.name, description: fm.description ?? "", isProtected });
 	}
 	skills.sort((a, b) => a.name.localeCompare(b.name));
 	return skills;

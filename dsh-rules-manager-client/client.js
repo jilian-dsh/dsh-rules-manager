@@ -770,7 +770,19 @@ window.__ModuleLoader__.load({
 					const res = await rulesApi.listSkills();
 					const data = unwrap(res);
 					if (data && data.ok) {
-						setSkills(data.skills);
+						// 2026-09-14 联动 A（用户拍板）：附带 dsh-skill-scoreboard 的使用统计（同源只读 API）。
+						// 插件未装 / 请求失败 → 静默降级（不加 usage 字段，界面不渲染该徽章），不影响技能管理本身。
+						let list = data.skills;
+						try {
+							const r = await fetch("/api/skill-scoreboard", { headers: { accept: "application/json" } });
+							if (r.ok) {
+								const d = await r.json();
+								const map = {};
+								for (const row of (d && d.skills) || []) if (row && row.name) map[row.name] = row;
+								list = list.map((x) => ({ ...x, usageLoaded: true, usage: map[x.name] || null }));
+							}
+						} catch { /* scoreboard 不可用 → 降级 */ }
+						setSkills(list);
 						setSkillError("");
 					} else setSkillError((data && data.error) || "未知错误");
 				} catch (e) {
@@ -951,7 +963,11 @@ window.__ModuleLoader__.load({
 				}
 			};
 			const doDisableSkill = (name) => {
-				askConfirm(`确定禁用技能「${name}」吗？\n\n禁用 = 把它移出技能目录（内容原样保留，随时可恢复）。\n注意：需要重启 DSH 后才完全生效。`, async () => {
+				const sk = (skills || []).find((x) => x.name === name);
+				const warn = sk && sk.isProtected
+					? "\n\n⚠️ 该技能已声明为核心资产（自身 SKILL.md 的 frontmatter `protected: true`）——禁用它可能破坏依赖该技能的规则、脚本或流程（例如「先查手册」类纪律会直接断链），请确认你了解后果。"
+					: "";
+				askConfirm(`确定禁用技能「${name}」吗？\n\n禁用 = 把它移出技能目录（内容原样保留，随时可恢复）。\n注意：需要重启 DSH 后才完全生效。${warn}`, async () => {
 					try {
 						const res = await rulesApi.disableSkill(name);
 						const data = unwrap(res);
@@ -976,7 +992,11 @@ window.__ModuleLoader__.load({
 				loadDisabledSkills();
 			};
 			const doDeleteSkill = (name) => {
-				askConfirm(`确定删除技能「${name}」吗？\n\n删除 = 移入回收站（~/.dsh/.backups/trash-<时间戳>/），内容不丢失，随时可恢复。\n\n注意：需要重启 DSH 后才完全生效。`, async () => {
+				const sk = (skills || []).find((x) => x.name === name);
+				const warn = sk && sk.isProtected
+					? "\n\n⚠️ 该技能已声明为核心资产（自身 SKILL.md 的 frontmatter `protected: true`）——删除后即使可从回收站恢复，也会在其缺席期间破坏依赖它的规则、脚本或流程。"
+					: "";
+				askConfirm(`确定删除技能「${name}」吗？\n\n删除 = 移入回收站（~/.dsh/.backups/trash-<时间戳>/），内容不丢失，随时可恢复。\n\n注意：需要重启 DSH 后才完全生效。${warn}`, async () => {
 					try {
 						const res = await rulesApi.deleteSkill(name);
 						const data = unwrap(res);
@@ -1341,14 +1361,28 @@ window.__ModuleLoader__.load({
 				if (skillError) return react.createElement("div", { style: s.msgErr }, `加载失败：${skillError}`);
 				return react.createElement("div", null,
 					skillMessage ? react.createElement("div", { style: { ...s.msg, marginBottom: "8px" } }, skillMessage) : null,
-					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "技能 = 教会 AI 特定本领的说明书，存放在 ~/.dsh/skills/ 下。禁用 = 把它移到旁边的存放区（内容原样保留，可随时恢复）；删除 = 移入回收站（可恢复）。禁用或删除都需要重启 DSH 后才完全生效。"),
+					react.createElement("div", { style: { ...s.sub, marginBottom: "8px" } }, "技能 = 教会 AI 特定本领的说明书，存放在 ~/.dsh/skills/ 下。禁用 = 把它移到旁边的存放区（内容原样保留，可随时恢复）；删除 = 移入回收站（可恢复）。禁用或删除都需要重启 DSH 后才完全生效。徽章「用过 N 次 / 未使用」来自 dsh-skill-scoreboard 记分板（会话去重口径），只统计该插件装上之后的调用——「未使用」是判断某个技能是否值得保留的直接依据。"),
 					(skills || []).length === 0 ? react.createElement("div", { style: s.empty }, "尚未发现技能") : null,
 					react.createElement("div", { style: s.skillGrid, className: "rm-skill-grid" },
 						(skills || []).map((sk) => react.createElement("div", { key: sk.name, style: { ...s.card, ...s.skillCard, ...s.hoverCard }, className: "rm-hover-card" },
 							react.createElement("div", { style: s.cardHead },
 								react.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: "6px", minWidth: 0, flex: 1, flexWrap: "wrap" } },
 									react.createElement("span", { style: { ...s.cardTitle, whiteSpace: "normal", wordBreak: "break-word" } }, sk.title === sk.name ? sk.name : `${sk.title}（${sk.name}）`),
-									react.createElement("span", { style: { ...s.badge, ...s.badgeGreen, flexShrink: 0 } }, "启用")
+									react.createElement("span", { style: { ...s.badge, ...s.badgeGreen, flexShrink: 0 } }, "启用"),
+									sk.isProtected
+										? react.createElement("span", {
+											style: { ...s.badge, background: "var(--dsw-alias-bg-warning, #fff4e5)", color: "var(--dsw-alias-text-warning, #b26a00)", flexShrink: 0 },
+											title: "该技能在自身 SKILL.md 的 frontmatter 声明 protected: true —— 属核心资产（缺失会破坏既有流程或工具链）；禁用/删除会额外弹确认警示"
+										}, "⚠️ 核心")
+										: null,
+									sk.usageLoaded
+										? react.createElement("span", {
+											style: { ...s.badge, ...(sk.usage && sk.usage.count > 0 ? s.badgeGreen : s.badgeGray), flexShrink: 0 },
+											title: sk.usage
+												? `会话去重 ${sk.usage.count} 次／每次加载 ${sk.usage.loads} 次（数据源：dsh-skill-scoreboard，只统计该插件装上之后的调用）`
+												: "记分板中无此技能记录（从未被加载过）"
+										}, sk.usage && sk.usage.count > 0 ? `用过 ${sk.usage.count} 次` : "未使用")
+										: null
 								),
 								react.createElement("div", { style: { display: "flex", gap: "4px", flexWrap: "nowrap", flexShrink: 0 } },
 									skillDetail && skillDetail.name === sk.name

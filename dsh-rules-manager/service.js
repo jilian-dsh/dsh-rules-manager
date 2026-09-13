@@ -112,13 +112,11 @@ class RulesManagerService extends TypertRemoteService {
 
 	constructor(ctx) {
 		super(ctx, "rulesManager");
-		// 手动模拟 @Remote 装饰器：context.addInitializer 立即以实例为 this 执行，
-		// 使 typert-protocol 的内部 marker 表记录这些方法（gateway 据此暴露 RPC）。
-		// 注意：Remote 第一参数必须是"非字符串"（字符串会被当作 exportName 装饰器工厂），
-		// 传 null 触发直接调用分支 addMarkerInitializer(context, {kind:"direct"})。
+		// 手动模拟 @Remote 装饰器（0.1.2 适配 2026-09-08 重放：09-07 22:29 cfeda801 会话 reset --hard 曾覆盖本适配）：
+		// typert-protocol 0.1.2 中 typeof null==='object'，Remote(null,…) 落流选项分支（仅容 {mode:"stream"}）抛 TypeError。
+		// 正确形态=Remote(undefined, fakeContext)，fakeContext 需 {name, private, static, addInitializer}（kind 字段删除）。
 		for (const name of REMOTE_METHODS) {
-			Remote(null, {
-				kind: "method",
+			Remote(undefined, {
 				name,
 				private: false,
 				static: false,

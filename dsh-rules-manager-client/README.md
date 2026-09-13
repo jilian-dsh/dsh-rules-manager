@@ -56,7 +56,7 @@ npm install dsh-rules-manager dsh-rules-manager-client
 
 ## 发行固定源
 
-- **1.5.0（当前）** 固定于 main Commit `b4a4a1f`（`git checkout b4a4a1f` + 发布 bump 可复现 npm `dsh-rules-manager-client@1.5.0` 与 GitHub Release v1.5.0 同源代码）。**注：release 提交号由发布脚本自动回填。**
+- **1.5.0（当前）** 固定于 main Commit `25c8a1a`（`git checkout 25c8a1a` 可复现 npm `dsh-rules-manager-client@1.5.0` 与 GitHub Release v1.5.0 同源代码）。
 
 - **1.4.5** 固定于 main Commit `a36c9d0`（`git checkout a36c9d0` 可复现 npm `dsh-rules-manager-client@1.4.5` 与 GitHub Release v1.4.5 同源代码）。
 

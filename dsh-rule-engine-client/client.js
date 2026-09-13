@@ -74,15 +74,19 @@ window.__ModuleLoader__.load({
 
 			const load = useCallback(async () => {
 				if (!cardApi || typeof cardApi.getTurnCard !== "function") {
+					console.warn("[rule-engine] cardApi 不可用：ctx.get('remote.ruleEngine') 未解析到");
 					setState("none");
 					return;
 				}
 				try {
 					const res = unwrap(await cardApi.getTurnCard(messageId));
 					const data = (res && res.ok) ? res.card : null;
+					if (!res || res.ok !== true) console.warn("[rule-engine] getTurnCard 调用失败：", res);
+					else if (!data) console.warn("[rule-engine] 该消息无卡片记录 messageId=", messageId);
 					if (!alive.current) return;
 					if (data && data.verdict === "denied" && data.blocks && data.blocks.length > 0) {
 						setCard(data);
+						console.info("[rule-engine] 卡片已渲染 blocks=", data.blocks.length);
 						setState("ready");
 					} else {
 						setCard(null);
@@ -275,14 +279,16 @@ window.__ModuleLoader__.load({
 		async function apply(ctx) {
 			await ctx.remote.$mount(TYPERT_REMOTE);
 			// 取 remote.ruleEngine 服务实例（普通对象，规避 proxy 守卫）
-			let cardApi = null;
-			try { cardApi = ctx.get("remote.ruleEngine"); } catch (e) { cardApi = null; }
+			// 惰性解析：不在 apply 时快照（快照为 null 会永久静默）
+			const resolveCardApi = () => {
+				try { return ctx.get("remote.ruleEngine") || null; } catch (e) { return null; }
+			};
 			ctx.slots.inject("conversation.chat.assistant-actions", () => {
 				const dispose = ctx.slots.register({
 					name: "conversation.chat.assistant-actions",
 					id: "rule-turn-card",
 					order: 20, // 官方 feedback = 10；本卡片在其右侧（list 多 entry 共存）
-					inject: () => ({ cardApi })
+					inject: () => ({ cardApi: resolveCardApi() })
 				}, TurnCardAction);
 				return () => { dispose(); };
 			});

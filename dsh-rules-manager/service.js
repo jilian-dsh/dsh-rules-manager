@@ -251,8 +251,7 @@ class RulesManagerService extends TypertRemoteService {
 
 	/** 规则清单（含分区/编号/标题/正文原文），供可视化编辑 */
 	async listRules() {
-		const { lines, rules, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules } = await loadRules();
 		return {
 			ok: true,
 			rules: rules.map((r) => ruleView(r, lines))
@@ -260,8 +259,7 @@ class RulesManagerService extends TypertRemoteService {
 	}
 	/** 新增规则（自动编号 + 来源标注 + 自动备份；P1-5：未声明执行等级时自动补 D 级并返回提示） */
 	async addRule(title, body) {
-		const { lines, rules, bom, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules, bom } = await loadRules();
 		const op = addRuleOp(lines, rules, title, body);
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
@@ -269,8 +267,7 @@ class RulesManagerService extends TypertRemoteService {
 	}
 	/** 修改规则正文（标题与来源保持不变） */
 	async editRule(index, body) {
-		const { lines, rules, bom, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules, bom } = await loadRules();
 		const op = editRuleOp(lines, rules, index, body);
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
@@ -278,8 +275,7 @@ class RulesManagerService extends TypertRemoteService {
 	}
 	/** 删除规则（编号不复用） */
 	async deleteRule(index) {
-		const { lines, rules, bom, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules, bom } = await loadRules();
 		const op = deleteRuleOp(lines, rules, index);
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
@@ -287,8 +283,7 @@ class RulesManagerService extends TypertRemoteService {
 	}
 	/** 禁用规则：从 AGENTS.md 移除并原样保存到 disabled-rules.json（可恢复） */
 	async disableRule(index) {
-		const { lines, rules, bom, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules, bom } = await loadRules();
 		const op = disableRuleOp(lines, rules, index);
 		if (op.error) return { ok: false, error: op.error };
 		const backup = await saveLines(op.lines, bom);
@@ -302,8 +297,7 @@ class RulesManagerService extends TypertRemoteService {
 		const disabled = await loadDisabledRules();
 		const entry = disabled.find((d) => String(d.index) === String(index));
 		if (!entry) return { ok: false, error: `没有已禁用的规则 ${index}` };
-		const { lines, rules, bom, missing } = await loadRules();
-		if (missing) return { ok: false, error: "未找到 AGENTS.md（$DSH_HOME/AGENTS.md）" };
+		const { lines, rules, bom } = await loadRules();
 		const nextLines = [...lines];
 		const taken = rules.some((r) => String(r.index) === String(entry.index));
 		const bodyLines = (entry.body || "").split("\n");

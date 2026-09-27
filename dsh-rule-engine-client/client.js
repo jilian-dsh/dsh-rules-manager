@@ -14,6 +14,9 @@ window.__ModuleLoader__.load({
 		let { useState, useEffect, useCallback, useRef } = react;
 
 		// ── 1. Remote 贡献（host 面权威；client 只做传输）──────────────
+		// 同 dsh-rules-manager-client：DSH 0.1.7 的 typert validateCodec 要求
+		// mode:"strict" 的 codec 必须带 create() 工厂，故每个 codec 均补
+		// create: () => passthrough（保持「不做强校验」的原意）。
 		const passthrough = { parse: (v) => v };
 		const TYPERT_REMOTE = {
 			package: "rule-engine",
@@ -25,9 +28,9 @@ window.__ModuleLoader__.load({
 					method: "getTurnCard",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "messageId", wire: "messageId", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTurnCard:messageId", schema: passthrough } }
+						{ name: "messageId", wire: "messageId", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTurnCard:messageId", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTurnCard:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTurnCard:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -37,12 +40,12 @@ window.__ModuleLoader__.load({
 					method: "rateTurnCard",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "messageId", wire: "messageId", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:messageId", schema: passthrough } },
-						{ name: "verdict", wire: "verdict", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:verdict", schema: passthrough } },
-						{ name: "expectedVerdict", wire: "expectedVerdict", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:expectedVerdict", schema: passthrough } },
-						{ name: "blockIndex", wire: "blockIndex", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:blockIndex", schema: passthrough } }
+						{ name: "messageId", wire: "messageId", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:messageId", schema: passthrough, create: () => passthrough } },
+						{ name: "verdict", wire: "verdict", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:verdict", schema: passthrough, create: () => passthrough } },
+						{ name: "expectedVerdict", wire: "expectedVerdict", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:expectedVerdict", schema: passthrough, create: () => passthrough } },
+						{ name: "blockIndex", wire: "blockIndex", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:blockIndex", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/rateTurnCard:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				// ── B0（2026-09-14）：引擎自带设置页所需 Remote（自 rules-manager-client 迁来的声明）──
@@ -53,7 +56,7 @@ window.__ModuleLoader__.load({
 					method: "getStatus",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getStatus:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getStatus:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -63,7 +66,7 @@ window.__ModuleLoader__.load({
 					method: "checkUpdate",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/checkUpdate:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/checkUpdate:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -73,9 +76,9 @@ window.__ModuleLoader__.load({
 					method: "getAuditLog",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "n", wire: "n", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:n", schema: passthrough } }
+						{ name: "n", wire: "n", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:n", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getAuditLog:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -85,7 +88,7 @@ window.__ModuleLoader__.load({
 					method: "getTaskContractConfig",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTaskContractConfig:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/getTaskContractConfig:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -95,9 +98,9 @@ window.__ModuleLoader__.load({
 					method: "setTaskContractConfig",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "partial", wire: "partial", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:partial", schema: passthrough } }
+						{ name: "partial", wire: "partial", source: "json", codec: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:partial", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/setTaskContractConfig:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				},
 				{
@@ -107,7 +110,7 @@ window.__ModuleLoader__.load({
 					method: "whitelistStatus",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/whitelistStatus:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rule-engine#ruleEngine/whitelistStatus:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "dsh-rule-engine/lib/service.js", line: 1, column: 1 }
 				}
 			]

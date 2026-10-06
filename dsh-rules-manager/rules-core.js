@@ -89,7 +89,13 @@ async function backupAgents(file) {
 	// 时间戳含毫秒（slice 到 23）：避免同一秒内多次操作互相覆盖备份
 	const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 23);
 	const dest = join(dir, `AGENTS.md-${stamp}.bak`);
-	await copyFile(file, dest);
+	try {
+		await copyFile(file, dest);
+	} catch (error) {
+		// 首次创建：AGENTS.md 尚不存在，没有内容可备份——放行，让 saveLines 建文件
+		if (error.code === "ENOENT") return "";
+		throw error;
+	}
 	// 超额清理：移入回收站（不永久删除，可恢复）
 	await pruneBackups();
 	return dest;

@@ -35,6 +35,12 @@ window.__ModuleLoader__.load({
 
 		// ── 1. Remote 贡献：rulesManager 服务（client 端调用面）──────────────
 		// schema 用 passthrough：client 侧只做传输，不做强校验（host 端是权威）。
+		// DSH 0.1.7 起 @deepseek-ai/dsh-typert-registry 的 validateCodec 要求
+		// mode:"strict" 的 codec 必须带 create() 工厂；而 @deepseek-ai/dsh-api-gateway
+		// 的 requireStrictInputs 又要求参数 codec 必须是 strict —— 二者夹击之下不能
+		// 改用 src-json，只能补 create。返回 passthrough 即保持「不做强校验」的原意。
+		// 缺它时 ctx.remote.$mount() 抛 "strict codec has no create() factory"，
+		// 客户端 fiber 落到 failed，整个 Web GUI 变成 "Failed to load plugins"。
 		const passthrough = { parse: (v) => v };
 		const TYPERT_REMOTE = {
 			package: "rules-manager",
@@ -46,7 +52,7 @@ window.__ModuleLoader__.load({
 					method: "listRules",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listRules:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listRules:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 30, column: 1 }
 				},
 				{
@@ -56,10 +62,10 @@ window.__ModuleLoader__.load({
 					method: "addRule",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "title", wire: "title", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:title", schema: passthrough } },
-						{ name: "body", wire: "body", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:body", schema: passthrough } }
+						{ name: "title", wire: "title", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:title", schema: passthrough, create: () => passthrough } },
+						{ name: "body", wire: "body", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:body", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/addRule:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 36, column: 1 }
 				},
 				{
@@ -69,10 +75,10 @@ window.__ModuleLoader__.load({
 					method: "editRule",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:index", schema: passthrough } },
-						{ name: "body", wire: "body", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:body", schema: passthrough } }
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:index", schema: passthrough, create: () => passthrough } },
+						{ name: "body", wire: "body", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:body", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/editRule:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 44, column: 1 }
 				},
 				{
@@ -82,9 +88,9 @@ window.__ModuleLoader__.load({
 					method: "deleteRule",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteRule:index", schema: passthrough } }
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteRule:index", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteRule:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteRule:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 52, column: 1 }
 				},
 				{
@@ -94,9 +100,9 @@ window.__ModuleLoader__.load({
 					method: "disableRule",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:index", schema: passthrough } }
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:index", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableRule:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 60, column: 1 }
 				},
 				{
@@ -106,9 +112,9 @@ window.__ModuleLoader__.load({
 					method: "enableRule",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:index", schema: passthrough } }
+						{ name: "index", wire: "index", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:index", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableRule:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 68, column: 1 }
 				},
 				{
@@ -118,7 +124,7 @@ window.__ModuleLoader__.load({
 					method: "listDisabledRules",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledRules:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledRules:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 76, column: 1 }
 				},
 				{
@@ -128,7 +134,7 @@ window.__ModuleLoader__.load({
 					method: "listBackups",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listBackups:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listBackups:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 292, column: 1 }
 				},
 				{
@@ -138,9 +144,9 @@ window.__ModuleLoader__.load({
 					method: "restoreBackup",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/restoreBackup:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 300, column: 1 }
 				},
 				{
@@ -150,7 +156,7 @@ window.__ModuleLoader__.load({
 					method: "pruneBackups",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/pruneBackups:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/pruneBackups:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 308, column: 1 }
 				},
 				{
@@ -160,7 +166,7 @@ window.__ModuleLoader__.load({
 					method: "listCommands",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listCommands:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listCommands:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 60, column: 1 }
 				},
 				{
@@ -170,7 +176,7 @@ window.__ModuleLoader__.load({
 					method: "listUserCommands",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listUserCommands:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listUserCommands:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 68, column: 1 }
 				},
 				{
@@ -180,10 +186,10 @@ window.__ModuleLoader__.load({
 					method: "saveUserCommand",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:name", schema: passthrough } },
-						{ name: "prompt", wire: "prompt", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:prompt", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:name", schema: passthrough, create: () => passthrough } },
+						{ name: "prompt", wire: "prompt", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:prompt", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/saveUserCommand:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 76, column: 1 }
 				},
 				{
@@ -193,9 +199,9 @@ window.__ModuleLoader__.load({
 					method: "deleteUserCommand",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteUserCommand:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteUserCommand:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteUserCommand:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteUserCommand:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 84, column: 1 }
 				},
 				{
@@ -205,9 +211,9 @@ window.__ModuleLoader__.load({
 					method: "disableUserCommand",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableUserCommand:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 92, column: 1 }
 				},
 				{
@@ -217,9 +223,9 @@ window.__ModuleLoader__.load({
 					method: "enableUserCommand",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableUserCommand:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 100, column: 1 }
 				},
 				{
@@ -229,7 +235,7 @@ window.__ModuleLoader__.load({
 					method: "listSkills",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listSkills:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listSkills:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 108, column: 1 }
 				},
 				{
@@ -239,9 +245,9 @@ window.__ModuleLoader__.load({
 					method: "getSkill",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/getSkill:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 116, column: 1 }
 				},
 				{
@@ -251,9 +257,9 @@ window.__ModuleLoader__.load({
 					method: "disableSkill",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/disableSkill:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 124, column: 1 }
 				},
 				{
@@ -263,9 +269,9 @@ window.__ModuleLoader__.load({
 					method: "enableSkill",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/enableSkill:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 132, column: 1 }
 				},
 				{
@@ -275,9 +281,9 @@ window.__ModuleLoader__.load({
 					method: "deleteSkill",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:name", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:name", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/deleteSkill:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 140, column: 1 }
 				},
 				{
@@ -287,7 +293,7 @@ window.__ModuleLoader__.load({
 					method: "listDisabledSkills",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledSkills:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/listDisabledSkills:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 148, column: 1 }
 				},
 				{
@@ -297,10 +303,10 @@ window.__ModuleLoader__.load({
 					method: "setSkillProtected",
 					invocation: { kind: "direct" },
 					parameters: [
-						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:name", schema: passthrough } },
-						{ name: "value", wire: "value", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:value", schema: passthrough } }
+						{ name: "name", wire: "name", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:name", schema: passthrough, create: () => passthrough } },
+						{ name: "value", wire: "value", source: "json", codec: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:value", schema: passthrough, create: () => passthrough } }
 					],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/setSkillProtected:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 470, column: 1 }
 				},
 				{
@@ -310,7 +316,7 @@ window.__ModuleLoader__.load({
 					method: "whitelistStatus",
 					invocation: { kind: "direct" },
 					parameters: [],
-					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/whitelistStatus:result", schema: passthrough },
+					result: { mode: "strict", typeSymbol: "rules-manager#rulesManager/whitelistStatus:result", schema: passthrough, create: () => passthrough },
 					sourceLocation: { file: "profiles/rules-manager/service.js", line: 156, column: 1 }
 				}
 			]

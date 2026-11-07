@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "mode": "build-source",
+  "plugin": {
+    "name": "",
+    "summary": ""
+  },
+  "targetUsers": [],
+  "problem": "",
+  "whyNow": "",
+  "trigger": "",
+  "outcome": {
+    "expectedResult": "",
+    "acceptanceCriteria": [],
+    "nonGoals": []
+  },
+  "capabilities": [],
+  "presentation": {
+    "tools": [],
+    "defaultCard": "derive",
+    "customClientCards": false,
+    "replayRequired": true
+  },
+  "data": {
+    "read": [],
+    "write": []
+  },
+  "ui": {
+    "needed": false,
+    "surface": "none",
+    "notes": ""
+  },
+  "external": {
+    "network": "none",
+    "services": [],
+    "processes": [],
+    "accounts": [],
+    "credentials": "none",
+    "credentialHandling": "none",
+    "devices": []
+  },
+  "profile": {
+    "target": "",
+    "mutations": [],
+    "restart": false,
+    "restartOwner": "none"
+  },
+  "security": {
+    "sensitiveData": [],
+    "exposure": "local",
+    "authentication": "none",
+    "encryption": "local-only",
+    "forbiddenActions": [
+      "modify-dsh-core",
+      "modify-official-packages",
+      "shadow-official-inventory",
+      "unconfirmed-real-profile-write"
+    ]
+  },
+  "constraints": {
+    "mustUse": [],
+    "mustNot": [],
+    "privacy": [],
+    "compatibility": []
+  },
+  "delivery": {
+    "workspace": "",
+    "repository": "",
+    "license": "",
+    "releaseTarget": "none",
+    "artifactType": "dsh-bundle",
+    "publicDownload": false,
+    "metadataAuthority": "release-manifest",
+    "sourceLinkRequired": true,
+    "licenseNoticeRequired": true,
+    "marketplace": {
+      "target": "none",
+      "listingIntent": "none",
+      "repositoryUrl": "",
+      "manifestPath": "package.json",
+      "installPath": "",
+      "immutableCommit": "",
+      "categories": []
+    }
+  },
+  "acceptance": {
+    "targetEvidence": "E3",
+    "realProfileAllowed": false,
+    "externalAcceptanceAllowed": false
+  },
+  "notes": ""
+}

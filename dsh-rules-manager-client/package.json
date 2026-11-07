@@ -1,0 +1,49 @@
+{
+  "name": "dsh-rules-manager-client",
+  "version": "1.5.0",
+  "description": "DeepSeek Harness (dsh) settings panel: '规则、命令与技能' — visual rule editing, slash command list, user-defined custom command management (with {input} argument support, disable/enable), skill management (view/disable/enable/delete-to-trash), and backup restore (client bundle for dsh-rules-manager)",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "settings",
+    "rules",
+    "commands",
+    "agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilian-dsh/dsh-rules-manager.git"
+  },
+  "homepage": "https://github.com/jilian-dsh/dsh-rules-manager",
+  "engines": {
+    "node": ">=22"
+  },
+  "dshCompat": {
+    "min": "0.1.0-rc.3",
+    "max": "0.2.0"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

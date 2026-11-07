@@ -1,0 +1,15 @@
+{
+  "id": "replace-with-unique-candidate-id",
+  "name": "Replace with project display name",
+  "description": "Replace with a bounded discovery-only description.",
+  "repositoryUrl": "https://github.com/owner/repository",
+  "defaultBranch": "main",
+  "latestCommit": null,
+  "sourceUpdatedAt": null,
+  "discoveredAt": "replace-with-ISO-date-time",
+  "discoverySources": ["github-topic"],
+  "topics": ["dsh-plugin"],
+  "status": "discovered",
+  "route": "direct-review",
+  "statusReason": null
+}

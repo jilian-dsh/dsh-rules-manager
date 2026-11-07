@@ -1,0 +1,60 @@
+{
+  "name": "dsh-rules-manager",
+  "version": "1.6.0",
+  "description": "DeepSeek Harness (dsh) rules, commands & skills manager: /rules slash command, settings panel with visual rule editing, command list, user-defined custom commands (with {input} argument support, disable/enable), skill management (view/disable/enable/delete-to-trash), and backup restore. Installable as an official dsh bundle.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./service.js": "./service.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "service.js",
+    "rules-core.js",
+    "skills-core.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "rules",
+    "commands",
+    "agent"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilian-dsh/dsh-rules-manager.git"
+  },
+  "homepage": "https://github.com/jilian-dsh/dsh-rules-manager",
+  "engines": {
+    "node": ">=22"
+  },
+  "dshCompat": {
+    "min": "0.1.0-rc.3",
+    "max": "0.2.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "dsh-rules-manager-client": "^1.4.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0 <5.0.0",
+    "@deepseek-ai/dsh-home-paths": ">=0.1.0-rc.3 <0.2.0 || >=0.1.1-rc.0 <0.2.0",
+    "@deepseek-ai/dsh-typert-protocol": ">=0.1.0-rc.3 <0.2.0 || >=0.1.1-rc.0 <0.2.0"
+  },
+  "scripts": {
+    "test": "node test-service.mjs && node test-local.mjs"
+  }
+}

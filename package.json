@@ -54,9 +54,9 @@
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.0 <5.0.0",
-    "@deepseek-ai/dsh-home-paths": ">=0.1.0-rc.3 <0.2.0 || >=0.1.1-rc.0 <0.2.0",
+    "@deepseek-ai/dsh-home-paths": ">=0.1.0-rc.3 <0.3.0-0",
     "@deepseek-ai/dsh-llm": ">=0.1.5-rc.3 <0.3.0-0",
-    "@deepseek-ai/dsh-typert-protocol": ">=0.1.0-rc.3 <0.2.0 || >=0.1.1-rc.0 <0.2.0"
+    "@deepseek-ai/dsh-typert-protocol": ">=0.1.0-rc.3 <0.3.0-0"
   },
   "scripts": {
     "test": "node test-service.mjs && node test-local.mjs"

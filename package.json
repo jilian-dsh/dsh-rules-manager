@@ -1,16 +1,18 @@
 {
   "name": "dsh-rules-manager",
-  "version": "1.6.1",
-  "description": "DeepSeek Harness (dsh) rules, commands & skills manager: /rules slash command, settings panel with visual rule editing, command list, user-defined custom commands (with {input} argument support, disable/enable), skill management (view/disable/enable/delete-to-trash), and backup restore. Installable as an official dsh bundle.",
+  "version": "1.7.0",
+  "description": "DeepSeek Harness (dsh) rules, commands & skills manager: /rules slash command, settings panel with visual rule editing, command list, user-defined custom commands (with {input} argument support, disable/enable), skill management (view/disable/enable/delete-to-trash), and backup restore. Installable as an official dsh bundle (single package: host + web client).",
   "type": "module",
   "main": "index.js",
   "exports": {
     ".": "./index.js",
+    "./client": "./client.js",
     "./service.js": "./service.js",
     "./package.json": "./package.json"
   },
   "files": [
     "index.js",
+    "client.js",
     "service.js",
     "rules-core.js",
     "skills-core.js",
@@ -45,10 +47,10 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
     }
-  },
-  "dependencies": {
-    "dsh-rules-manager-client": "^1.4.1"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": ">=4.0.0 <5.0.0",

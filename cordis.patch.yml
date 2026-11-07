@@ -7,5 +7,3 @@
       name: 'dsh-rules-manager'
     - id: rules-manager-service
       name: 'dsh-rules-manager/service.js'
-    - id: rules-manager-client
-      name: 'dsh-rules-manager-client'

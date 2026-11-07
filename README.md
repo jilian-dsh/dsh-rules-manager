@@ -1,7 +1,7 @@
 # dsh-rules-manager（规则、命令与技能管理）
 
 ![license](https://img.shields.io/github/license/jilian-dsh/dsh-rules-manager)
-![version](https://img.shields.io/badge/version-1.6.1-blue)
+![version](https://img.shields.io/badge/version-1.7.0-blue)
 ![node](https://img.shields.io/badge/node-%3E%3D22-green)
 ![topic](https://img.shields.io/badge/topic-dsh--plugin-blue)
 ![lang](https://img.shields.io/badge/lang-中文%20%7C%20English-lightgrey)
@@ -10,7 +10,7 @@
 >
 > ⚡ 规则保存在 `$DSH_HOME/AGENTS.md`，任何修改**实时生效**（DSH 自动热加载），每次修改前**自动备份**，可随时**一键恢复到任意备份时刻**。
 >
-> 当前版本 **1.6.1**（技能列表过滤无 `SKILL.md` 的目录；技能卡片新增「用过 N 次／未使用」徽章与「⚠️ 核心」保护标记及开/关按钮；修正 CRLF 格式技能描述解析；0.2.2 适配＝仅版本号）。
+> 当前版本 **1.7.0**（单包双面合并：设置面板 client 并入本包，新增 `dsh.client` 与 `exports["./client"]`；装本包即含设置页，不再需要 `dsh-rules-manager-client`。此前版本含技能使用统计、使用徽章与核心保护、CRLF 解析修复、0.2.2 适配）。
 
 ## ✨ 功能
 
@@ -229,6 +229,7 @@ node test-local.js     # 33 项断言：/rules 命令全场景（含规则体检
 
 | 版本 | 日期 | 要点 |
 |---|---|---|
+| **1.7.0** | 2026-11-07 | 单包双面合并：设置面板 client 并入本包（`dsh.client`＋`exports["./client"]`）；装本包即含设置页，旧 `dsh-rules-manager-client` 废弃；本包从 `projects\oss` monorepo 拆为独立仓 |
 | **1.6.1** | 2026-11-06 | 0.2.2 适配：服务端无设置页/导航引用，未改码；本版仅版本号变更 |
 | **1.6.0** | 2026-09-14 | 技能列表过滤无 `SKILL.md` 的目录；新增技能使用次数统计（记分板口径，`dsh-skill-scoreboard`）与核心资产保护机制——**是否保护由技能自声明**（其 `SKILL.md` frontmatter 写 `protected: true`），面板可标记/取消；修复 CRLF 换行技能描述解析（影响 9 个技能） |
 | **1.5.4** | 2026-09-07 | 规则 / 命令 / 技能三面板稳定版；技能管理支持查看、禁用/启用、删除进回收站 |

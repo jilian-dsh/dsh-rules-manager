@@ -253,3 +253,11 @@ node test-local.js     # 33 项断言：/rules 命令全场景（含规则体检
 ---
 
 *本项目为社区插件，与 DeepSeek Harness 官方仓库相互独立。发现方式：GitHub 话题 `dsh-plugin`。*
+
+## 🔁 从旧版迁移（1.7.0 起单包）
+
+若你此前装过 `dsh-rules-manager-client`，按三步迁移：
+
+1. **删旧依赖**：从 profile 依赖里移除 `dsh-rules-manager-client`；
+2. **装新包**：`dsh plugin --profile <你的profile> add dsh-rules-manager`（1.7.0 已含设置面板，无需另装 client）；
+3. **重启 DSH**：设置页「规则、命令与技能」随主包加载。

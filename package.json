@@ -13,6 +13,7 @@
   "files": [
     "index.js",
     "client.js",
+    "lib",
     "service.js",
     "rules-core.js",
     "skills-core.js",

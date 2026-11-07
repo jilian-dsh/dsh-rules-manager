@@ -134,7 +134,7 @@ AGENTS.md 支持一个**自由区域**：被 `<!-- free-zone:start -->` / `<!-- 
 - **网络**：**无**。本插件不发起任何网络请求。
 - **命令执行**：**无**。本插件不执行系统命令或子进程；"命令"指 DSH 生态的斜杠命令（如 `/rules`）数据操作。
 - **凭据**：**无**。不读取环境变量、API Key、令牌等凭据。
-- **依赖**：`dsh-rules-manager-client`（配套设置面板 UI，与主包同仓库、同发布）；peer 依赖 `@deepseek-ai/cordis`、`@deepseek-ai/dsh-home-paths`、`@deepseek-ai/dsh-typert-protocol`、`@deepseek-ai/dsh-llm`（DSH 官方运行时接口）。`package.json` 无安装期生命周期脚本（无 preinstall/install/postinstall/prepare）。
+- **依赖**：单包安装，设置面板随包加载（client 已并入本包，`dsh.client` ＋ `exports["./client"]`）；peer 依赖 `@deepseek-ai/cordis`、`@deepseek-ai/dsh-home-paths`、`@deepseek-ai/dsh-typert-protocol`、`@deepseek-ai/dsh-llm`（DSH 官方运行时接口）。`package.json` 无安装期生命周期脚本（无 preinstall/install/postinstall/prepare）。
 - **外部服务**：无。
 - **失败边界**：规则修改**先备份后写入**，写失败保持原文件；技能移动采用"整目录改名"，目标已存在时**拒绝**（绝不覆盖）；恢复备份前会把当前文件再备份一次（双保险）；所有操作失败均不静默——详见上文「🛡️ 安全设计」与下文「⚠️ 已知问题与踩坑」。
 - **权限等级**（保守自评）：**高**（可写用户规则/命令/技能数据并移动技能目录）——建议安装前阅读「安全设计」章节并按需二次审查。
@@ -156,7 +156,7 @@ AGENTS.md 支持一个**自由区域**：被 `<!-- free-zone:start -->` / `<!-- 
 dsh plugin --profile web add dsh-rules-manager
 ```
 
-dsh 会自动：安装本包及其依赖（含配套面板 `dsh-rules-manager-client`）、把本包追加进该 profile 的 `dsh.profile.bundles`、加载包内 `cordis.patch.yml` 挂载三个插件行（host 命令 / Remote 服务 / client 面板）。重启 DSH 后设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
+dsh 会自动：安装本包（单包，设置面板随包加载）、把本包追加进该 profile 的 `dsh.profile.bundles`、加载包内 `cordis.patch.yml` 挂载 host 命令与 Remote 服务（客户端由 `dsh.client` 发现）。重启 DSH 后设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
 
 卸载：
 
@@ -168,11 +168,11 @@ dsh plugin --profile web remove dsh-rules-manager
 
 ### 方式二：npm 安装 + 手动装配（自动管理依赖，保持原装配方式）
 
-本插件发布在 npm，包名 `dsh-rules-manager`（配套面板 `dsh-rules-manager-client`）：
+本插件发布在 npm，包名 `dsh-rules-manager`（**单包**：host ＋ 设置面板 client）：
 
 ```sh
 # 在 $DSH_HOME/profiles/web 目录下安装（或你配置的插件目录）
-npm install dsh-rules-manager dsh-rules-manager-client
+npm install dsh-rules-manager
 ```
 
 然后在 `$DSH_HOME/profiles/web/cordis.patch.yml` 装配（见下方「DSH 插件装配三步」第 2 步，host 引用改成 npm 包名），重启 DSH 即可。
@@ -183,7 +183,7 @@ npm install dsh-rules-manager dsh-rules-manager-client
 
 本仓库包含两个包，都需要装配：
 
-1. **拷贝**：把 `dsh-rules-manager/` 放到 `$DSH_HOME/profiles/web/` 下；把 `dsh-rules-manager-client/` 放到 `$DSH_HOME/profiles/node_modules/` 下；
+1. **拷贝**：把 `dsh-rules-manager/` 放到 `$DSH_HOME/profiles/web/` 下；
 2. **装配**：在 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加：
 
    ```yaml
@@ -193,7 +193,6 @@ npm install dsh-rules-manager dsh-rules-manager-client
        - id: rules-manager-service
          name: './rules-manager/service.js'
        - id: rules-manager-client
-         name: 'dsh-rules-manager-client'
    ```
 
 3. **重启** DSH（Electron 窗口 ✕ → 重新打开）。设置页出现「规则、命令与技能」，聊天框可用 `/rules`。
@@ -207,7 +206,6 @@ dsh-rules-manager/              host 插件（纯 Node，无需构建）
 ├── index.js                    /rules 斜杠命令（聊天框管理规则）
 ├── service.js                  Remote 服务（TypertRemoteService，供设置面板调用）
 ├── rules-core.js               共享核心：AGENTS.md 解析 / 备份 / 增删改
-dsh-rules-manager-client/       client 插件（浏览器 bundle）
 ├── index.js                    host 面占位入口
 └── client.js                   设置页「规则、命令与技能」面板（手写 __ModuleLoader__ bundle）
 ```
